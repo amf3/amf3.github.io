@@ -12,3 +12,4 @@ Content is too be determined.
 
 Okay lets see how what this looks like.
 
+This is a [link](./test2.html)
