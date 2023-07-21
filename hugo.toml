@@ -1,0 +1,5 @@
+baseURL = 'http://amf3.github.io/'
+languageCode = 'en-us'
+title = 'Adam Faris'
+publishDir = 'docs'
+theme = 'ananke'
