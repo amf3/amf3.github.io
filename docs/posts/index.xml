@@ -1,20 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Posts on Adam Faris</title>
+    <title>posts on Adam Faris</title>
     <link>http://amf3.github.io/posts/</link>
-    <description>Recent content in Posts on Adam Faris</description>
+    <description>Recent content in posts on Adam Faris</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
-    <lastBuildDate>Thu, 20 Jul 2023 23:44:36 -0700</lastBuildDate><atom:link href="http://amf3.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>My First Post</title>
-      <link>http://amf3.github.io/posts/my-first-post/</link>
-      <pubDate>Thu, 20 Jul 2023 23:44:36 -0700</pubDate>
-      
-      <guid>http://amf3.github.io/posts/my-first-post/</guid>
-      <description>Hello World! This is a post</description>
-    </item>
-    
+    <language>en-us</language><atom:link href="http://amf3.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>
