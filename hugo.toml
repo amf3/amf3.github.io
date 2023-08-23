@@ -5,21 +5,15 @@ publishDir = 'docs'
 theme = 'PaperMod'
 
 [[menu.main]]
-identifier = "search"
-name = "search"
-url = "search/"
-weight = 5
-
-[[menu.main]]
-identifier = "posts"
-name = "posts"
-url = "/posts/"
-weight = 10
-
-[[menu.main]]
 identifier = "articles"
 name = "articles"
 url = "/articles/"
+weight = 10
+
+[[menu.main]]
+identifier = "search"
+name = "search"
+url = "search/"
 weight = 20
 
 [[menu.main]]
