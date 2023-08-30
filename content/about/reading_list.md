@@ -1,7 +1,7 @@
 ---
 title: "Reading Lists"
 date: 2023-08-20T22:45:23-07:00
-draft: true
+draft: false
 ---
 
 ## Intro
@@ -32,7 +32,7 @@ observability, or even incident management.
 
 The following is a list of of books that I've found helpful.
 
-* *Working Effectively with Legacy Code, Michael C Feathers
+* Working Effectively with Legacy Code, Michael C Feathers
 * The Clean Coder: A Code of Conduct for Professional Programmers, Robert C Martin
 * Linux Kernel Development: Robert Love
 
