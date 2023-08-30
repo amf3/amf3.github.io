@@ -8,13 +8,24 @@
     <language>en-us</language>
     <lastBuildDate>Fri, 25 Aug 2023 07:38:23 -0700</lastBuildDate><atom:link href="http://amf3.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Elastic Block Store Observations</title>
+      <title>Elastic Block Store Design for Home Lab Use</title>
       <link>http://amf3.github.io/articles/arch/aws_ebs/ebs/</link>
       <pubDate>Fri, 25 Aug 2023 07:38:23 -0700</pubDate>
       
       <guid>http://amf3.github.io/articles/arch/aws_ebs/ebs/</guid>
-      <description>Intro I have a small home lab that I use for testing differnet scenarios. Lately I have been choosing a distributed storage solution for use at home. Usually I look at industry and scale down the solution. This has lead to conversations with colleages and the question of &amp;ldquo;How did Amazon Web Services implement their Elastic Block Store offering?&amp;rdquo;.
+      <description>Intro I have a small home lab that I use for testing different software stacks. Lately I have been choosing a distributed storage solution for use at home. Usually I look at industry and scale down the solution. This has lead to conversations with colleagues and the question of &amp;ldquo;How did Amazon Web Services implement their Elastic Block Store offering?&amp;rdquo;.
 Background There are solutions that provide network storage like iSCSI, CIFS, or NFS.</description>
+    </item>
+    
+    <item>
+      <title>Reading Lists</title>
+      <link>http://amf3.github.io/about/reading_list/</link>
+      <pubDate>Sun, 20 Aug 2023 22:45:23 -0700</pubDate>
+      
+      <guid>http://amf3.github.io/about/reading_list/</guid>
+      <description>Intro I&amp;rsquo;ll occasionally browse [Hacker News[(https://news.ycombinator.com) or Lobsters for industry news. I typically find more value from subscribing to newsletters.
+Newsletters The newsletter owners have done a great job of not spaming the list. Usually they arrive in the inbox on Sunday morning so it&amp;rsquo;s good timing to read them while relaxing with a cup of coffee. While there is some overlap in topics, the articles themselves don&amp;rsquo;t overlap.
+Devops weekly Devops Weekly is a great collection of recent articles that cover topics like deployments, provisioning, observability, or even incident management.</description>
     </item>
     
     <item>
