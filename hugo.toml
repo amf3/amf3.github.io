@@ -32,7 +32,6 @@ taxonomy = ['html']
 term = ['html']
 
 [params]
-env = 'production'
 ShowBreadCrumbs = 'false'
 ShowShareButtons = 'true'
 ShareButtons = ['rss']
