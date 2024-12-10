@@ -1,20 +1,21 @@
-baseURL = 'http://amf3.github.io/'
+baseURL = 'https://amf3.github.io/'
 languageCode = 'en-us'
 title = 'Adam Faris'
 publishDir = 'docs'
 theme = 'PaperMod'
+enableRobotsTXT = 'true'
 
 [[menu.main]]
 identifier = "articles"
 name = "articles"
 url = "/articles/"
-weight = 10
+weight = 20
 
 [[menu.main]]
 identifier = "search"
 name = "search"
 url = "search/"
-weight = 20
+weight = 10
 
 [[menu.main]]
 identifier = "about"
@@ -23,7 +24,20 @@ url = "/about/"
 weight = 30
 
 [outputs]
-home = [ "HTML", "RSS", "JSON" ]
+home = ['html']
+page = ['html']
+rss = ['rss']
+section = ['html', 'rss']
+taxonomy = ['html']
+term = ['html']
+
+[params]
+env = 'production'
+ShowBreadCrumbs = 'false'
+ShowShareButtons = 'true'
+ShareButtons = ['rss']
+ShowFullTextinRSS = 'true'
+mainSections = ['articles']
 
 [params.fuseOpts]
 isCaseSensitive = false
@@ -33,7 +47,10 @@ distance = 1_000
 threshold = 0.4
 minMatchCharLength = 0
 keys = [ "title", "permalink", "summary", "content" ]
+  
+[[params.socialIcons]]
+name = 'rss'
+url = 'https://amf3.github.io/index.xml'
 
-[params]
-ShowBreadCrumbs = false
-ShowShareButtons = false
+[markup.goldmark.renderer]
+unsafe = false
