@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Adam Faris</title>
+    <link>https://amf3.github.io/</link>
+    <description>Recent content on Adam Faris</description>
+    <generator>Hugo -- 0.139.4</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 17 Aug 2023 23:39:33 -0700</lastBuildDate>
+    <atom:link href="https://amf3.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Who, What, and Why</title>
+      <link>https://amf3.github.io/about/about/</link>
+      <pubDate>Thu, 17 Aug 2023 23:39:33 -0700</pubDate>
+      <guid>https://amf3.github.io/about/about/</guid>
+      <description>&lt;h3 id=&#34;who&#34;&gt;Who&lt;/h3&gt;
+&lt;p&gt;I&amp;rsquo;m Adam Faris and my pronouns are he,him,his. I work in computer operations at companies in the
+San Francisco Bay Area and live nearby.  Presently I manage a data processing platform and work in a
+large on-premise Linux environment where we use Java, Python, &amp;amp; Go as application languages. The
+different langauges becomes an interesting mix of challenges in itself; along with the normal
+day to day problems.&lt;/p&gt;
+&lt;p&gt;Outside of work, I enjoy working with my hands by maintaining a vegatable garden and DIY home repair.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<h3 id="who">Who</h3>
+<p>I&rsquo;m Adam Faris and my pronouns are he,him,his. I work in computer operations at companies in the
+San Francisco Bay Area and live nearby.  Presently I manage a data processing platform and work in a
+large on-premise Linux environment where we use Java, Python, &amp; Go as application languages. The
+different langauges becomes an interesting mix of challenges in itself; along with the normal
+day to day problems.</p>
+<p>Outside of work, I enjoy working with my hands by maintaining a vegatable garden and DIY home repair.</p>
+<h3 id="what">What</h3>
+<p>This is a place to share findings that could be useful or interesting to others.<br>
+It may contain notes to myself as a reference in the future.  Topics will range from large
+installation systems administration to home labs and embedded devices.</p>
+<h3 id="why">Why</h3>
+<p>I started working with data processing platforms in 2011.  What amazed me is how open
+the data community was with sharing ideas and how quickly software changed from it.  In-person meetups
+were both frequent and crowded with great presentations.</p>
+<p>With this site, I&rsquo;d like to carry on that tradition of sharing ideas and findings.</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Contact</title>
+      <link>https://amf3.github.io/about/contact/</link>
+      <pubDate>Thu, 17 Aug 2023 23:25:02 -0700</pubDate>
+      <guid>https://amf3.github.io/about/contact/</guid>
+      <description>&lt;h3 id=&#34;how-to-get-in-touch&#34;&gt;How to get in touch&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;GitHub: &lt;a href=&#34;https://github.com/amf3&#34;&gt;https://github.com/amf3&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;LinkedIn: &lt;a href=&#34;https://www.linkedin.com/in/adammfaris/&#34;&gt;https://www.linkedin.com/in/adammfaris/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;BlueSky Social: &lt;a href=&#34;https://@amf3.bsky.social&#34;&gt;https://@amf3.bsky.social&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description>
+      <content:encoded><![CDATA[<h3 id="how-to-get-in-touch">How to get in touch</h3>
+<ul>
+<li>GitHub: <a href="https://github.com/amf3">https://github.com/amf3</a></li>
+<li>LinkedIn: <a href="https://www.linkedin.com/in/adammfaris/">https://www.linkedin.com/in/adammfaris/</a></li>
+<li>BlueSky Social: <a href="https://@amf3.bsky.social">https://@amf3.bsky.social</a></li>
+</ul>
+]]></content:encoded>
+    </item>
+  </channel>
+</rss>
