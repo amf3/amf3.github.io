@@ -2,11 +2,156 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>articles on Adam Faris</title>
-    <link>https://amf3.github.io/articles/</link>
+    <link>http://localhost:1313/articles/</link>
     <description>Recent content in articles on Adam Faris</description>
-    <generator>Hugo -- 0.139.4</generator>
+    <generator>Hugo -- 0.144.2</generator>
     <language>en-us</language>
-    <lastBuildDate></lastBuildDate>
-    <atom:link href="https://amf3.github.io/articles/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 21 Feb 2025 23:06:35 -0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/articles/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Getting started with cloud-init for unattended Linux deployments</title>
+      <link>http://localhost:1313/articles/cloudinit/intro/</link>
+      <pubDate>Fri, 21 Feb 2025 23:06:35 -0800</pubDate>
+      <guid>http://localhost:1313/articles/cloudinit/intro/</guid>
+      <description>&lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;
+&lt;p&gt;Cloud compute companies like GCP, AWS, or Azure offer a management API for allocating resources. In the on-premise space,
+services such as Docker or Incus provide APIs for managing containers or virtual machines (VMs). But what about installing
+the operating system (OS) on bare-metal hosts? What API exists for this task? This is where
+&lt;a href=&#34;https://github.com/canonical/cloud-init&#34;&gt;cloud-init&lt;/a&gt; enters the picture, providing the ability to provision VMs or
+bare-metal hardware.&lt;/p&gt;
+&lt;p&gt;cloud-init is a useful tool that doesn&amp;rsquo;t rely on network services like PXE as a dependency.  Its simplicity saves time by
+removing the need to navigate OS installation menus, while ensuring user accounts and installed software packages are consistent
+across hosts. So why should one bother using cloud-init if they are managing a single host at home? In the event
+the OS needs to be reinstalled due to failure, cloud-init allows one to quickly restore the system to a known state.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<h2 id="intro">Intro</h2>
+<p>Cloud compute companies like GCP, AWS, or Azure offer a management API for allocating resources. In the on-premise space,
+services such as Docker or Incus provide APIs for managing containers or virtual machines (VMs). But what about installing
+the operating system (OS) on bare-metal hosts? What API exists for this task? This is where
+<a href="https://github.com/canonical/cloud-init">cloud-init</a> enters the picture, providing the ability to provision VMs or
+bare-metal hardware.</p>
+<p>cloud-init is a useful tool that doesn&rsquo;t rely on network services like PXE as a dependency.  Its simplicity saves time by
+removing the need to navigate OS installation menus, while ensuring user accounts and installed software packages are consistent
+across hosts. So why should one bother using cloud-init if they are managing a single host at home? In the event
+the OS needs to be reinstalled due to failure, cloud-init allows one to quickly restore the system to a known state.</p>
+<p>This example will use cloud-init to configure a Personal Package Archive (PPA), install Docker, and create a user account inside a Ubuntu VM.</p>
+<h2 id="prerequisite">Prerequisite</h2>
+<p>I find that using cloud-init with Multipass is a easy way to get started.  Multipass is a virtual machine manager that
+works with Linux, MacOS (arm &amp; intel), and Windows.  When launching a new VM, Multipass is capable of initializing the VM with cloud-init.
+If Multipass isn&rsquo;t already installed, this link will provide instructions for installing
+<a href="https://canonical.com/multipass/install">Multipass</a>.  For this cloud-init introduction, I&rsquo;m using Multipass on a M2 Macbook running MacOS Sequoia.</p>
+<h2 id="cloud-init">cloud-init</h2>
+<p>Like many infrastructure tools, the input data for cloud-init is a YAML file.  For specifics of this schema, consult the official cloud-init
+<a href="https://cloudinit.readthedocs.io/en/latest/index.html">documentation</a>.  There one will find that cloud-init input file
+will need to be <a href="https://cloudinit.readthedocs.io/en/latest/tutorial/qemu.html#define-the-configuration-data-files">prefixed</a> with <code>#cloud-config</code>.</p>
+<h3 id="package-management">Package Management</h3>
+<p>Lets get started with package management for our Multipass instance.  This section will show how to add an external PPA (software repository) to
+the VM with cloud-init to provide additional software packages and define a list of software packages to be installed on the VM.</p>
+<h4 id="add-external-ppa">Add External PPA</h4>
+<p>Add the 3rd-party <a href="https://cloudinit.readthedocs.io/en/latest/reference/modules.html#apt-configure">PPA</a> provided by Docker, Inc.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># Add Docker&#39;s PPA for Ubuntu</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apt</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">sources</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">docker.list</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># This snippet comes from https://stackoverflow.com/a/62540068</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">source</span>: <span style="color:#ae81ff">deb [arch=arm64] https://download.docker.com/linux/ubuntu $RELEASE stable</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># Key ID can be found with “gpg --show-keys &lt;(curl -s https://download.docker.com/linux/ubuntu/gpg)”</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">keyid</span>: <span style="color:#ae81ff">9DC858229FC7DD38854AE2D88D81803C0EBFCD88 </span>
+</span></span></code></pre></div><p>Should the GPG key ID for the Docker PPA change, I have left a comment above on how to find that value.<br>
+This is how the GPG output appears in 2025.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ gpg --show-keys &lt;<span style="color:#f92672">(</span>curl -s https://download.docker.com/linux/ubuntu/gpg<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>pub   rsa4096 2017-02-22 <span style="color:#f92672">[</span>SCEA<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>      9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+</span></span><span style="display:flex;"><span>uid                      Docker Release <span style="color:#f92672">(</span>CE deb<span style="color:#f92672">)</span> &lt;docker@docker.com&gt;
+</span></span><span style="display:flex;"><span>sub   rsa4096 2017-02-22 <span style="color:#f92672">[</span>S<span style="color:#f92672">]</span>
+</span></span></code></pre></div><h4 id="define-package-list">Define Package List</h4>
+<p>Specify a list of <a href="https://cloudinit.readthedocs.io/en/latest/reference/modules.html#package-update-upgrade-install">packages</a> to install.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># Update the list of packages available online</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">package_update</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Upgrade all installed packages</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">package_upgrade</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Install docker &amp; other utilities</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">packages</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">apt-transport-https</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">ca-certificates</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">curl</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">gnupg-agent</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">software-properties-common</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">docker-ce</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">docker-ce-cli</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">containerd.io</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">docker-buildx-plugin</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">docker-compose-plugin</span>
+</span></span></code></pre></div><h3 id="user-management">User Management</h3>
+<p>Here a new new <a href="https://cloudinit.readthedocs.io/en/latest/reference/yaml_examples/user_groups.html">user</a> account is created and added
+to the docker group with cloud-init.  Its likely our user will require both a password &amp; ssh key for remote access.  A public ssh key and a
+password hash is needed for cloud-init input.</p>
+<h4 id="secrets-generating-a-password-hash">Secrets: Generating a Password Hash</h4>
+<p>To create a password hash, use the <code>mkpasswd</code> command from Ubuntu&rsquo;s whois package.  This example will
+hash the weak password of &ldquo;abc123&rdquo; with the sha512 algorithm.  A password better than &ldquo;abc123&rdquo; should be used if following these examples.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ mkpasswd -m sha-512 <span style="color:#e6db74">&#34;abc123&#34;</span>
+</span></span><span style="display:flex;"><span>$6$EkwQ38oDCPnJDuui$QKw3IISzY3emHXgJ/QHeEH8xyzGOKB3N6.bU/wAkwf4KDRsreB2iApa/EHULbunx6v9o9Q8foq4K.d8WtHukU/
+</span></span></code></pre></div><p>As mkpasswd is specific to Linux and doesn&rsquo;t work with MacOS, one can alternatively use <code>openssl</code> to create a password hash.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ echo abc123 |  openssl passwd -6 -stdin  
+</span></span><span style="display:flex;"><span>$6$tdPON3RwkVViXg41$4O9euMZeGFJQXgJ3bvP3YtVcCw9BwIMHLLkix1s/R7woSuAAFvWWtrqqQ.33ESzgcUi9/HdEwelqB9jJUIrpU0
+</span></span></code></pre></div><h4 id="secrets-generating-a-ssh-public-private-key-pair">Secrets: Generating a SSH public private key pair</h4>
+<p>To create a SSH key pair, use ssh-keygen: <code>ssh-keygen -t ed25519 -f ./docker_vm_key -C &quot;app@docker_vm&quot; -P abc123</code>.  This will create a public &amp; private
+ssh key in the current directory, with the easily guessable passphrase of <code>abc123</code>.  Once again, use a better passphrase if following these examples.</p>
+<h4 id="defining-the-user-account">Defining the User Account</h4>
+<p>This defines an application account named &ldquo;app&rdquo;.  The <code>ssh_authorized_keys</code> value comes from the contents of docker_vm_key.pub.<br>
+As a convenience, the <a href="./assets/docker_vm_key.pub">public</a> and <a href="./assets/docker_vm_key">private</a> ssh keys from this example are provided.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># create the docker group</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">groups</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">docker</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">users</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">app</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">groups</span>: [<span style="color:#ae81ff">docker, admin, users]</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">gecos</span>: <span style="color:#ae81ff">Application User</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">shell</span>: <span style="color:#ae81ff">/bin/bash</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">lock_passwd</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">passwd</span>: <span style="color:#ae81ff">$6$tdPON3RwkVViXg41$4O9euMZeGFJQXgJ3bvP3YtVcCw9BwIMHLLkix1s/R7woSuAAFvWWtrqqQ.33ESzgcUi9/HdEwelqB9jJUIrpU0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ssh_authorized_keys</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHsPNGa1NJLd4edDLRI033Sw33Nkl6qO+52qNAhY556C app@docker_vm</span>
+</span></span></code></pre></div><h3 id="putting-it-all-together">Putting it all together</h3>
+<p>I&rsquo;ve combined the YAML snippets into a single file named docker-install.yaml which can be downloaded <a href="./assets/docker-install.yaml">here</a>.<br>
+Run the following to see cloud-init in action. This will create a virtual machine with 2 virtual CPU cores, 2 GB of ram,
+with a 2GB virtual disk using the LTS release of Ubuntu.  Depending on your Internet speed, this may take a few minutes as
+you&rsquo;ll be downloading packages from the Internet.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ multipass launch -n docker-demo --cloud-init docker-install.yaml -c <span style="color:#ae81ff">2</span> -m 2G -d 4G lts
+</span></span><span style="display:flex;"><span>Starting docker-demo <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>Waiting <span style="color:#66d9ef">for</span> initialization to complete |
+</span></span><span style="display:flex;"><span>Launched: docker-demo
+</span></span></code></pre></div><p>To find the new VM and access it over SSH with the private key so a docker command can be ran from a remote shell.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% mp list                                                                                                                             
+</span></span><span style="display:flex;"><span>Name                    State             IPv4             Image
+</span></span><span style="display:flex;"><span>docker-demo             Running           192.168.64.32    Ubuntu 24.04 LTS        
+</span></span><span style="display:flex;"><span>                                          172.17.0.1     
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% ssh -l app -i ./docker_vm_key 192.168.64.32
+</span></span><span style="display:flex;"><span> The authenticity of host <span style="color:#e6db74">&#39;192.168.64.32 (192.168.64.32)&#39;</span> can<span style="color:#e6db74">&#39;t be established.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> ED25519 key fingerprint is SHA256:EUqLjr9n9CyjKY6Y8EzNQGomeEtpePMFo5BXjO8YfHY.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> This key is not known by any other names.                                 
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> ...
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">app@docker-demo:~$ docker run hello-world
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Unable to find image &#39;</span>hello-world:latest<span style="color:#960050;background-color:#1e0010">&#39;</span> locally
+</span></span><span style="display:flex;"><span>latest: Pulling from library/hello-world
+</span></span><span style="display:flex;"><span>c9c5fd25a1bd: Pull complete 
+</span></span><span style="display:flex;"><span>Digest: sha256:e0b569a5163a5e6be84e210a2587e7d447e08f87a0e90798363fa44a0464a1e8
+</span></span><span style="display:flex;"><span>Status: Downloaded newer image <span style="color:#66d9ef">for</span> hello-world:latest
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Hello from Docker!
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><h2 id="conclusion">Conclusion</h2>
+<p>Several cloud-init basics have been covered in this introduction. Like adding a PPA, installing software packages, and creating a user account.<br>
+While I understand that installing Docker in my example might not represent the typical workflow.  Combining cloud-init concepts with Multipass
+creates a local mini-cloud on my Macbook.  I can quickly iterate through cloud-init data file changes for other platforms like AWS or on-premise hardware.</p>
+<p>cloud-init is capable of much more, like formatting hard drives or managing network interfaces.  These &amp; other topics will be covered in followups
+which I will announce on <a href="https://bsky.app/profile/amf3.bsky.social">Bluesky</a>.  Follow me for notifications of when its made available.  Otherwise,
+try out these examples and let me know what works.</p>
+]]></content:encoded>
+    </item>
   </channel>
 </rss>
