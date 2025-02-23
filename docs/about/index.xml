@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>about on Adam Faris</title>
-    <link>http://localhost:1313/about/</link>
+    <link>https://amf3.github.io/about/</link>
     <description>Recent content in about on Adam Faris</description>
     <generator>Hugo -- 0.144.2</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 21 Feb 2025 22:58:02 -0700</lastBuildDate>
-    <atom:link href="http://localhost:1313/about/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://amf3.github.io/about/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Contact</title>
-      <link>http://localhost:1313/about/contact/</link>
+      <link>https://amf3.github.io/about/contact/</link>
       <pubDate>Fri, 21 Feb 2025 22:58:02 -0700</pubDate>
-      <guid>http://localhost:1313/about/contact/</guid>
+      <guid>https://amf3.github.io/about/contact/</guid>
       <description>&lt;h3 id=&#34;how-to-get-in-touch&#34;&gt;How to get in touch&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;GitHub: &lt;a href=&#34;https://github.com/amf3&#34;&gt;https://github.com/amf3&lt;/a&gt;&lt;/li&gt;
@@ -29,9 +29,9 @@
     </item>
     <item>
       <title>Who, What, and Why</title>
-      <link>http://localhost:1313/about/about/</link>
+      <link>https://amf3.github.io/about/about/</link>
       <pubDate>Fri, 21 Feb 2025 22:52:33 -0700</pubDate>
-      <guid>http://localhost:1313/about/about/</guid>
+      <guid>https://amf3.github.io/about/about/</guid>
       <description>&lt;h3 id=&#34;who&#34;&gt;Who&lt;/h3&gt;
 &lt;p&gt;I&amp;rsquo;m Adam Faris and my pronouns are he,him,his. Based in the San Francisco Bay Area, I have a strong background
 in computer operations, with experience managing data processing platforms and working in large on-premise Linux
