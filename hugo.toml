@@ -24,12 +24,13 @@ url = "/about/"
 weight = 30
 
 [outputs]
-home = ['html', 'rss']
-page = ['html']
-rss = ['rss']
-section = ['html', 'rss']
-taxonomy = ['html']
-term = ['html']
+home = [ "HTML", "RSS", "JSON" ]
+# home =  ["HTML", "RSS", "JSON"]
+# rss = ['rss']
+# page =  ["HTML", "RSS", "JSON"]
+# section =  ["HTML", "RSS", "JSON"]
+# taxonomy =  ["HTML", "RSS", "JSON"]
+# term =  ["HTML", "RSS", "JSON"]
 
 [params]
 ShowBreadCrumbs = 'false'
@@ -42,9 +43,9 @@ mainSections = ['articles']
 isCaseSensitive = false
 shouldSort = true
 location = 0
-distance = 1_000
+distance = 1000
 threshold = 0.4
-minMatchCharLength = 0
+minMatchCharLength = 4
 keys = [ "title", "permalink", "summary", "content" ]
   
 [[params.socialIcons]]
