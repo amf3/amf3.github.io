@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto">
 
-<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>Getting started with cloud-init for unattended Linux deployments | Adam Faris</title>
 <meta name="keywords" content="">
 <meta name="description" content="Intro
@@ -18,16 +18,16 @@ removing the need to navigate OS installation menus, while ensuring user account
 across hosts. So why should one bother using cloud-init if they are managing a single host at home? In the event
 the OS needs to be reinstalled due to failure, cloud-init allows one to quickly restore the system to a known state.">
 <meta name="author" content="">
-<link rel="canonical" href="http://localhost:1313/articles/cloudinit/intro/">
+<link rel="canonical" href="https://amf3.github.io/articles/cloudinit/intro/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.45e028aa8ce0961349adf411b013ee39406be2c0bc80d4ea3fc04555f7f4611a.css" integrity="sha256-ReAoqozglhNJrfQRsBPuOUBr4sC8gNTqP8BFVff0YRo=" rel="preload stylesheet" as="style">
-<link rel="icon" href="http://localhost:1313/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
-<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
-<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<link rel="icon" href="https://amf3.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://amf3.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://amf3.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://amf3.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://amf3.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:1313/articles/cloudinit/intro/">
+<link rel="alternate" hreflang="en" href="https://amf3.github.io/articles/cloudinit/intro/">
 <noscript>
     <style>
         #theme-toggle,
@@ -64,7 +64,79 @@ the OS needs to be reinstalled due to failure, cloud-init allows one to quickly 
         }
 
     </style>
-</noscript>
+</noscript><meta property="og:url" content="https://amf3.github.io/articles/cloudinit/intro/">
+  <meta property="og:site_name" content="Adam Faris">
+  <meta property="og:title" content="Getting started with cloud-init for unattended Linux deployments">
+  <meta property="og:description" content="Intro Cloud compute companies like GCP, AWS, or Azure offer a management API for allocating resources. In the on-premise space, services such as Docker or Incus provide APIs for managing containers or virtual machines (VMs). But what about installing the operating system (OS) on bare-metal hosts? What API exists for this task? This is where cloud-init enters the picture, providing the ability to provision VMs or bare-metal hardware.
+cloud-init is a useful tool that doesn’t rely on network services like PXE as a dependency. Its simplicity saves time by removing the need to navigate OS installation menus, while ensuring user accounts and installed software packages are consistent across hosts. So why should one bother using cloud-init if they are managing a single host at home? In the event the OS needs to be reinstalled due to failure, cloud-init allows one to quickly restore the system to a known state.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="articles">
+    <meta property="article:published_time" content="2025-02-21T23:06:35-08:00">
+    <meta property="article:modified_time" content="2025-02-21T23:06:35-08:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Getting started with cloud-init for unattended Linux deployments">
+<meta name="twitter:description" content="Intro
+Cloud compute companies like GCP, AWS, or Azure offer a management API for allocating resources. In the on-premise space,
+services such as Docker or Incus provide APIs for managing containers or virtual machines (VMs). But what about installing
+the operating system (OS) on bare-metal hosts? What API exists for this task? This is where
+cloud-init enters the picture, providing the ability to provision VMs or
+bare-metal hardware.
+cloud-init is a useful tool that doesn&rsquo;t rely on network services like PXE as a dependency.  Its simplicity saves time by
+removing the need to navigate OS installation menus, while ensuring user accounts and installed software packages are consistent
+across hosts. So why should one bother using cloud-init if they are managing a single host at home? In the event
+the OS needs to be reinstalled due to failure, cloud-init allows one to quickly restore the system to a known state.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "articles",
+      "item": "https://amf3.github.io/articles/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Getting started with cloud-init for unattended Linux deployments",
+      "item": "https://amf3.github.io/articles/cloudinit/intro/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Getting started with cloud-init for unattended Linux deployments",
+  "name": "Getting started with cloud-init for unattended Linux deployments",
+  "description": "Intro Cloud compute companies like GCP, AWS, or Azure offer a management API for allocating resources. In the on-premise space, services such as Docker or Incus provide APIs for managing containers or virtual machines (VMs). But what about installing the operating system (OS) on bare-metal hosts? What API exists for this task? This is where cloud-init enters the picture, providing the ability to provision VMs or bare-metal hardware.\ncloud-init is a useful tool that doesn\u0026rsquo;t rely on network services like PXE as a dependency. Its simplicity saves time by removing the need to navigate OS installation menus, while ensuring user accounts and installed software packages are consistent across hosts. So why should one bother using cloud-init if they are managing a single host at home? In the event the OS needs to be reinstalled due to failure, cloud-init allows one to quickly restore the system to a known state.\n",
+  "keywords": [
+    
+  ],
+  "articleBody": "Intro Cloud compute companies like GCP, AWS, or Azure offer a management API for allocating resources. In the on-premise space, services such as Docker or Incus provide APIs for managing containers or virtual machines (VMs). But what about installing the operating system (OS) on bare-metal hosts? What API exists for this task? This is where cloud-init enters the picture, providing the ability to provision VMs or bare-metal hardware.\ncloud-init is a useful tool that doesn’t rely on network services like PXE as a dependency. Its simplicity saves time by removing the need to navigate OS installation menus, while ensuring user accounts and installed software packages are consistent across hosts. So why should one bother using cloud-init if they are managing a single host at home? In the event the OS needs to be reinstalled due to failure, cloud-init allows one to quickly restore the system to a known state.\nThis example will use cloud-init to configure a Personal Package Archive (PPA), install Docker, and create a user account inside a Ubuntu VM.\nPrerequisite I find that using cloud-init with Multipass is a easy way to get started. Multipass is a virtual machine manager that works with Linux, MacOS (arm \u0026 intel), and Windows. When launching a new VM, Multipass is capable of initializing the VM with cloud-init. If Multipass isn’t already installed, this link will provide instructions for installing Multipass. For this cloud-init introduction, I’m using Multipass on a M2 Macbook running MacOS Sequoia.\ncloud-init Like many infrastructure tools, the input data for cloud-init is a YAML file. For specifics of this schema, consult the official cloud-init documentation. There one will find that cloud-init input file will need to be prefixed with #cloud-config.\nPackage Management Lets get started with package management for our Multipass instance. This section will show how to add an external PPA (software repository) to the VM with cloud-init to provide additional software packages and define a list of software packages to be installed on the VM.\nAdd External PPA Add the 3rd-party PPA provided by Docker, Inc.\n# Add Docker's PPA for Ubuntu apt: sources: docker.list: # This snippet comes from https://stackoverflow.com/a/62540068 source: deb [arch=arm64] https://download.docker.com/linux/ubuntu $RELEASE stable # Key ID can be found with “gpg --show-keys \u003c(curl -s https://download.docker.com/linux/ubuntu/gpg)” keyid: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88 Should the GPG key ID for the Docker PPA change, I have left a comment above on how to find that value.\nThis is how the GPG output appears in 2025.\n$ gpg --show-keys \u003c(curl -s https://download.docker.com/linux/ubuntu/gpg) pub rsa4096 2017-02-22 [SCEA] 9DC858229FC7DD38854AE2D88D81803C0EBFCD88 uid Docker Release (CE deb) sub rsa4096 2017-02-22 [S] Define Package List Specify a list of packages to install.\n# Update the list of packages available online package_update: true # Upgrade all installed packages package_upgrade: true # Install docker \u0026 other utilities packages: - apt-transport-https - ca-certificates - curl - gnupg-agent - software-properties-common - docker-ce - docker-ce-cli - containerd.io - docker-buildx-plugin - docker-compose-plugin User Management Here a new new user account is created and added to the docker group with cloud-init. Its likely our user will require both a password \u0026 ssh key for remote access. A public ssh key and a password hash is needed for cloud-init input.\nSecrets: Generating a Password Hash To create a password hash, use the mkpasswd command from Ubuntu’s whois package. This example will hash the weak password of “abc123” with the sha512 algorithm. A password better than “abc123” should be used if following these examples.\n$ mkpasswd -m sha-512 \"abc123\" $6$EkwQ38oDCPnJDuui$QKw3IISzY3emHXgJ/QHeEH8xyzGOKB3N6.bU/wAkwf4KDRsreB2iApa/EHULbunx6v9o9Q8foq4K.d8WtHukU/ As mkpasswd is specific to Linux and doesn’t work with MacOS, one can alternatively use openssl to create a password hash.\n$ echo abc123 | openssl passwd -6 -stdin $6$tdPON3RwkVViXg41$4O9euMZeGFJQXgJ3bvP3YtVcCw9BwIMHLLkix1s/R7woSuAAFvWWtrqqQ.33ESzgcUi9/HdEwelqB9jJUIrpU0 Secrets: Generating a SSH public private key pair To create a SSH key pair, use ssh-keygen: ssh-keygen -t ed25519 -f ./docker_vm_key -C \"app@docker_vm\" -P abc123. This will create a public \u0026 private ssh key in the current directory, with the easily guessable passphrase of abc123. Once again, use a better passphrase if following these examples.\nDefining the User Account This defines an application account named “app”. The ssh_authorized_keys value comes from the contents of docker_vm_key.pub.\nAs a convenience, the public and private ssh keys from this example are provided.\n# create the docker group groups: - docker users: - name: app groups: [docker, admin, users] gecos: Application User shell: /bin/bash lock_passwd: true passwd: $6$tdPON3RwkVViXg41$4O9euMZeGFJQXgJ3bvP3YtVcCw9BwIMHLLkix1s/R7woSuAAFvWWtrqqQ.33ESzgcUi9/HdEwelqB9jJUIrpU0 ssh_authorized_keys: - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHsPNGa1NJLd4edDLRI033Sw33Nkl6qO+52qNAhY556C app@docker_vm Putting it all together I’ve combined the YAML snippets into a single file named docker-install.yaml which can be downloaded here.\nRun the following to see cloud-init in action. This will create a virtual machine with 2 virtual CPU cores, 2 GB of ram, with a 2GB virtual disk using the LTS release of Ubuntu. Depending on your Internet speed, this may take a few minutes as you’ll be downloading packages from the Internet.\n$ multipass launch -n docker-demo --cloud-init docker-install.yaml -c 2 -m 2G -d 4G lts Starting docker-demo \\ Waiting for initialization to complete | Launched: docker-demo To find the new VM and access it over SSH with the private key so a docker command can be ran from a remote shell.\n% mp list Name State IPv4 Image docker-demo Running 192.168.64.32 Ubuntu 24.04 LTS 172.17.0.1 % ssh -l app -i ./docker_vm_key 192.168.64.32 The authenticity of host '192.168.64.32 (192.168.64.32)' can't be established. ED25519 key fingerprint is SHA256:EUqLjr9n9CyjKY6Y8EzNQGomeEtpePMFo5BXjO8YfHY. This key is not known by any other names. Are you sure you want to continue connecting (yes/no/[fingerprint])? yes ... app@docker-demo:~$ docker run hello-world Unable to find image 'hello-world:latest' locally latest: Pulling from library/hello-world c9c5fd25a1bd: Pull complete Digest: sha256:e0b569a5163a5e6be84e210a2587e7d447e08f87a0e90798363fa44a0464a1e8 Status: Downloaded newer image for hello-world:latest Hello from Docker! ... Conclusion Several cloud-init basics have been covered in this introduction. Like adding a PPA, installing software packages, and creating a user account.\nWhile I understand that installing Docker in my example might not represent the typical workflow. Combining cloud-init concepts with Multipass creates a local mini-cloud on my Macbook. I can quickly iterate through cloud-init data file changes for other platforms like AWS or on-premise hardware.\ncloud-init is capable of much more, like formatting hard drives or managing network interfaces. These \u0026 other topics will be covered in followups which I will announce on Bluesky. Follow me for notifications of when its made available. Otherwise, try out these examples and let me know what works.\n",
+  "wordCount" : "1048",
+  "inLanguage": "en",
+  "datePublished": "2025-02-21T23:06:35-08:00",
+  "dateModified": "2025-02-21T23:06:35-08:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://amf3.github.io/articles/cloudinit/intro/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Adam Faris",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://amf3.github.io/favicon.ico"
+    }
+  }
+}
+</script>
 </head>
 
 <body class="" id="top">
@@ -82,7 +154,7 @@ the OS needs to be reinstalled due to failure, cloud-init allows one to quickly 
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="http://localhost:1313/" accesskey="h" title="Adam Faris (Alt + H)">Adam Faris</a>
+            <a href="https://amf3.github.io/" accesskey="h" title="Adam Faris (Alt + H)">Adam Faris</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
                     <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
@@ -108,17 +180,17 @@ the OS needs to be reinstalled due to failure, cloud-init allows one to quickly 
         </div>
         <ul id="menu">
             <li>
-                <a href="http://localhost:1313/search/" title="search (Alt &#43; /)" accesskey=/>
+                <a href="https://amf3.github.io/search/" title="search (Alt &#43; /)" accesskey=/>
                     <span>search</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/articles/" title="articles">
+                <a href="https://amf3.github.io/articles/" title="articles">
                     <span>articles</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:1313/about/" title="about">
+                <a href="https://amf3.github.io/about/" title="about">
                     <span>about</span>
                 </a>
             </li>
@@ -129,7 +201,7 @@ the OS needs to be reinstalled due to failure, cloud-init allows one to quickly 
 
 <article class="post-single">
   <header class="post-header">
-    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/articles/">articles</a></div>
+    <div class="breadcrumbs"><a href="https://amf3.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://amf3.github.io/articles/">articles</a></div>
     <h1 class="post-title entry-hint-parent">
       Getting started with cloud-init for unattended Linux deployments
     </h1>
@@ -323,7 +395,7 @@ try out these examples and let me know what works.</p>
     </main>
     
 <footer class="footer">
-        <span>&copy; 2025 <a href="http://localhost:1313/">Adam Faris</a></span> · 
+        <span>&copy; 2025 <a href="https://amf3.github.io/">Adam Faris</a></span> · 
 
     <span>
         Powered by
