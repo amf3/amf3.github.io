@@ -93,7 +93,7 @@ packages:
 
 ### User Management
 
-Here a new new [user](https://cloudinit.readthedocs.io/en/latest/reference/yaml_examples/user_groups.html) account is created and added
+Here a new [user](https://cloudinit.readthedocs.io/en/latest/reference/yaml_examples/user_groups.html) account is created and added
 to the docker group with cloud-init.  Its likely our user will require both a password & ssh key for remote access.  A public ssh key and a
 password hash is needed for cloud-init input.
 
@@ -144,14 +144,11 @@ users:
 
 I've combined the YAML snippets into a single file named docker-install.yaml which can be downloaded [here](./assets/docker-install.yaml).  
 Run the following to see cloud-init in action. This will create a virtual machine with 2 virtual CPU cores, 2 GB of ram,
-with a 2GB virtual disk using the LTS release of Ubuntu.  Depending on your Internet speed, this may take a few minutes as
+with a 4GB virtual disk using the LTS release of Ubuntu.  Depending on your Internet speed, this may take a few minutes as
 you'll be downloading packages from the Internet.
 
 ```bash
 $ multipass launch -n docker-demo --cloud-init docker-install.yaml -c 2 -m 2G -d 4G lts
-Starting docker-demo \
-Waiting for initialization to complete |
-Launched: docker-demo
 ```
 
 To find the new VM and access it over SSH with the private key so a docker command can be ran from a remote shell.

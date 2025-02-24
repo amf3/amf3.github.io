@@ -83,7 +83,7 @@ This is how the GPG output appears in 2025.</p>
 </span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">docker-buildx-plugin</span>
 </span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">docker-compose-plugin</span>
 </span></span></code></pre></div><h3 id="user-management">User Management</h3>
-<p>Here a new new <a href="https://cloudinit.readthedocs.io/en/latest/reference/yaml_examples/user_groups.html">user</a> account is created and added
+<p>Here a new <a href="https://cloudinit.readthedocs.io/en/latest/reference/yaml_examples/user_groups.html">user</a> account is created and added
 to the docker group with cloud-init.  Its likely our user will require both a password &amp; ssh key for remote access.  A public ssh key and a
 password hash is needed for cloud-init input.</p>
 <h4 id="secrets-generating-a-password-hash">Secrets: Generating a Password Hash</h4>
@@ -116,12 +116,9 @@ As a convenience, the <a href="./assets/docker_vm_key.pub">public</a> and <a hre
 </span></span></code></pre></div><h3 id="putting-it-all-together">Putting it all together</h3>
 <p>I&rsquo;ve combined the YAML snippets into a single file named docker-install.yaml which can be downloaded <a href="./assets/docker-install.yaml">here</a>.<br>
 Run the following to see cloud-init in action. This will create a virtual machine with 2 virtual CPU cores, 2 GB of ram,
-with a 2GB virtual disk using the LTS release of Ubuntu.  Depending on your Internet speed, this may take a few minutes as
+with a 4GB virtual disk using the LTS release of Ubuntu.  Depending on your Internet speed, this may take a few minutes as
 you&rsquo;ll be downloading packages from the Internet.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ multipass launch -n docker-demo --cloud-init docker-install.yaml -c <span style="color:#ae81ff">2</span> -m 2G -d 4G lts
-</span></span><span style="display:flex;"><span>Starting docker-demo <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>Waiting <span style="color:#66d9ef">for</span> initialization to complete |
-</span></span><span style="display:flex;"><span>Launched: docker-demo
 </span></span></code></pre></div><p>To find the new VM and access it over SSH with the private key so a docker command can be ran from a remote shell.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% mp list                                                                                                                             
 </span></span><span style="display:flex;"><span>Name                    State             IPv4             Image
