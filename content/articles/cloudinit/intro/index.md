@@ -4,7 +4,7 @@ date: 2025-02-21T23:06:35-08:00
 draft: false
 searchHidden: false
 showtoc: true
-categories: [cloud]
+categories: [cloud, automation, operations]
 robotsNoIndex: false
 ---
 
