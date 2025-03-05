@@ -1,0 +1,51 @@
+#cloud-config
+autoinstall:
+  version: 1
+  identity:
+    hostname: my-qemu-vm
+    username: ubuntu
+    password: $6$xK2amorOU9tK4jt4$zLA1RZUpo4CzyDBzPDHCT61FLOngjWpV7Q/BH9KieLsJ/VG8r/Y88YIMLIOL.vc4ZHees40IAqORxjqa7GKti/
+    # password is "abc123"
+  ssh:
+    # Install SSH server and allow password logins
+    allow-pw: true
+    install-server: true
+  source:
+    # id can also be ubuntu-server 
+    id: ubuntu-server-minimal
+  network:
+    version: 2
+    ethernets:
+      my-en-devices:
+          match:
+              # This will match Systemd naming conventions for ethernet devices which start with "en" and set them to use DHCPv4
+              name: "en*"
+          dhcp4: true
+      my-eth-devices:
+          match:
+              # This will match OpenRC naming conventions like "eth0"
+              name: "eth*"
+          addresses:
+            # This will specify a static network address
+            - 10.10.10.2/24
+          nameservers:
+            # We can modify the DNS search path & specify DNS name servers.
+            search:
+              - "mycompany.local"
+            addresses:
+              - 10.10.10.253
+              - 8.8.8.8
+    storage:
+      layout:
+        name: lvm
+        sizing-policy: all
+        match:
+          size: smallest
+    user-data:
+      package_update: true    # update the list of available packages
+      package_upgrade: true   # upgrade currently installed packages.
+      packages:
+      - curl
+      - ca-certificates
+
+    
