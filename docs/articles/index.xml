@@ -6,8 +6,266 @@
     <description>Recent content in articles on Adam Faris</description>
     <generator>Hugo -- 0.144.2</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 21 Feb 2025 23:06:35 -0800</lastBuildDate>
+    <lastBuildDate>Mon, 03 Mar 2025 23:07:23 -0800</lastBuildDate>
     <atom:link href="https://amf3.github.io/articles/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Unattended Ubuntu Installs - Virtual Machines to Bare-Metal</title>
+      <link>https://amf3.github.io/articles/cloudinit/autoinstall/</link>
+      <pubDate>Mon, 03 Mar 2025 23:07:23 -0800</pubDate>
+      <guid>https://amf3.github.io/articles/cloudinit/autoinstall/</guid>
+      <description>&lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;
+&lt;p&gt;In a &lt;a href=&#34;../../../articles/cloudinit/intro/&#34;&gt;previous post&lt;/a&gt;, I discussed using cloud-init and Multipass as a method of provisioning
+virtual machines on a local computer with a cloud-like API.  Today I am going
+to dive deeper with Ubuntu and how their autoinstall API can simplify on-premise host provisioning.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://canonical-subiquity.readthedocs-hosted.com/en/latest/intro-to-autoinstall.html&#34;&gt;autoinstall&lt;/a&gt;
+is a tool that allows for unattended installations of Ubuntu, ensuring consistency, reporducibility, and providing automation
+across a fleet of hosts.  In this post I&amp;rsquo;ll walk through an example of using autoinstall
+to configure networking, local storage, and demonstrate shell command execution during provisioning.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<h2 id="intro">Intro</h2>
+<p>In a <a href="../../../articles/cloudinit/intro/">previous post</a>, I discussed using cloud-init and Multipass as a method of provisioning
+virtual machines on a local computer with a cloud-like API.  Today I am going
+to dive deeper with Ubuntu and how their autoinstall API can simplify on-premise host provisioning.</p>
+<p><a href="https://canonical-subiquity.readthedocs-hosted.com/en/latest/intro-to-autoinstall.html">autoinstall</a>
+is a tool that allows for unattended installations of Ubuntu, ensuring consistency, reporducibility, and providing automation
+across a fleet of hosts.  In this post I&rsquo;ll walk through an example of using autoinstall
+to configure networking, local storage, and demonstrate shell command execution during provisioning.</p>
+<h2 id="prerequisite">Prerequisite</h2>
+<p>Because the final target is a bare-metal instance, I find it quicker to iterate &amp; test autoinstall changes with
+QEMU on my macOS M2 laptop.  QEMU is a hardware emulator
+which runs on Linux, macOS, &amp; Windows, allowing the emulation of different CPUs, network cards, or storage devices.
+Instructions to <a href="https://www.qemu.org/download/#macos">install QEMU</a> can be found online.  For macOS, this can be as simple as
+running <code>brew install qemu</code>.</p>
+<p>Next we need the Ubuntu install media which can be downloaded
+<a href="https://ubuntu.com/download/server">here</a>.</p>
+<h3 id="qemu-overview">QEMU overview</h3>
+<p>Let&rsquo;s get started by creating a virtual disk drive for installing Ubuntu.  This can be done with
+<code>qemu-img create -f qcow2 virtual_disk.img 6G</code> which creates a 6GB virtual disk named
+virtual_disk.img in the current directory.</p>
+<p>In the example below, the <code>-boot once=d</code> option instructes QEMU to boot from the virtual CD-ROM on first startup. After which QEMU will
+boot from the virtual disk. The other options initialize a 4 core CPU with 4GB of memory.  The <code>-net user,hostfwd</code> string will
+port forward from localhost on the host system to port 22 on the virtual machine.  If additional port forwarding is needed, like testing
+https traffic on port 443 of the VM, multiple hostfwd options seperated by commas can used.  Be sure to adjust the filename and path to the Ubuntu ISO
+as needed.</p>
+<pre tabindex="0"><code class="language-code" data-lang="code">qemu-system-x86_64 -hda virtual_disk.img -boot once=d  -cdrom ./ubuntu-24.10-live-server-amd64.iso -m 4096 -smp cpus=4 -net nic,model=virtio -net user,hostfwd=tcp:127.0.0.1:22-:22
+</code></pre><h2 id="autoinstall">Autoinstall</h2>
+<p>Autoinstall is included as part of the Ubuntu boot ISO and works with other provisioning tools from Canonical like
+<a href="https://canonical-subiquity.readthedocs-hosted.com/en/latest/">Subiquity</a>,
+<a href="https://curtin.readthedocs.io/en/latest/topics/overview.html">Curtin</a>, or <a href="https://cloudinit.readthedocs.io/en/latest/">cloud-init</a>.
+When reading Autoinstall documentation, it&rsquo;s useful to know which tool is being used during each install stage as often those
+options are passed to the underlying provisioning tool.</p>
+<p>Like Kickstart for RHEL, Autoinstall is Ubuntu&rsquo;s answer to unattended
+installations, and uses YAML files for data input.  Autoinstall uses default locations for finding the YAML files and locations
+can also be specified in the GRUB menu when the instance boots.  Locations are specified as either a filepath or a URL.  I&rsquo;ll be
+using a URL for the file locations.</p>
+<p>Lets create the empty YAML files and use python to create a simple webserver to serve the files.  In another terminal type the following as the
+webserver runs in the foreground.  Use cntl-c to terminate the python webserver when it&rsquo;s no longer needed.</p>
+<pre tabindex="0"><code class="language-code" data-lang="code">touch user-data meta-data network-config vendor-data
+python3 -m http.server -b 127.0.0.1 -d $PWD 8080
+</code></pre><p>Next start the virtual machine.</p>
+<pre tabindex="0"><code class="language-code" data-lang="code">qemu-system-x86_64 -hda virtual_disk.img -boot once=d  -cdrom ./ubuntu-24.10-live-server-amd64.iso -m 4096 -smp cpus=4 -net nic,model=virtio -net user,hostfwd=tcp:127.0.0.1:22-:22
+</code></pre><p>This will open a QEMU console window where we&rsquo;ll interact with the GRUB menu to specify the YAML file locations. Change focus to
+the console window, highlight &ldquo;Try or Install Ubuntu Server&rdquo; and hit the <code>&quot;e&quot;</code> key to edit the grub menu.</p>
+<p>On the line starting with “linux /casper/vmlinuz” add:  <code>autoinstall ds=nocloud\;s=http://10.0.2.2:8080/</code>  before
+the three dashes.  The grub menu should look something like this when the edits are complete.</p>
+<pre tabindex="0"><code class="language-code" data-lang="code">linux   /casper/vmlinuz autoinstall ds=nocloud\;s=http://10.0.2.2:8080/ ---
+initrd  /casper/initrd  
+</code></pre><p>Exit grub and boot by following the on-screen instructions to hit F10 or cntl-x.  Watch the terminal running the python webserver and
+requests for the autoinstall YAML files should be seen.  As they are empty config files, an interactive menu-driven session will present itself
+in the QEMU console window.  To cancel the install, close the QEMU console window.</p>
+<p>The GRUB modification tells autoinstall to use the
+<a href="https://cloudinit.readthedocs.io/en/latest/reference/datasources/nocloud.html">nocloud</a> plugin from cloud-init to download
+its configuration at the specified URL.  QEMU assigns the special IP address of <code>10.0.2.2</code> to the host system when using <code>-net user</code>.  This allows the
+VM to reach services running on the host such as our local Python HTTP server and why autoinstall is able to download its configurations over HTTP.</p>
+<p>The YAML block should be added to the user-data file that was created earlier.  The other files will remain empty.
+The <a href="https://github.com/canonical/subiquity/blob/main/doc/howto/autoinstall-quickstart.rst">minimal config example</a> assigns a
+hostname of my-qemu-vm, creates an admin account named ubuntu, and assigns the ubuntu user the password of abc123.<br>
+It&rsquo;s possible to generate a different secure password hash with openssl, as shown in
+this example: <code>echo abc123 |  openssl passwd -6 -stdin</code>.  Restart the QEMU VM so it boots from the
+virtual CD-ROM and modify the GRUB menu so it loads the new config when the VM boots.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">version</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">identity</span>:
+</span></span><span style="display:flex;"><span>     <span style="color:#f92672">hostname</span>: <span style="color:#ae81ff">my-qemu-vm</span>
+</span></span><span style="display:flex;"><span>     <span style="color:#f92672">username</span>: <span style="color:#ae81ff">ubuntu</span>
+</span></span><span style="display:flex;"><span>     <span style="color:#f92672">password</span>: <span style="color:#ae81ff">$6$xK2amorOU9tK4jt4$zLA1RZUpo4CzyDBzPDHCT61FLOngjWpV7Q/BH9KieLsJ/VG8r/Y88YIMLIOL.vc4ZHees40IAqORxjqa7GKti/</span>
+</span></span><span style="display:flex;"><span>     <span style="color:#75715e"># password is &#34;abc123&#34;</span>
+</span></span></code></pre></div><p>Autoinstall will take several minutes to complete and will reboot when done.  In some stages autoinstall can look stuck in some stages.
+Remember that Linux virtual consoles are available to inspect running processes.  Virtual consoles are accessible by typing alt + left/right
+arrow key or using alt + F2 or alt + F3.  (Use the option key for alt when using a Mac keyboard.)  Eventually the VM will reboot and the login
+prompt should be visible if everything went as expected.</p>
+<p>Autoinstall has a list of defaults it uses when the option is present in the user-data file.  After logging into the QEMU instance, it&rsquo;s
+possible to view the specified values from the user-data YAML file that have been merged into the defaults.</p>
+<pre tabindex="0"><code class="language-code" data-lang="code">sudo less /var/log/installer/autoinstall-user-data
+</code></pre><p>Before continuing lets enable the ssh server, allow passwords for ssh login, and minimize the number of packages used during
+the install.  Other options like locale or the keyboard setup can be found in the autoinstall-user-data file and added ot the example below.  Restarting
+the QEMU VM and modifying the GRUB menu to reinstall the host OS is needed to apply the new changes to the YAML file.  Reinstalling
+the OS also demonstrates the ease of initializing a system to a known state with autoinstall &amp; cloud-init configs.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">version</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">identity</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">hostname</span>: <span style="color:#ae81ff">my-qemu-vm</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">username</span>: <span style="color:#ae81ff">ubuntu</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">password</span>: <span style="color:#ae81ff">$6$xK2amorOU9tK4jt4$zLA1RZUpo4CzyDBzPDHCT61FLOngjWpV7Q/BH9KieLsJ/VG8r/Y88YIMLIOL.vc4ZHees40IAqORxjqa7GKti/</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># password is &#34;abc123&#34;</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">ssh</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># Install SSH server and allow password logins</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">allow-pw</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">install-server</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">source</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># id can also be ubuntu-server </span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">id</span>: <span style="color:#ae81ff">ubuntu-server-minimal</span>
+</span></span></code></pre></div><h3 id="networking">Networking</h3>
+<p>Both autoinstall and cloud-init support a netplan-formatted network configuration, meaning the YAML network example will work with
+either installer.</p>
+<p>Network device names are different between distributions that use Systemd (Ubuntu, Fedora) vs OpenRC (Alpine).  Where OpenRC
+will use easily found device names like &ldquo;eth0&rdquo;, or &ldquo;eth1&rdquo;,
+<a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.net-naming-scheme.html">Systemd</a> will use the PCI slot number.
+A Systemd example might look like &ldquo;enp2s0&rdquo;, where &ldquo;en&rdquo; means ethernet, and &ldquo;p2s0&rdquo; is the
+<a href="https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/">physical PCI slot</a>.
+This value will change based on which slot a PCI card is plugged into.  Luckily
+<a href="https://canonical-subiquity.readthedocs-hosted.com/en/latest/reference/autoinstall-reference.html#network">autoinstall</a>
+lets us wildcard the device names.</p>
+<p>This network example will work with either OpenRC or Systemd device names.  It&rsquo;s similar to what&rsquo;s used by
+<a href="https://git.launchpad.net/livecd-rootfs/tree/live-build/ubuntu-server/includes.chroot.ubuntu-server-minimal.ubuntu-server.installer/etc/cloud/cloud.cfg#n23">Ubuntu&rsquo;s LiveCD</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">network</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">version</span>: <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">ethernets</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">my-en-devices</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">match</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># This will match Systemd naming conventions for ethernet devices which start with &#34;en&#34; and set them to use DHCPv4</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">name</span>: <span style="color:#e6db74">&#34;en*&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">dhcp4</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">my-eth-devices</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">match</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># This will match OpenRC naming conventions like &#34;eth0&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">name</span>: <span style="color:#e6db74">&#34;eth*&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">addresses</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e"># This will specify a static network address</span>
+</span></span><span style="display:flex;"><span>          - <span style="color:#ae81ff">10.10.10.2</span><span style="color:#ae81ff">/24</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">nameservers</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e"># We can modify the DNS search path &amp; specify DNS name servers.</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">search</span>:
+</span></span><span style="display:flex;"><span>            - <span style="color:#e6db74">&#34;mycompany.local&#34;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">addresses</span>:
+</span></span><span style="display:flex;"><span>            - <span style="color:#ae81ff">10.10.10.253</span>
+</span></span><span style="display:flex;"><span>            - <span style="color:#ae81ff">8.8.8.8</span>
+</span></span></code></pre></div><h3 id="storage">Storage</h3>
+<p>Configuring
+<a href="https://canonical-subiquity.readthedocs-hosted.com/en/latest/reference/autoinstall-reference.html#storage">storage</a>
+can be complex when configuring per partition byte offsets. Luckily we can provide a storage device name and let defaults
+handle the details.  I&rsquo;ll show a basic lvm example but the other supported layouts are direct, and zfs.</p>
+<p>Here we specify a LVM configuration with a sizing policy to use the entire disk for the logical volume.  If sizing-policy
+were set to <code>scaled</code>, free space would be left on the storage device for things like snapshots or further expansion.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">storage</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">layout</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">name</span>: <span style="color:#ae81ff">lvm</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">sizing-policy</span>: <span style="color:#ae81ff">all</span>
+</span></span></code></pre></div><p>Its possible to target a specific drive to wipe and install a new OS with a
+<a href="https://canonical-subiquity.readthedocs-hosted.com/en/latest/reference/autoinstall-reference.html#disk-selection-extensions">match</a>
+statement.  There are multiple ways to select a storage device, model name, serial number, path, whether
+its rotational or not, or even big or little in size.  These values can be found in smartctl output, which
+comes from the smartmontools package.</p>
+<pre tabindex="0"><code class="language-code" data-lang="code">ubuntu@my-qemu-vm:~$ sudo apt-get install -y smartmontools
+... install stuff ...
+
+ubuntu@my-qemu-vm:~$ sudo smartctl -i /dev/sda
+smartctl 7.4 2023-08-01 r5530 [x86_64-linux-6.11.0-18-generic] (local build)
+Copyright (C) 2002-23, Bruce Allen, Christian Franke, www.smartmontools.org
+
+=== START OF INFORMATION SECTION ===
+Device Model:     QEMU HARDDISK
+Serial Number:    QM00001
+Firmware Version: 2.5+
+User Capacity:    8,589,934,592 bytes [8.58 GB]
+Sector Size:      512 bytes logical/physical
+TRIM Command:     Available, deterministic
+Device is:        Not in smartctl database 7.3/5528
+ATA Version is:   ATA/ATAPI-7, ATA/ATAPI-5 published, ANSI NCITS 340-2000
+Local Time is:    Tue Mar  4 05:45:56 2025 UTC
+SMART support is: Available - device has SMART capability.
+SMART support is: Enabled
+</code></pre><p>If we wanted to match this disk by wild-carding the model name, we would use the following.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">storage</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">layout</span>:
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">name</span>: <span style="color:#ae81ff">lvm</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">sizing-policy</span>: <span style="color:#ae81ff">all</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">match</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">model</span>: <span style="color:#ae81ff">QEMU*</span>
+</span></span></code></pre></div><p>Alternatively if our on-premise hardware instance had a 1GB SSD for the OS and a second 12GB spinning disk for data storage, we could
+use a match with size <code>size: smallest</code> to install the OS on the 1GB disk.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">storage</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">layout</span>:
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">name</span>: <span style="color:#ae81ff">lvm</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">sizing-policy</span>: <span style="color:#ae81ff">all</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">match</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">size</span>: <span style="color:#ae81ff">smallest</span>
+</span></span></code></pre></div><h3 id="commands">Commands</h3>
+<p>Running arbitrary commands is possible when autoinstall runs.  Commands are specified as a list and run under &ldquo;sh -c&rdquo;.
+Its  possible to specify if commands should run early in the autoinstall process, late, or when an error occurs.</p>
+<p>For example we want to hit a web endpoint when the installer has completed.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">late-commands</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">curl -H &#39;Content-Type</span>: <span style="color:#ae81ff">application/json&#39; --data &#39;{&#34;host&#34;: &#34;&#39;$HOSTNAME&#39;&#34;}&#39; http://myapi.example.com/success</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">echo &#34;Install Success&#34;  &gt; /var/log/my.log</span>
+</span></span></code></pre></div><p>To run a command before the autoinstall process runs, like downloading internal x509 certificates:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">early-commands</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">mkdir /etc/ssl/mycerts</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">wget -O /etc/ssl/mycerts/internal.pem &#34;http://x509api.example.com/certs/$HOSTNAME&#34;</span>
+</span></span></code></pre></div><p>Or reporting an error when autoinstall fails</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">error-commands</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">echo &#34;Install failed&#34; &gt; /var/log/my.log</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">curl -H &#39;Content-Type</span>: <span style="color:#ae81ff">application/json&#39; --data &#39;{&#34;host&#34;: &#34;&#39;$HOSTNAME&#39;&#34;}&#39; http://myapi.example.com/failures</span>
+</span></span></code></pre></div><h3 id="cloud-init">cloud-init</h3>
+<p>It&rsquo;s possible to invoke cloud-init from autoinstall, allowing for additional functionality. This is done by placing
+the cloud-init entries under a user-data key.  Here&rsquo;s a cloud-init example that installs a few packages.</p>
+<p>cloud-init and
+autoinstall sometimes perform similar tasks. When configuring a storage device with cloud-init, I found it was
+better to use autoinstall as the cloud-init changes were overwritten.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">user-data</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">package_update</span>: <span style="color:#66d9ef">true</span>    <span style="color:#75715e"># update the list of available packages</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">package_upgrade</span>: <span style="color:#66d9ef">true</span>   <span style="color:#75715e"># upgrade currently installed packages.</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">packages</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">curl</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">ca-certificates</span>
+</span></span></code></pre></div><h3 id="other">Other</h3>
+<p>It&rsquo;s possible to configure a local proxy for downloading software packages.  Running apt-cacher-ng as a package
+proxy inside a docker container on my laptop helps when I&rsquo;m on a high latency Internet connection.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">proxy</span>: <span style="color:#ae81ff">http://10.0.2.2:3142</span>
+</span></span></code></pre></div><h2 id="provision-a-physical-host">Provision a physical host</h2>
+<p>A complete autoinstall user-data file can be downloaded from <a href="./assets/user-data">here</a>.  It contains all the examples listed in this post.</p>
+<p>Provisioning a physical host is very similar to using QEMU. The only change is when starting the python
+webserver.  Instead of python binding to 127.0.0.1, have it bind to all interfaces so configs can be downloaded
+by remote hosts.</p>
+<pre tabindex="0"><code class="language-code" data-lang="code">python3 -m http.server -d $PWD 8080
+</code></pre><p>A USB thumb drive is needed to make the Ubuntu ISO available to the physical host; and a monitor &amp; keyboard are needed
+to modify the GRUB menu when the on-premise hosts boots. When modifying the GRUB menu,
+instead of using http://10.0.2.2 in the nocloud URL, specify the hostname of the host running the python webserver.  In my scenario, the hostname would
+resolve to my personal laptop.</p>
+<h2 id="wrapping-up">Wrapping Up</h2>
+<p>By leveraging autoinstall, it&rsquo;s possible to reliably reproduce system setups, whether for virtual machines or bare-metal hosts.
+In this post, autoinstall was explored as a method to streamline unattended provisioning for Ubuntu instances.  Using a QEMU-based test environment,
+it was possible to quickly iterate on autoinstall configurations by modifying the GRUB menu to pull configuration files over HTTP.  The process demonstrated
+how to format storage devices, set up networking, and run shell commands during installation.</p>
+<p>Next steps?  If looking to extend this setup, consider integrating additional automation, such as PXE boot for network-based installs or using cloud-init to
+interact with configuration management systems like Puppet or Chef.  If you have insights from your own experiences, feel free to share them
+on <a href="https://bsky.app/profile/amf3.bsky.social">Bluesky</a>.</p>
+]]></content:encoded>
+    </item>
     <item>
       <title>Getting started with cloud-init for unattended Linux deployments</title>
       <link>https://amf3.github.io/articles/cloudinit/intro/</link>
