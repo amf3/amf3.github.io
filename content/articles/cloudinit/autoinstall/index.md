@@ -2,6 +2,10 @@
 title: Unattended Ubuntu Installs - Virtual Machines to Bare-Metal
 date: 2025-03-03T23:07:23-08:00
 draft: false
+searchHidden: false
+showtoc: true
+categories: [cloud, automation, operations]
+robotsNoIndex: false
 ---
 
 ## Intro
