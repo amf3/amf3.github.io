@@ -4,10 +4,154 @@
     <title>Cloud on Adam Faris</title>
     <link>https://amf3.github.io/categories/cloud/</link>
     <description>Recent content in Cloud on Adam Faris</description>
-    <generator>Hugo -- 0.144.2</generator>
+    <generator>Hugo -- 0.135.0</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 03 Mar 2025 23:07:23 -0800</lastBuildDate>
+    <lastBuildDate>Fri, 21 Mar 2025 16:28:54 -0400</lastBuildDate>
     <atom:link href="https://amf3.github.io/categories/cloud/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>cloud-init troubleshooting</title>
+      <link>https://amf3.github.io/articles/cloudinit/troubleshooting/</link>
+      <pubDate>Fri, 21 Mar 2025 16:28:54 -0400</pubDate>
+      <guid>https://amf3.github.io/articles/cloudinit/troubleshooting/</guid>
+      <description>&lt;h1 id=&#34;introduction&#34;&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;I previously wrote an &lt;a href=&#34;../../../articles/cloudinit/intro/&#34;&gt;introduction&lt;/a&gt; to cloud-init. I&amp;rsquo;d like to now follow up with a discussion on
+troubleshooting. cloud-init failures on remote hosts can be challenging. Depending on the failure point, cloud-init may or may not
+provide clear error indicators.  These are methods I use during provisioning issues related to cloud-init.&lt;/p&gt;
+&lt;h1 id=&#34;understanding-cloud-init-execution-stages&#34;&gt;Understanding cloud-init execution stages&lt;/h1&gt;
+&lt;p&gt;Before continuing, let&amp;rsquo;s cover some background.  cloud-init follows
+&lt;a href=&#34;https://cloudinit.readthedocs.io/en/latest/explanation/boot.html&#34;&gt;five stages&lt;/a&gt; during boot which run sequentially. If
+a stage completes, output will contain a status that can be used to verify that stage was successful.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<h1 id="introduction">Introduction</h1>
+<p>I previously wrote an <a href="../../../articles/cloudinit/intro/">introduction</a> to cloud-init. I&rsquo;d like to now follow up with a discussion on
+troubleshooting. cloud-init failures on remote hosts can be challenging. Depending on the failure point, cloud-init may or may not
+provide clear error indicators.  These are methods I use during provisioning issues related to cloud-init.</p>
+<h1 id="understanding-cloud-init-execution-stages">Understanding cloud-init execution stages</h1>
+<p>Before continuing, let&rsquo;s cover some background.  cloud-init follows
+<a href="https://cloudinit.readthedocs.io/en/latest/explanation/boot.html">five stages</a> during boot which run sequentially. If
+a stage completes, output will contain a status that can be used to verify that stage was successful.</p>
+<p><strong>Detect stage:</strong> The init system is responsible for calling
+<a href="https://github.com/canonical/cloud-init/blob/main/tools/ds-identify">ds_identify</a> to determine whether cloud-init
+should run.  With systemd hosts, this is implemented as a systemd generator.</p>
+<p><strong>Local stage:</strong> Identifies local resources that are available without network access. Configures networking, which if unsuccessful
+falls back to DHCP.</p>
+<p><strong>Network stage:</strong> Retrieves user-data, sets up disk partitions, and mounts the filesystem.  When complete, serial console or SSH access
+should become available.</p>
+<p><strong>Config stage:</strong> Runs configuration modules and executes commands specified in user-data.</p>
+<p><strong>Final stage:</strong> Installs packages, applies configuration management plugins like puppet or chef, and runs user or vendor defined scripts.</p>
+<h1 id="checking-stage-status">Checking Stage Status</h1>
+<p>The <strong>status</strong> submenu from the cloud-init command provides a method of checking each stage for errors.  In this
+example I intentionally mistyped a schema key name that should be <code>passwd</code> as <code>password</code>.  Output shows the failure
+occurred during the init stage &amp; provides a suggestion on how to resolve it.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ cloud-init status --format json
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;extended_status&#34;</span>: <span style="color:#e6db74">&#34;degraded done&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;init&#34;</span>: <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;errors&#34;</span>: <span style="color:#f92672">[]</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;finished&#34;</span>: 6.52,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;recoverable_errors&#34;</span>: <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;WARNING&#34;</span>: <span style="color:#f92672">[</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;cloud-config failed schema validation! You may run &#39;sudo cloud-init schema --system&#39; to check the details.&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>,
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;status&#34;</span>: <span style="color:#e6db74">&#34;done&#34;</span>
+</span></span></code></pre></div><h1 id="checking-logs-for-errors">Checking logs for Errors</h1>
+<p>When the issue is not obvious, there logs are available for further examination.</p>
+<ul>
+<li>/var/log/cloud-init.log  (execution details and errors)</li>
+<li>/var/log/cloud-init-output.log  (captured output from executed commands)</li>
+<li>/run/cloud-init/result.json  (summary of execution status)</li>
+</ul>
+<p>Example log output from cloud-init.log indicating a schema validation failure.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>2025-03-18 11:46:41,379 - schema.py<span style="color:#f92672">[</span>WARNING<span style="color:#f92672">]</span>: cloud-config failed schema validation! You may run <span style="color:#e6db74">&#39;sudo cloud-init schema --system&#39;</span> to check the details.
+</span></span></code></pre></div><h1 id="debugging-user-data-issues">Debugging User-Data Issues</h1>
+<p>cloud-init has a defined schema and it’s possible to validate user-data content with the <strong>schema</strong> submenu.
+To troubleshoot a possible schema issue on a remote host where a YAML key named <code>passwd</code> was mistyped as <code>password</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo cloud-init schema --system
+</span></span><span style="display:flex;"><span>Found cloud-config data types: user-data, vendor-data, network-config
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>1. user-data at /var/lib/cloud/instances/docker-demo/cloud-config.txt:
+</span></span><span style="display:flex;"><span>  Invalid user-data /var/lib/cloud/instances/docker-demo/cloud-config.txt
+</span></span><span style="display:flex;"><span>  Error: Cloud config schema errors: users.0: Additional properties are not allowed <span style="color:#f92672">(</span><span style="color:#e6db74">&#39;password&#39;</span> was unexpected<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>…
+</span></span><span style="display:flex;"><span>Error: Invalid schema: user-data
+</span></span></code></pre></div><p>To test changes made to user-data content prior to provisioning: <code>cloud-init schema -c “my_user_data_file.yaml”</code>.</p>
+<p>For timeout issues in user or vendor scripts, <code>cloud-init analyze</code> will print execution times which pinpoint delays.</p>
+<h1 id="common-failure-scenarios-and-fixes">Common Failure Scenarios and Fixes</h1>
+<p>A typical source of failures is from syntax errors in the user-data file.  As already mentioned, <code>cloud-init schema</code> will
+show schema issues in user-data.  Manually check for typos within the values in user-data. A mistyped value is
+still a string and can pass the schema validation.</p>
+<p>Another possible issue is misconfigured network settings preventing package installation.  Ensure package mirrors are reachable
+and contain the package.  The <strong>cloud-init-output.log</strong> file can show additional hints related to package failures.  If SSH is unavailable,
+try accessing the instance over the instance&rsquo;s serial console.</p>
+<p>Check for missing or incorrectly set permissions on scripts.</p>
+<p>Use <code>cloud-init analyze show</code> to help in identifying long-running stages.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ cloud-init analyze show
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>-- Boot Record <span style="color:#ae81ff">01</span> --
+</span></span><span style="display:flex;"><span>The total time elapsed since completing an event is printed after the <span style="color:#e6db74">&#34;@&#34;</span> character.
+</span></span><span style="display:flex;"><span>The time the event takes is printed after the <span style="color:#e6db74">&#34;+&#34;</span> character.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Starting stage: init-local
+</span></span><span style="display:flex;"><span>|<span style="color:#e6db74">`</span>-&gt;no cache found @00.00100s +00.00000s
+</span></span><span style="display:flex;"><span>|<span style="color:#e6db74">`</span>-&gt;found local data from DataSourceNoCloud @00.00400s +00.01500s
+</span></span><span style="display:flex;"><span>Finished stage: <span style="color:#f92672">(</span>init-local<span style="color:#f92672">)</span> 00.28900 seconds
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Starting stage: init-network
+</span></span><span style="display:flex;"><span>|<span style="color:#e6db74">`</span>-&gt;restored from cache with run check: DataSourceNoCloud <span style="color:#f92672">[</span>seed<span style="color:#f92672">=</span>/dev/vda<span style="color:#f92672">]</span> @02.56800s +00.00100s
+</span></span><span style="display:flex;"><span>|<span style="color:#e6db74">`</span>-&gt;setting up datasource @02.57600s +00.00000s
+</span></span><span style="display:flex;"><span>|<span style="color:#e6db74">`</span>-&gt;reading and applying user-data @02.58000s +00.00200s
+</span></span><span style="display:flex;"><span>|<span style="color:#e6db74">`</span>-&gt;reading and applying vendor-data @02.58200s +00.00200s
+</span></span><span style="display:flex;"><span>|<span style="color:#e6db74">`</span>-&gt;reading and applying vendor-data2 @02.58400s +00.00000s
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><h1 id="recovery-and-re-runs">Recovery and Re-Runs</h1>
+<p>Additional steps are needed after modifying user-data files on the failed instance. When cloud-init runs, output is
+cached to disk.  If the cache exists on reboot, cloud-init will not run again.  To clean cached instance data,
+run <code>cloud-init clean --logs</code> and reboot the instance.</p>
+<p>Issues with a specific module can be exposed by using <code>cloud-init single</code>.  This could be useful when
+troubleshooting user or vendor scripts.  Module names can be found with <code>grep &quot;Running module&quot; /var/log/cloud-init.log</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo cloud-init single --name set_passwords
+</span></span><span style="display:flex;"><span>Cloud-init v. 24.4.1-0ubuntu0~24.04.1 running <span style="color:#e6db74">&#39;single&#39;</span> at Fri, <span style="color:#ae81ff">21</span> Mar <span style="color:#ae81ff">2025</span> 20:45:47 +0000. Up 16145.16 seconds.
+</span></span></code></pre></div><p>When using the <strong>single</strong> submenu, it won&rsquo;t necessarily fix dependencies unless those are also explicitly re-triggered.  It&rsquo;s best
+to reprovision the instance after troubleshooting any failed modules.</p>
+<h1 id="takeaways">Takeaways</h1>
+<p>There’s no simple fix for understanding why instance provisioning with cloud-init failed.  That’s why I’m
+closing with a checklist.</p>
+<ul>
+<li>Check cloud-init status
+<ul>
+<li>Use <code>cloud-init status --long</code> (or &ndash;json) for execution state</li>
+<li>Use <code>cloud-init analyze</code> for timing analysis</li>
+</ul>
+</li>
+<li>Inspect logs for errors
+<ul>
+<li>/var/log/cloud-init.log: Shows errors and execution order</li>
+<li>/var/log/cloud-init-output.log: contains command output</li>
+</ul>
+</li>
+<li>Validate user-data input
+<ul>
+<li><code>cloud-init schema</code> to validate syntax</li>
+<li>Ensure values are correct and not only properly formatted YAML</li>
+</ul>
+</li>
+<li>Check for missing dependencies or network issues
+<ul>
+<li>Ensure package mirrors are available and contain the necessary packages.</li>
+<li>Verify custom scripts are executable.</li>
+</ul>
+</li>
+<li>Re-run cloud-init if needed.
+<ul>
+<li>Clean logs and reset cloud-init: <code>cloud-init clean --logs</code> &amp;&amp; reboot</li>
+<li>Manually rerun a failed module: <code>cloud-init single -n “some_module_name”</code></li>
+</ul>
+</li>
+</ul>
+<p>Happy provisioning and good luck!</p>
+]]></content:encoded>
+    </item>
     <item>
       <title>Unattended Ubuntu Installs - Virtual Machines to Bare-Metal</title>
       <link>https://amf3.github.io/articles/cloudinit/autoinstall/</link>

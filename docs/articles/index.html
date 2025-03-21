@@ -149,6 +149,20 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">cloud-init troubleshooting
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Introduction I previously wrote an introduction to cloud-init. I’d like to now follow up with a discussion on troubleshooting. cloud-init failures on remote hosts can be challenging. Depending on the failure point, cloud-init may or may not provide clear error indicators. These are methods I use during provisioning issues related to cloud-init.
+Understanding cloud-init execution stages Before continuing, let’s cover some background. cloud-init follows five stages during boot which run sequentially. If a stage completes, output will contain a status that can be used to verify that stage was successful.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-03-21 16:28:54 -0400 EDT'>March 21, 2025</span></footer>
+  <a class="entry-link" aria-label="post link to cloud-init troubleshooting" href="https://amf3.github.io/articles/cloudinit/troubleshooting/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">Unattended Ubuntu Installs - Virtual Machines to Bare-Metal
     </h2>
   </header>
@@ -157,7 +171,7 @@
 autoinstall is a tool that allows for unattended installations of Ubuntu, ensuring consistency, reporducibility, and providing automation across a fleet of hosts. In this post I’ll walk through an example of using autoinstall to configure networking, local storage, and demonstrate shell command execution during provisioning.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-03-03 23:07:23 -0800 PST'>March 3, 2025</span></footer>
+  <footer class="entry-footer"><span title='2025-03-03 23:07:23 -0800 -0800'>March 3, 2025</span></footer>
   <a class="entry-link" aria-label="post link to Unattended Ubuntu Installs - Virtual Machines to Bare-Metal" href="https://amf3.github.io/articles/cloudinit/autoinstall/"></a>
 </article>
 
@@ -171,7 +185,7 @@ autoinstall is a tool that allows for unattended installations of Ubuntu, ensuri
 cloud-init is a useful tool that doesn’t rely on network services like PXE as a dependency. Its simplicity saves time by removing the need to navigate OS installation menus, while ensuring user accounts and installed software packages are consistent across hosts. So why should one bother using cloud-init if they are managing a single host at home? In the event the OS needs to be reinstalled due to failure, cloud-init allows one to quickly restore the system to a known state.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-02-21 23:06:35 -0800 PST'>February 21, 2025</span></footer>
+  <footer class="entry-footer"><span title='2025-02-21 23:06:35 -0800 -0800'>February 21, 2025</span></footer>
   <a class="entry-link" aria-label="post link to Getting started with cloud-init for unattended Linux deployments" href="https://amf3.github.io/articles/cloudinit/intro/"></a>
 </article>
     </main>
