@@ -1,25 +1,36 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto">
 
-<head><meta charset="utf-8">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="index, follow">
-<title>posts | Adam Faris</title>
+<meta name="robots" content="noindex, nofollow">
+<title>Three tips for qemu images | Adam Faris</title>
 <meta name="keywords" content="">
-<meta name="description" content="posts - Adam Faris">
+<meta name="description" content="About QEMU images
+One - Snapshots
+what snapshots do
+take a snapshot
+List snapshots
+Roll back a snapshot
+Roll forward a snapshot
+Two - Modify a QEMU image
+Kernel module
+MacOS
+Three - Transfer a QEMU image to bare-metal
+Convert image
+DD commands">
 <meta name="author" content="">
-<link rel="canonical" href="https://amf3.github.io/posts/">
+<link rel="canonical" href="http://localhost:1313/articles/virtualization/3_qemuimage_things/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.f49d66caae9ea0fd43f21f29e71a8d3e284517ed770f2aa86fa012953ad3c9ef.css" integrity="sha256-9J1myq6eoP1D8h8p5xqNPihFF&#43;13Dyqob6ASlTrTye8=" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://amf3.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://amf3.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://amf3.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://amf3.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://amf3.github.io/safari-pinned-tab.svg">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" type="application/rss+xml" href="https://amf3.github.io/posts/index.xml">
-<link rel="alternate" hreflang="en" href="https://amf3.github.io/posts/">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/articles/virtualization/3_qemuimage_things/">
 <noscript>
     <style>
         #theme-toggle,
@@ -56,33 +67,10 @@
         }
 
     </style>
-</noscript><meta property="og:url" content="https://amf3.github.io/posts/">
-  <meta property="og:site_name" content="Adam Faris">
-  <meta property="og:title" content="posts">
-  <meta property="og:locale" content="en-us">
-  <meta property="og:type" content="website">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="posts">
-<meta name="twitter:description" content="">
-
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position":  1 ,
-      "name": "posts",
-      "item": "https://amf3.github.io/posts/"
-    }
-  ]
-}
-</script>
+</noscript>
 </head>
 
-<body class="list" id="top">
+<body class="" id="top">
 <script>
     if (localStorage.getItem("pref-theme") === "dark") {
         document.body.classList.add('dark');
@@ -97,7 +85,7 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://amf3.github.io/" accesskey="h" title="Adam Faris (Alt + H)">Adam Faris</a>
+            <a href="http://localhost:1313/" accesskey="h" title="Adam Faris (Alt + H)">Adam Faris</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
                     <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
@@ -123,33 +111,110 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://amf3.github.io/search/" title="search (Alt &#43; /)" accesskey=/>
+                <a href="http://localhost:1313/search/" title="search (Alt &#43; /)" accesskey=/>
                     <span>search</span>
                 </a>
             </li>
             <li>
-                <a href="https://amf3.github.io/articles/" title="articles">
+                <a href="http://localhost:1313/articles/" title="articles">
                     <span>articles</span>
                 </a>
             </li>
             <li>
-                <a href="https://amf3.github.io/about/" title="about">
+                <a href="http://localhost:1313/about/" title="about">
                     <span>about</span>
                 </a>
             </li>
         </ul>
     </nav>
 </header>
-<main class="main"> 
-<header class="page-header"><div class="breadcrumbs"><a href="https://amf3.github.io/">Home</a></div>
-  <h1>
-    posts
-  </h1>
-</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/articles/">articles</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Three tips for qemu images
+    </h1>
+    <div class="post-meta"><span title='2025-04-06 07:41:29 -0400 AST'>April 6, 2025</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#about-qemu-images" aria-label="About QEMU images">About QEMU images</a></li>
+                <li>
+                    <a href="#one---snapshots" aria-label="One - Snapshots">One - Snapshots</a><ul>
+                        
+                <li>
+                    <a href="#what-snapshots-do" aria-label="what snapshots do">what snapshots do</a></li>
+                <li>
+                    <a href="#take-a-snapshot" aria-label="take a snapshot">take a snapshot</a></li>
+                <li>
+                    <a href="#list-snapshots" aria-label="List snapshots">List snapshots</a></li>
+                <li>
+                    <a href="#roll-back-a-snapshot" aria-label="Roll back a snapshot">Roll back a snapshot</a></li>
+                <li>
+                    <a href="#roll-forward-a-snapshot" aria-label="Roll forward a snapshot">Roll forward a snapshot</a></li></ul>
+                </li>
+                <li>
+                    <a href="#two---modify-a-qemu-image" aria-label="Two - Modify a QEMU image">Two - Modify a QEMU image</a><ul>
+                        
+                <li>
+                    <a href="#kernel-module" aria-label="Kernel module">Kernel module</a></li>
+                <li>
+                    <a href="#macos" aria-label="MacOS">MacOS</a></li></ul>
+                </li>
+                <li>
+                    <a href="#three---transfer-a-qemu-image-to-bare-metal" aria-label="Three - Transfer a QEMU image to bare-metal">Three - Transfer a QEMU image to bare-metal</a><ul>
+                        
+                <li>
+                    <a href="#convert-image" aria-label="Convert image">Convert image</a></li>
+                <li>
+                    <a href="#dd-commands" aria-label="DD commands">DD commands</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="about-qemu-images">About QEMU images<a hidden class="anchor" aria-hidden="true" href="#about-qemu-images">#</a></h1>
+<h1 id="one---snapshots">One - Snapshots<a hidden class="anchor" aria-hidden="true" href="#one---snapshots">#</a></h1>
+<h2 id="what-snapshots-do">what snapshots do<a hidden class="anchor" aria-hidden="true" href="#what-snapshots-do">#</a></h2>
+<h2 id="take-a-snapshot">take a snapshot<a hidden class="anchor" aria-hidden="true" href="#take-a-snapshot">#</a></h2>
+<h2 id="list-snapshots">List snapshots<a hidden class="anchor" aria-hidden="true" href="#list-snapshots">#</a></h2>
+<h2 id="roll-back-a-snapshot">Roll back a snapshot<a hidden class="anchor" aria-hidden="true" href="#roll-back-a-snapshot">#</a></h2>
+<h2 id="roll-forward-a-snapshot">Roll forward a snapshot<a hidden class="anchor" aria-hidden="true" href="#roll-forward-a-snapshot">#</a></h2>
+<h1 id="two---modify-a-qemu-image">Two - Modify a QEMU image<a hidden class="anchor" aria-hidden="true" href="#two---modify-a-qemu-image">#</a></h1>
+<h2 id="kernel-module">Kernel module<a hidden class="anchor" aria-hidden="true" href="#kernel-module">#</a></h2>
+<h2 id="macos">MacOS<a hidden class="anchor" aria-hidden="true" href="#macos">#</a></h2>
+<h1 id="three---transfer-a-qemu-image-to-bare-metal">Three - Transfer a QEMU image to bare-metal<a hidden class="anchor" aria-hidden="true" href="#three---transfer-a-qemu-image-to-bare-metal">#</a></h1>
+<h2 id="convert-image">Convert image<a hidden class="anchor" aria-hidden="true" href="#convert-image">#</a></h2>
+<h2 id="dd-commands">DD commands<a hidden class="anchor" aria-hidden="true" href="#dd-commands">#</a></h2>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+
+<ul class="share-buttons">
+</ul>
+
+  </footer>
+</article>
     </main>
     
 <footer class="footer">
-        <span>&copy; 2025 <a href="https://amf3.github.io/">Adam Faris</a></span> · 
+        <span>&copy; 2025 <a href="http://localhost:1313/">Adam Faris</a></span> · 
 
     <span>
         Powered by

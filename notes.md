@@ -3,23 +3,31 @@
 ### Update the papermod theme
 
 ```
-cd themes/PaperMod
-git pull
+git submodule update --remote --merge
 ```
 
 ### Local builds
 
-Run the followwing to serve locally
+Run the following to serve locally
 ```
- $ hugo serve --minify  --disableFastRender
+ $ hugo serve
 ```
 
-I can then visit http://localhost:1313/ with a web browser to view the local changes.
+Visit http://localhost:1313/ with a web browser to view the local changes.
 
 ### To publish
 
-publishDir has been changed to docs to allow building locally & pushing the repo to github.  As 
-new content will get generated in docs, this will get picked up by github pages & served.  To generate content 
+publishDir has been changed to `docs` to allow building locally & pushing the repo to github.  As 
+new content will get generated in `docs`, this will get picked up by github pages & served.  
+
+To create a new page.  This is considered a [page bundle](https://gohugo.io/content-management/page-bundles/) 
+where all elements are stored in the my_topic directory.
+
+```
+hugo new content/articles/my_topic/index.md
+```
+
+To publish content to github 
 
 * run `hugo` without any args.  This will generate the content/
 * git add, commit, push

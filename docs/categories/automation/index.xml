@@ -190,7 +190,7 @@ boot from the virtual disk. The other options initialize a 4 core CPU with 4GB o
 port forward from localhost on the host system to port 22 on the virtual machine.  If additional port forwarding is needed, like testing
 https traffic on port 443 of the VM, multiple hostfwd options seperated by commas can used.  Be sure to adjust the filename and path to the Ubuntu ISO
 as needed.</p>
-<pre tabindex="0"><code class="language-code" data-lang="code">qemu-system-x86_64 -hda virtual_disk.img -boot once=d  -cdrom ./ubuntu-24.10-live-server-amd64.iso -m 4096 -smp cpus=4 -net nic,model=virtio -net user,hostfwd=tcp:127.0.0.1:22-:22
+<pre tabindex="0"><code class="language-code" data-lang="code">qemu-system-x86_64 -hda virtual_disk.img -boot once=d  -cdrom ./ubuntu-24.10-live-server-amd64.iso -m 4096 -smp cpus=4 -net nic,model=virtio -net user,hostfwd=tcp:127.0.0.1:2222-:22
 </code></pre><h2 id="autoinstall">Autoinstall</h2>
 <p>Autoinstall is included as part of the Ubuntu boot ISO and works with other provisioning tools from Canonical like
 <a href="https://canonical-subiquity.readthedocs-hosted.com/en/latest/">Subiquity</a>,
@@ -206,7 +206,7 @@ webserver runs in the foreground.  Use cntl-c to terminate the python webserver 
 <pre tabindex="0"><code class="language-code" data-lang="code">touch user-data meta-data network-config vendor-data
 python3 -m http.server -b 127.0.0.1 -d $PWD 8080
 </code></pre><p>Next start the virtual machine.</p>
-<pre tabindex="0"><code class="language-code" data-lang="code">qemu-system-x86_64 -hda virtual_disk.img -boot once=d  -cdrom ./ubuntu-24.10-live-server-amd64.iso -m 4096 -smp cpus=4 -net nic,model=virtio -net user,hostfwd=tcp:127.0.0.1:22-:22
+<pre tabindex="0"><code class="language-code" data-lang="code">qemu-system-x86_64 -hda virtual_disk.img -boot once=d  -cdrom ./ubuntu-24.10-live-server-amd64.iso -m 4096 -smp cpus=4 -net nic,model=virtio -net user,hostfwd=tcp:127.0.0.1:2222-:22
 </code></pre><p>This will open a QEMU console window where we&rsquo;ll interact with the GRUB menu to specify the YAML file locations. Change focus to
 the console window, highlight &ldquo;Try or Install Ubuntu Server&rdquo; and hit the <code>&quot;e&quot;</code> key to edit the grub menu.</p>
 <p>On the line starting with “linux /casper/vmlinuz” add:  <code>autoinstall ds=nocloud\;s=http://10.0.2.2:8080/</code>  before
