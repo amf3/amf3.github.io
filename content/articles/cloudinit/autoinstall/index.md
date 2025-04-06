@@ -44,7 +44,7 @@ https traffic on port 443 of the VM, multiple hostfwd options seperated by comma
 as needed.
 
 ```code
-qemu-system-x86_64 -hda virtual_disk.img -boot once=d  -cdrom ./ubuntu-24.10-live-server-amd64.iso -m 4096 -smp cpus=4 -net nic,model=virtio -net user,hostfwd=tcp:127.0.0.1:22-:22
+qemu-system-x86_64 -hda virtual_disk.img -boot once=d  -cdrom ./ubuntu-24.10-live-server-amd64.iso -m 4096 -smp cpus=4 -net nic,model=virtio -net user,hostfwd=tcp:127.0.0.1:2222-:22
 ```
 
 ## Autoinstall
@@ -71,7 +71,7 @@ python3 -m http.server -b 127.0.0.1 -d $PWD 8080
 Next start the virtual machine.
 
 ```code
-qemu-system-x86_64 -hda virtual_disk.img -boot once=d  -cdrom ./ubuntu-24.10-live-server-amd64.iso -m 4096 -smp cpus=4 -net nic,model=virtio -net user,hostfwd=tcp:127.0.0.1:22-:22
+qemu-system-x86_64 -hda virtual_disk.img -boot once=d  -cdrom ./ubuntu-24.10-live-server-amd64.iso -m 4096 -smp cpus=4 -net nic,model=virtio -net user,hostfwd=tcp:127.0.0.1:2222-:22
 ```
 
 This will open a QEMU console window where we'll interact with the GRUB menu to specify the YAML file locations. Change focus to

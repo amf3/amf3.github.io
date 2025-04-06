@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Virtualization on Adam Faris</title>
+    <link>https://amf3.github.io/categories/virtualization/</link>
+    <description>Recent content in Virtualization on Adam Faris</description>
+    <generator>Hugo -- 0.135.0</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 06 Apr 2025 07:41:29 -0400</lastBuildDate>
+    <atom:link href="https://amf3.github.io/categories/virtualization/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Tips for working with qemu images</title>
+      <link>https://amf3.github.io/articles/virtualization/qemuimage_tips/</link>
+      <pubDate>Sun, 06 Apr 2025 07:41:29 -0400</pubDate>
+      <guid>https://amf3.github.io/articles/virtualization/qemuimage_tips/</guid>
+      <description>&lt;h1 id=&#34;about-qemu-images&#34;&gt;About QEMU images&lt;/h1&gt;
+&lt;p&gt;QEMU uses files to emulate storage devices, and the features available
+depend on how those files are created.  While QEMU can emulate disks from Parallels and VirtualBox, I’m going to
+focus on the formats most commonly used in automation and scripting, &lt;strong&gt;raw&lt;/strong&gt; and &lt;strong&gt;qcow2&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;The default format is raw and raw offers the fewest features.  It&amp;rsquo;s just plain storage.  The other format qcow2
+supports compression, snapshots, and copy-on-write in addition to storage.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<h1 id="about-qemu-images">About QEMU images</h1>
+<p>QEMU uses files to emulate storage devices, and the features available
+depend on how those files are created.  While QEMU can emulate disks from Parallels and VirtualBox, I’m going to
+focus on the formats most commonly used in automation and scripting, <strong>raw</strong> and <strong>qcow2</strong>.</p>
+<p>The default format is raw and raw offers the fewest features.  It&rsquo;s just plain storage.  The other format qcow2
+supports compression, snapshots, and copy-on-write in addition to storage.</p>
+<h2 id="raw-format">Raw Format</h2>
+<p>Creating a raw disk with qemu-img is similar to using dd to create a block-based file. One can see this with
+the output of <strong>qemu-img info</strong>.</p>
+<p>Here I create two storage devices, one with qemu-img which defaults to the raw format and another with the
+dd command.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img create my_disk.img +1m         
+</span></span><span style="display:flex;"><span>Formatting <span style="color:#e6db74">&#39;my_disk.img&#39;</span>, fmt<span style="color:#f92672">=</span>raw size<span style="color:#f92672">=</span><span style="color:#ae81ff">1048576</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>/dev/zero of<span style="color:#f92672">=</span>my_block.file count<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> bs<span style="color:#f92672">=</span>1m
+</span></span><span style="display:flex;"><span>1+0 records in
+</span></span><span style="display:flex;"><span>1+0 records out
+</span></span></code></pre></div><p>Now let&rsquo;s use <strong>qemu-img info</strong> to confirm there&rsquo;s no difference between the two files.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img info my_disk.img  
+</span></span><span style="display:flex;"><span>image: my_disk.img
+</span></span><span style="display:flex;"><span>file format: raw
+</span></span><span style="display:flex;"><span>virtual size: <span style="color:#ae81ff">1</span> MiB <span style="color:#f92672">(</span><span style="color:#ae81ff">1048576</span> bytes<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>disk size: <span style="color:#ae81ff">1</span> MiB
+</span></span><span style="display:flex;"><span>Child node <span style="color:#e6db74">&#39;/file&#39;</span>:
+</span></span><span style="display:flex;"><span>    filename: my_disk.img
+</span></span><span style="display:flex;"><span>    protocol type: file
+</span></span><span style="display:flex;"><span>    file length: <span style="color:#ae81ff">1</span> MiB <span style="color:#f92672">(</span><span style="color:#ae81ff">1048576</span> bytes<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    disk size: <span style="color:#ae81ff">1</span> MiB
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% qemu-img info my_block.file 
+</span></span><span style="display:flex;"><span>image: my_block.file
+</span></span><span style="display:flex;"><span>file format: raw
+</span></span><span style="display:flex;"><span>virtual size: <span style="color:#ae81ff">1</span> MiB <span style="color:#f92672">(</span><span style="color:#ae81ff">1048576</span> bytes<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>disk size: <span style="color:#ae81ff">1</span> MiB
+</span></span><span style="display:flex;"><span>Child node <span style="color:#e6db74">&#39;/file&#39;</span>:
+</span></span><span style="display:flex;"><span>    filename: my_block.file
+</span></span><span style="display:flex;"><span>    protocol type: file
+</span></span><span style="display:flex;"><span>    file length: <span style="color:#ae81ff">1</span> MiB <span style="color:#f92672">(</span><span style="color:#ae81ff">1048576</span> bytes<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    disk size: <span style="color:#ae81ff">1</span> MiB
+</span></span></code></pre></div><h2 id="qcow2-format">Qcow2 Format</h2>
+<p>Creating a disk in <strong>qcow2</strong> format enables zlib compression by default.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img create -f qcow2 my_disk.img 1M 
+</span></span><span style="display:flex;"><span>Formatting <span style="color:#e6db74">&#39;my_disk.img&#39;</span>, fmt<span style="color:#f92672">=</span>qcow2 cluster_size<span style="color:#f92672">=</span><span style="color:#ae81ff">65536</span> extended_l2<span style="color:#f92672">=</span>off compression_type<span style="color:#f92672">=</span>zlib size<span style="color:#f92672">=</span><span style="color:#ae81ff">1048576</span> lazy_refcounts<span style="color:#f92672">=</span>off refcount_bits<span style="color:#f92672">=</span><span style="color:#ae81ff">16</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% qemu-img info my_disk.img 
+</span></span><span style="display:flex;"><span>image: my_disk.img
+</span></span><span style="display:flex;"><span>file format: qcow2
+</span></span><span style="display:flex;"><span>virtual size: <span style="color:#ae81ff">1</span> MiB <span style="color:#f92672">(</span><span style="color:#ae81ff">1048576</span> bytes<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>disk size: <span style="color:#ae81ff">196</span> KiB
+</span></span><span style="display:flex;"><span>cluster_size: <span style="color:#ae81ff">65536</span>
+</span></span><span style="display:flex;"><span>Format specific information:
+</span></span><span style="display:flex;"><span>    compat: 1.1
+</span></span><span style="display:flex;"><span>    compression type: zlib
+</span></span><span style="display:flex;"><span>    lazy refcounts: false
+</span></span><span style="display:flex;"><span>    refcount bits: <span style="color:#ae81ff">16</span>
+</span></span><span style="display:flex;"><span>    corrupt: false
+</span></span><span style="display:flex;"><span>    extended l2: false
+</span></span><span style="display:flex;"><span>Child node <span style="color:#e6db74">&#39;/file&#39;</span>:
+</span></span><span style="display:flex;"><span>    filename: my_disk.img
+</span></span><span style="display:flex;"><span>    protocol type: file
+</span></span><span style="display:flex;"><span>    file length: <span style="color:#ae81ff">192</span> KiB <span style="color:#f92672">(</span><span style="color:#ae81ff">197120</span> bytes<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    disk size: <span style="color:#ae81ff">196</span> KiB
+</span></span></code></pre></div><h1 id="tip-one---resize-an-image-file">Tip One - Resize an image file</h1>
+<p>It&rsquo;s possible to grow or shrink a QEMU storage device.  Think of this as expanding the physical SSD itself, not the filesystem
+that sits on it.  <strong>Important,</strong> when shrinking a image with negative values,
+<strong>always shrink the filesystem first</strong> using resize2fs before running qemu-img resize <strong>or risk data corruption.</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img resize my_disk.img +1m  
+</span></span><span style="display:flex;"><span>Image resized.
+</span></span></code></pre></div><p>When inspecting the new disk image, we see the new capacity is 2MB but the file size on disk is under 200KB.  This is because qcow2 supports
+copy-on-write and compression.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img info my_disk.img
+</span></span><span style="display:flex;"><span>image: my_disk.img
+</span></span><span style="display:flex;"><span>file format: qcow2
+</span></span><span style="display:flex;"><span>virtual size: <span style="color:#ae81ff">2</span> MiB <span style="color:#f92672">(</span><span style="color:#ae81ff">2097152</span> bytes<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>disk size: <span style="color:#ae81ff">196</span> KiB
+</span></span><span style="display:flex;"><span>cluster_size: <span style="color:#ae81ff">65536</span>
+</span></span><span style="display:flex;"><span>Format specific information:
+</span></span><span style="display:flex;"><span>    compat: 1.1
+</span></span><span style="display:flex;"><span>    compression type: zlib
+</span></span><span style="display:flex;"><span>    lazy refcounts: false
+</span></span><span style="display:flex;"><span>    refcount bits: <span style="color:#ae81ff">16</span>
+</span></span><span style="display:flex;"><span>    corrupt: false
+</span></span><span style="display:flex;"><span>    extended l2: false
+</span></span><span style="display:flex;"><span>Child node <span style="color:#e6db74">&#39;/file&#39;</span>:
+</span></span><span style="display:flex;"><span>    filename: my_disk.img
+</span></span><span style="display:flex;"><span>    protocol type: file
+</span></span><span style="display:flex;"><span>    file length: <span style="color:#ae81ff">192</span> KiB <span style="color:#f92672">(</span><span style="color:#ae81ff">197120</span> bytes<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    disk size: <span style="color:#ae81ff">196</span> KiB
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% ls -lh my_disk.img 
+</span></span><span style="display:flex;"><span>-rw-r--r--  <span style="color:#ae81ff">1</span> adam  staff   192K Apr  <span style="color:#ae81ff">6</span> 10:19 my_disk.img
+</span></span></code></pre></div><p>If I were to resize a QEMU storage file formatted as raw, the file size on disk of 2MB matches the image capacity of 2MB as raw
+doesn&rsquo;t support compression or copy-on-write.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img create raw_disk.img +2m
+</span></span><span style="display:flex;"><span>Formatting <span style="color:#e6db74">&#39;raw_disk.img&#39;</span>, fmt<span style="color:#f92672">=</span>raw size<span style="color:#f92672">=</span><span style="color:#ae81ff">2097152</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% ls -lh raw_disk.img 
+</span></span><span style="display:flex;"><span>-rw-r--r--  <span style="color:#ae81ff">1</span> adam  staff   2.0M Apr  <span style="color:#ae81ff">6</span> 10:22 raw_disk.img
+</span></span></code></pre></div><h1 id="tip-two---snapshots">Tip Two - Snapshots</h1>
+<p>Snapshots are supported with qcow2 devices.  These are handy for creating a base disk image that&rsquo;s shareable and later modified
+for other purposes.  Snapshots also make a great backup point before making image changes.</p>
+<p>To create a snapshot named &ldquo;my_first_snapshot&rdquo; inside an existing qcow2 image.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img snapshot -c my_first_snapshot my_disk.img 
+</span></span></code></pre></div><p>To list existing snapshots</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img snapshot -l my_disk.img 
+</span></span><span style="display:flex;"><span>Snapshot list:
+</span></span><span style="display:flex;"><span>ID      TAG               VM_SIZE                DATE        VM_CLOCK     ICOUNT
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span>       my_first_snapshot      <span style="color:#ae81ff">0</span> B 2025-04-06 10:37:07  0000:00:00.000          <span style="color:#ae81ff">0</span>
+</span></span></code></pre></div><p>To revert or &ldquo;apply&rdquo; a snapshot</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img snapshot -a my_first_snapshot my_disk.img 
+</span></span></code></pre></div><p>To delete a snapshot from a file</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img snapshot -d my_first_snapshot my_disk.img 
+</span></span></code></pre></div><h1 id="tip-three---modify-a-qemu-image">Tip Three - Modify a QEMU image</h1>
+<p>While many online guides suggest using the Network Block Device (NBD) kernel driver in Linux to mount and modify QEMU images, I
+use a different process that also works on MacOS.  My preferred method is to boot a VM using QEMU and attaching the image as a data drive.</p>
+<p>This example uses the <a href="https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/x86_64/alpine-extended-3.21.3-x86_64.iso">extended x86_64 Alpine Linux ISO</a>
+and a QEMU command that mounts the image as a data drive.  The Alpine extended ISO lets you log in as root with an empty password,
+which makes quick edits easy.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#75715e">#/bin/sh</span>
+</span></span><span style="display:flex;"><span>qemu-system-x86_64 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -m 2G -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial stdio <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -boot once<span style="color:#f92672">=</span>d  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -drive file<span style="color:#f92672">=</span>./my_disk.img,format<span style="color:#f92672">=</span>qcow2,media<span style="color:#f92672">=</span>disk,cache<span style="color:#f92672">=</span>unsafe <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -drive file<span style="color:#f92672">=</span>./alpine-extended-3.21.2-x86_64.iso,format<span style="color:#f92672">=</span>raw,media<span style="color:#f92672">=</span>cdrom <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -nic user,model<span style="color:#f92672">=</span>virtio-net-pci,hostfwd<span style="color:#f92672">=</span>tcp::2222-:22
+</span></span></code></pre></div><p>Once logged in, you&rsquo;ll see the QEMU file we want to modify listed as /dev/sda.  The device hasn&rsquo;t been formatted with a filesystem, but if
+one were present it could be mounted within the VM, files edited within the image, and then unmounted.</p>
+<h1 id="tip-four---transfer-a-qemu-image-to-bare-metal">Tip Four - Transfer a QEMU image to bare-metal</h1>
+<p>It&rsquo;s possible to use a QEMU image with bare-metal by converting it to <strong>raw</strong> format.  Use the following to convert the image from qcow2 to raw.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img convert -f qcow2 -O raw my_disk.img raw_disk.img
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% qemu-img info raw_disk.img 
+</span></span><span style="display:flex;"><span>image: raw_disk.img
+</span></span><span style="display:flex;"><span>file format: raw
+</span></span><span style="display:flex;"><span>virtual size: <span style="color:#ae81ff">10</span> MiB <span style="color:#f92672">(</span><span style="color:#ae81ff">10485760</span> bytes<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>disk size: <span style="color:#ae81ff">10</span> MiB
+</span></span><span style="display:flex;"><span>Child node <span style="color:#e6db74">&#39;/file&#39;</span>:
+</span></span><span style="display:flex;"><span>    filename: raw_disk.img
+</span></span><span style="display:flex;"><span>    protocol type: file
+</span></span><span style="display:flex;"><span>    file length: <span style="color:#ae81ff">10</span> MiB <span style="color:#f92672">(</span><span style="color:#ae81ff">10485760</span> bytes<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    disk size: <span style="color:#ae81ff">10</span> MiB
+</span></span></code></pre></div><p>Once we have the raw image, the <strong>dd</strong> command can be used to write the data to either a USB stick or physical SSD.  To avoid
+any destructive commands let&rsquo;s pretend raw_disk2.img represents /dev/sdc, your verified USB thumb drive.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>raw_disk.img of<span style="color:#f92672">=</span>raw_disk2.img bs<span style="color:#f92672">=</span>1m 
+</span></span><span style="display:flex;"><span>10+0 records in
+</span></span><span style="display:flex;"><span>10+0 records out
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">10485760</span> bytes transferred in 0.006266 secs <span style="color:#f92672">(</span><span style="color:#ae81ff">1673437600</span> bytes/sec<span style="color:#f92672">)</span>
+</span></span></code></pre></div><p>Because our raw file is only 10MB in size, only 10MB will be used on the thumb drive.  This is where follow up tools like LVM or
+resize2fs will extend the filesystem to fill the entire thumb drive.  Tools used for expansion depends on how the filesystem was created.</p>
+<h1 id="putting-it-all-together">Putting it all together</h1>
+<p>Enough with the documentation, let&rsquo;s put it into practice with a real use case.  Presume that after reading my <a href="../../../articles/cloudinit/intro/">cloud-init
+tutorials</a> you wish to modify the <a href="https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/cloud/nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2">Alpine Linux cloud-init image</a> before installation.</p>
+<p>We can see the downloaded file is a qcow2 image with a capacity of 200Mb from <strong>qemu-img info</strong>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span> % qemu-img info nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2 
+</span></span><span style="display:flex;"><span>image: nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2
+</span></span><span style="display:flex;"><span>file format: qcow2
+</span></span><span style="display:flex;"><span>virtual size: <span style="color:#ae81ff">200</span> MiB <span style="color:#f92672">(</span><span style="color:#ae81ff">209715200</span> bytes<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>disk size: <span style="color:#ae81ff">181</span> MiB
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>As we want to install our java app into the installer, we need to add space to the image with <strong>qemu-img resize</strong>.  But first,
+let’s create a snapshot. That way, if we make a mistake, we won’t need to re-download the cloud-init image.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img snapshot -c no_modifications nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% qemu-img resize nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2 +800M
+</span></span><span style="display:flex;"><span>Image resized.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> % qemu-img info nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2        
+</span></span><span style="display:flex;"><span>image: nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2
+</span></span><span style="display:flex;"><span>file format: qcow2
+</span></span><span style="display:flex;"><span>virtual size: 0.977 GiB <span style="color:#f92672">(</span><span style="color:#ae81ff">1048576000</span> bytes<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>disk size: <span style="color:#ae81ff">197</span> MiB
+</span></span><span style="display:flex;"><span>cluster_size: <span style="color:#ae81ff">65536</span>
+</span></span><span style="display:flex;"><span>Snapshot list:
+</span></span><span style="display:flex;"><span>ID      TAG               VM_SIZE                DATE        VM_CLOCK     ICOUNT
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span>       no_modifications      <span style="color:#ae81ff">0</span> B 2025-04-06 15:23:50  0000:00:00.000          <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>Format specific information:
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>I&rsquo;m still using the Alpine extended ISO to boot the VM. Alpine cloud images require setup for ssh key authentication to login and an
+empty root password is much easier to use.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-system-x86_64 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -m 2G -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial stdio <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -boot once<span style="color:#f92672">=</span>d  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -drive file<span style="color:#f92672">=</span>./nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2,format<span style="color:#f92672">=</span>qcow2,media<span style="color:#f92672">=</span>disk,cache<span style="color:#f92672">=</span>unsafe <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -drive file<span style="color:#f92672">=</span>./alpine-extended-3.21.2-x86_64.iso,format<span style="color:#f92672">=</span>raw,media<span style="color:#f92672">=</span>cdrom <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -nic user,model<span style="color:#f92672">=</span>virtio-net-pci,hostfwd<span style="color:#f92672">=</span>tcp::2222-:22
+</span></span></code></pre></div><p>Login as root and mount the disk device under /mnt</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>localhost:~# mount /dev/sda /mnt 
+</span></span><span style="display:flex;"><span>localhost:~# ls /mnt
+</span></span><span style="display:flex;"><span>bin         home        mnt         run         tmp
+</span></span><span style="display:flex;"><span>boot        lib         opt         sbin        usr
+</span></span><span style="display:flex;"><span>dev         lost+found  proc        srv         var
+</span></span><span style="display:flex;"><span>etc         media       root        sys
+</span></span></code></pre></div><p>Then make changes to the cloud image, unmount the filesystem and you&rsquo;re done.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>localhost:~# echo <span style="color:#e6db74">&#34;Adam Faris was here&#34;</span> &gt; /mnt/etc/motd 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>localhost:~# cat /mnt/etc/motd 
+</span></span><span style="display:flex;"><span>Adam Faris was here
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>localhost:~# umount /mnt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>localhost:~# poweroff
+</span></span></code></pre></div><p>Finally, convert our modified cloud image from qcow2 format to raw format, then use dd to write the raw image to a USB device.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img convert -f qcow2 -O nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2 alpine_cloudinit.raw
+</span></span><span style="display:flex;"><span>% dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>alpine_cloudinit.raw bs<span style="color:#f92672">=</span>1m of<span style="color:#f92672">=</span>/dev/...
+</span></span></code></pre></div><p>With the modified image written to the USB device, you can now boot a physical machine from it. Thanks for sticking with me until
+the end. If you find this content useful, follow me on <a href="https://@amf3.bsky.social">BlueSky social</a> for future announcements.</p>
+]]></content:encoded>
+    </item>
+  </channel>
+</rss>
