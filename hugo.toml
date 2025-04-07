@@ -26,7 +26,7 @@ weight = 30
 [outputs]
 home = [ "HTML", "RSS", "JSON" ]
 # home =  ["HTML", "RSS", "JSON"]
-# rss = ['rss']
+rss = ['rss']
 # page =  ["HTML", "RSS", "JSON"]
 # section =  ["HTML", "RSS", "JSON"]
 # taxonomy =  ["HTML", "RSS", "JSON"]
@@ -38,6 +38,12 @@ ShowShareButtons = 'true'
 ShareButtons = ['rss']
 ShowFullTextinRSS = 'true'
 mainSections = ['articles']
+analytics.google.SiteVerificationTag = '6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E'
+ShowWordCount = 'true'
+env = 'production'
+ShowCodeCopyButtons = 'true'
+
+
 
 [params.fuseOpts]
 isCaseSensitive = false

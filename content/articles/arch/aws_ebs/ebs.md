@@ -3,6 +3,8 @@ title: "Elastic Block Store Design for Home Lab Use"
 date: 2023-08-25T07:38:23-07:00
 draft: true
 categories: [homelab, architecture]
+robotsNoIndex: true
+searchHidden: true
 ---
 
 # TODO: Rewrite & make content more focused on the message.
