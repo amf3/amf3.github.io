@@ -63,7 +63,21 @@ a stage completes, output will contain a status that can be used to verify that 
         }
 
     </style>
-</noscript><meta property="og:url" content="https://amf3.github.io/articles/cloudinit/troubleshooting/">
+</noscript>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-MKR06D6KGD"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-MKR06D6KGD');
+        }
+      </script><meta property="og:url" content="https://amf3.github.io/articles/cloudinit/troubleshooting/">
   <meta property="og:site_name" content="Adam Faris">
   <meta property="og:title" content="cloud-init troubleshooting">
   <meta property="og:description" content="Introduction I previously wrote an introduction to cloud-init. I’d like to now follow up with a discussion on troubleshooting. cloud-init failures on remote hosts can be challenging. Depending on the failure point, cloud-init may or may not provide clear error indicators. These are methods I use during provisioning issues related to cloud-init.

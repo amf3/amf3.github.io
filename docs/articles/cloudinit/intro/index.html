@@ -65,7 +65,21 @@ the OS needs to be reinstalled due to failure, cloud-init allows one to quickly 
         }
 
     </style>
-</noscript><meta property="og:url" content="https://amf3.github.io/articles/cloudinit/intro/">
+</noscript>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-MKR06D6KGD"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-MKR06D6KGD');
+        }
+      </script><meta property="og:url" content="https://amf3.github.io/articles/cloudinit/intro/">
   <meta property="og:site_name" content="Adam Faris">
   <meta property="og:title" content="Getting started with cloud-init for unattended Linux deployments">
   <meta property="og:description" content="Intro Cloud compute companies like GCP, AWS, or Azure offer a management API for allocating resources. In the on-premise space, services such as Docker or Incus provide APIs for managing containers or virtual machines (VMs). But what about installing the operating system (OS) on bare-metal hosts? What API exists for this task? This is where cloud-init enters the picture, providing the ability to provision VMs or bare-metal hardware.
