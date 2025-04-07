@@ -3,7 +3,6 @@ title: "Contact"
 date: 2025-02-21T22:58:02-07:00
 draft: false
 searchHidden: true
-robotsNoIndex: false
 ---
 
 ### How to get in touch

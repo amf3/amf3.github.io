@@ -5,7 +5,6 @@ draft: false
 searchHidden: false
 showtoc: true
 categories: [cloud, automation, operations]
-robotsNoIndex: false
 ---
 
 ## Intro

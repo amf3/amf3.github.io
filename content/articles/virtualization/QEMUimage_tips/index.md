@@ -5,7 +5,6 @@ draft: false
 searchHidden: false
 showtoc: true
 categories: [cloud, virtualization, tips]
-robotsNoIndex: false
 ---
 
 # About QEMU images

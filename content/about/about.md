@@ -3,7 +3,6 @@ title: "Who, What, and Why"
 date: 2025-02-21T22:52:33-07:00
 draft: false
 searchHidden: true
-robotsNoIndex: false
 ---
 
 ### Who
