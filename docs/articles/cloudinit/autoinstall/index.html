@@ -63,7 +63,21 @@ to configure networking, local storage, and demonstrate shell command execution 
         }
 
     </style>
-</noscript><meta property="og:url" content="https://amf3.github.io/articles/cloudinit/autoinstall/">
+</noscript>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-MKR06D6KGD"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-MKR06D6KGD');
+        }
+      </script><meta property="og:url" content="https://amf3.github.io/articles/cloudinit/autoinstall/">
   <meta property="og:site_name" content="Adam Faris">
   <meta property="og:title" content="Unattended Ubuntu Installs - Virtual Machines to Bare-Metal">
   <meta property="og:description" content="Intro In a previous post, I discussed using cloud-init and Multipass as a method of provisioning virtual machines on a local computer with a cloud-like API. Today I am going to dive deeper with Ubuntu and how their autoinstall API can simplify on-premise host provisioning.
