@@ -39,6 +39,7 @@ ShareButtons = ['rss']
 ShowFullTextinRSS = 'true'
 mainSections = ['articles']
 analytics.google.SiteVerificationTag = '6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E'
+analytics.bing.SiteVerificationTag = 'C1E02AC59FE7ECBDB6D9EFB7D5E02B65'
 ShowWordCount = 'true'
 env = 'production'
 ShowCodeCopyButtons = 'true'
