@@ -1,0 +1,102 @@
+## Creating the VMs
+
+### RouterOS VM
+
+RouterOS "Cloud Hosted Router" (CHR) is a commercial product with a "free to use" license that limits upload speed to 1 Mbps.  
+This is perfectly fine for validating router configurations before deploying them to physical networks.
+
+You can download the CHR image from [MikroTik’s download page](https://mikrotik.com/download). I used the stable 7.x version and chose the **Raw disk image** — which is x86 (not ARM).
+
+> 💡 In hindsight, the ARM image might be more appropriate for Apple Silicon, but the x86 image works fine.
+
+![RouterOS Download Link](./assets/routerOS-dl-screenshot.png#center)
+
+---
+
+First, convert the raw image to `qcow2` format. This allows snapshotting the VM, making it easy to roll back from bad config changes:
+
+```sh
+% qemu-img convert -f raw -O qcow2 chr-7.18.2.img chr-7.18.2.qcow2
+% qemu-img snapshot -c original_image chr-7.18.2.qcow2
+% qemu-img info chr-7.18.2.qcow2 
+
+image: chr-7.18.2.qcow2
+file format: qcow2
+virtual size: 128 MiB (134217728 bytes)
+disk size: 44.2 MiB
+...
+Snapshot list:
+ID  TAG             VM_SIZE   DATE               VM_CLOCK        ICOUNT
+1   original_image  0 B       2025-05-08 22:40   0000:00:00.000  0
+
+
+
+Now, launch the RouterOS VM and create the two virtual networks:
+
+
+sudo qemu-system-x86_64 -m 2048 -smp cpus=4 -serial mon:stdio  \
+  -device virtio-scsi-pci,id=scsi0 \
+  -drive file=./chr-7.18.2.qcow2,if=none,format=qcow2,discard=unmap,id=hda \
+  -device scsi-hd,drive=hda,bus=scsi0.0 \
+  -device virtio-net-pci,netdev=net1 \
+  -netdev vmnet-shared,id=net1,start-address=172.16.0.1,end-address=172.31.255.254,subnet-mask=255.240.0.0 \
+  -device virtio-net-pci,netdev=net2 \
+  -netdev vmnet-host,id=net2,start-address=192.168.2.1,end-address=192.168.2.254,subnet-mask=255.255.255.0,net-uuid=154780B0-F499-4968-9B20-E58C02FDF5FB
+
+
+What this command does:
+
+Uses sudo to create vmnet interfaces (required on macOS).
+Allocates 2 GB of RAM and 4 vCPUs.
+Opens a serial console in the terminal (handy for copy/paste).
+Attaches two network devices:
+vmnet-shared for simulated external Internet.
+vmnet-host for internal traffic (private LAN).
+IP ranges follow RFC 1918.
+The net-uuid disables the macOS DHCP server for vmnet-host.
+You can generate it using uuidgen.
+
+Once RouterOS boots, log in with username admin and press Enter for a blank password. You’ll be prompted to set a new one.
+
+To list interfaces:
+
+[admin@MikroTik] > /interface print 
+
+----
+
+Only one IP is listed — why?
+
+The vmnet-shared interface (ether1) has DHCP enabled by Apple’s Hypervisor framework. RouterOS sends a DHCP request and gets an IP, similar to how a home router works. Meanwhile, vmnet-host has DHCP disabled, so we must assign a static IP to ether2.
+
+Once assigned, a web console becomes accessible via the external interface — in this case:
+http://172.16.0.2/
+
+
+### Minimal Configuration Steps
+Here are the minimum configuration steps to route traffic:
+
+# Assign a static IP to ether2 (internal interface)
+[admin@MikroTik] > /ip address add address=192.168.2.1/24 interface=ether2 network=192.168.2.0
+
+# Define DHCP pool and server
+[admin@MikroTik] > /ip pool add name=dhcp ranges=192.168.2.50-192.168.2.100
+[admin@MikroTik] > /ip dhcp-server add address-pool=dhcp interface=ether2 lease-time=1h name=defconf
+[admin@MikroTik] > /ip dhcp-server network add address=192.168.2.0/24 comment=defconf dns-server=172.16.0.1,1.1.1.1 gateway=192.168.2.1
+
+# Enable NAT for Internet-bound traffic
+[admin@MikroTik] > /ip firewall nat add action=masquerade chain=srcnat out-interface=ether1
+
+
+⚠️ This example does not set any firewall rules. Use it as a starting point only.
+
+
+
+To shut down the router safely:
+
+[admin@MikroTik] > /system shutdown
+
+
+Answer y when prompted. Or, leave the router running — we’ll use it again shortly.
+
+
+

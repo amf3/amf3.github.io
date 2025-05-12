@@ -355,4 +355,4 @@ how to format storage devices, set up networking, and run shell commands during 
 
 Next steps?  If looking to extend this setup, consider integrating additional automation, such as PXE boot for network-based installs or using cloud-init to 
 interact with configuration management systems like Puppet or Chef.  If you have insights from your own experiences, feel free to share them 
-on [Bluesky](https://bsky.app/profile/amf3.bsky.social).
+on [Bluesky](https://bsky.app/profile/af9.us).
