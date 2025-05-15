@@ -4,10 +4,278 @@
     <title>articles on Adam Faris</title>
     <link>https://amf3.github.io/articles/</link>
     <description>Recent content in articles on Adam Faris</description>
-    <generator>Hugo -- 0.145.0</generator>
+    <generator>Hugo -- 0.147.2</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 06 Apr 2025 07:41:29 -0400</lastBuildDate>
+    <lastBuildDate>Wed, 14 May 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://amf3.github.io/articles/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Virtual Router Lab on macOS with QEMU</title>
+      <link>https://amf3.github.io/articles/virtualization/macos_qemu_networks/</link>
+      <pubDate>Wed, 14 May 2025 00:00:00 +0000</pubDate>
+      <guid>https://amf3.github.io/articles/virtualization/macos_qemu_networks/</guid>
+      <description>Debugging macOS QEMU networking with unified logging and lightweight Linux VMs</description>
+      <content:encoded><![CDATA[<h2 id="introduction">Introduction</h2>
+<p><a href="https://github.com/utmapp/UTM">UTM</a> and <a href="https://canonical.com/multipass">Multipass</a> are great apps for virtualization on macOS.<br>
+But I wanted a lighter-weight approach by invoking QEMU directly.  Which meant I needed to understand how QEMU&rsquo;s networking options interact
+with the <code>vmnet</code> virtualization API on macOS.</p>
+<p>This becomes especially important when dealing with VM-to-VM connections, network isolation, and bridging on macOS.</p>
+<p>In this post, I&rsquo;ll walk through creating a simple QEMU-based networking lab.</p>
+<ul>
+<li>Set up RouterOS and Alpine Linux VMs using QEMU on macOS</li>
+<li>Connect VMs with Apple&rsquo;s Hypervisor <code>vmnet</code> networking APIs</li>
+<li>Use unified logging to troubleshoot QEMU network issues on macOS</li>
+</ul>
+<h2 id="lab-setup-overview">Lab Setup Overview</h2>
+<p>The network diagram shows the network topology used in this lab.  Both VMs run on on the
+same macOS host and connected to virtual network interfaces using QEMU&rsquo;s support for Apple&rsquo;s <strong>vmnet</strong> virtualization API.</p>
+<p>The RouterOS VM has two virtual network interfaces, which allows it to route traffic between the Alpine Linux VM and the physical local area network.</p>
+<p><img alt="Network Diagram" loading="lazy" src="/articles/virtualization/macos_qemu_networks/assets/Network.png#center"></p>
+<h2 id="qemu-networking-on-macos">QEMU Networking on macOS</h2>
+<p>Let&rsquo;s review the <strong>vmnet.shared</strong> and <strong>vmnet.host</strong> labels in the Network1 and Network2 boxes.</p>
+<ul>
+<li>
+<p><a href="https://www.qemu.org/docs/master/interop/qemu-qmp-ref.html#object-QMP-net.NetdevVmnetSharedOptions"><strong>vmnet.shared</strong></a>: Allows traffic from the VM to reach the Internet using a built-in network address translation (NAT) feature. This is similar to how UTM’s &ldquo;shared network&rdquo; mode works.</p>
+</li>
+<li>
+<p><a href="https://www.qemu.org/docs/master/interop/qemu-qmp-ref.html#object-QMP-net.NetdevVmnetHostOptions"><strong>vmnet.host</strong></a>: Traffic can only reach the macOS host and other VMs on the same host-mode network. This mode <strong>does not</strong> provide Internet access.</p>
+</li>
+</ul>
+<p>Since the Alpine Linux VM is only connected to the <code>vmnet.host</code> network, and that network cannot reach the Internet, we know the RouterOS VM must be acting as the gateway. It routes traffic between <code>Network2</code> (host-only) and <code>Network1</code> (shared). You can confirm this by watching interface packet counts on RouterOS.</p>
+<h3 id="triple-nat">Triple NAT!</h3>
+<p>As a fun side note, traffic from the Alpine VM to the Internet passes through <strong>three layers of NAT</strong>:</p>
+<ol>
+<li><strong>RouterOS VM NAT:</strong> Alpine’s traffic is translated as it passes through RouterOS (ether2 → ether1).</li>
+<li><strong>macOS vmnet NAT:</strong> <code>vmnet0</code> (shared mode) applies another layer of NAT as it exits to the host’s physical LAN.</li>
+<li><strong>Physical Router NAT:</strong> Finally, the home router applies NAT before sending packets to the Internet.</li>
+</ol>
+<h3 id="other-qemu-network-backends">Other QEMU Network Backends</h3>
+<p>To see a complete list of network backends supported by QEMU:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cmd" data-lang="cmd"><span style="display:flex;"><span>%  qemu-system-x86_64 -netdev help  
+</span></span><span style="display:flex;"><span>Available netdev backend types:
+</span></span><span style="display:flex;"><span>socket
+</span></span><span style="display:flex;"><span>stream
+</span></span><span style="display:flex;"><span>dgram
+</span></span><span style="display:flex;"><span>hubport
+</span></span><span style="display:flex;"><span>tap
+</span></span><span style="display:flex;"><span>user
+</span></span><span style="display:flex;"><span>vde
+</span></span><span style="display:flex;"><span>bridge
+</span></span><span style="display:flex;"><span>vhost-user
+</span></span><span style="display:flex;"><span>vmnet-host
+</span></span><span style="display:flex;"><span>vmnet-shared
+</span></span></code></pre></div><p>A few notes about QEMU network backends:</p>
+<p><strong>socket</strong> and <strong>user</strong>: Built into QEMU and don’t require elevated privileges. Great for quick VMs, but they don’t behave like traditional network bridges. You can’t easily interconnect multiple VMs.</p>
+<p><strong>tap</strong>: Closer to a traditional bridged network and supports full traffic pass-through. However, it requires setup outside of QEMU and isn’t available on macOS, since tap interfaces depend on kernel extensions (which Apple no longer supports).</p>
+<p><strong>vmnet</strong>: The backend is macOS-native and works out of the box with Apple’s Hypervisor Framework.  It lets QEMU manage the bridge interfaces directly so no extra tooling is needed. Win!</p>
+<h2 id="creating-the-vms">Creating the VMs</h2>
+<h3 id="routeros-vm">RouterOS VM</h3>
+<p>RouterOS &ldquo;Cloud Hosted Router&rdquo; (CHR) is a commercial product with a &ldquo;free to use&rdquo; license that limits upload speed to 1 Mbps. While a paid license is available
+to remove the upload limit, the restriction doesn&rsquo;t prevent me from validating changes before deploying them to physical networks.</p>
+<p>One can download the CHR image from <a href="https://mikrotik.com/download">MikroTik’s download page</a>. I used the stable 7.x version and chose the <strong>Raw disk image</strong> — which is x86 (not ARM).</p>
+<blockquote>
+<p>💡 In hindsight, the ARM image might be more appropriate for Apple Silicon, but the x86 image works fine.</p></blockquote>
+<p><img alt="RouterOS download page with &lsquo;Cloud Hosted Router&rsquo; and &lsquo;Raw disk image&rsquo; highlighted" loading="lazy" src="/articles/virtualization/macos_qemu_networks/assets/routerOS-dl-screenshot.png#center"></p>
+<hr>
+<p>First, convert the raw image to <code>qcow2</code> format. This allows snapshotting the VM, making it easy to roll back from bad config changes.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span> % qemu-img convert -f raw -O qcow2 chr-7.18.2.img chr-7.18.2.qcow2
+</span></span><span style="display:flex;"><span> % qemu-img snapshot -c original_image chr-7.18.2.qcow2
+</span></span><span style="display:flex;"><span> % qemu-img info chr-7.18.2.qcow2 
+</span></span><span style="display:flex;"><span>image: chr-7.18.2.qcow2
+</span></span><span style="display:flex;"><span>file format: qcow2
+</span></span><span style="display:flex;"><span>virtual size: <span style="color:#ae81ff">128</span> MiB <span style="color:#f92672">(</span><span style="color:#ae81ff">134217728</span> bytes<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>disk size: 44.2 MiB
+</span></span><span style="display:flex;"><span>cluster_size: <span style="color:#ae81ff">65536</span>
+</span></span><span style="display:flex;"><span>Snapshot list:
+</span></span><span style="display:flex;"><span>ID      TAG               VM_SIZE                DATE        VM_CLOCK     ICOUNT
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span>       original_image        <span style="color:#ae81ff">0</span> B 2025-05-08 22:40:36  0000:00:00.000          <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>Format specific information:
+</span></span><span style="display:flex;"><span>    compat: 1.1
+</span></span><span style="display:flex;"><span>    compression type: zlib
+</span></span><span style="display:flex;"><span>    lazy refcounts: false
+</span></span><span style="display:flex;"><span>    refcount bits: <span style="color:#ae81ff">16</span>
+</span></span><span style="display:flex;"><span>    corrupt: false
+</span></span><span style="display:flex;"><span>    extended l2: false
+</span></span><span style="display:flex;"><span>Child node <span style="color:#e6db74">&#39;/file&#39;</span>:
+</span></span><span style="display:flex;"><span>    filename: chr-7.18.2.qcow2
+</span></span><span style="display:flex;"><span>    protocol type: file
+</span></span><span style="display:flex;"><span>    file length: 44.2 MiB <span style="color:#f92672">(</span><span style="color:#ae81ff">46333952</span> bytes<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    disk size: 44.2 MiB
+</span></span></code></pre></div><p>Now, start the RouterOS VM and create the two virtual networks with QEMU.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>sudo qemu-system-x86_64  -m <span style="color:#ae81ff">2048</span> -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial mon:stdio  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device virtio-scsi-pci,id<span style="color:#f92672">=</span>scsi0 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -drive file<span style="color:#f92672">=</span>./chr-7.18.2.qcow2,if<span style="color:#f92672">=</span>none,format<span style="color:#f92672">=</span>qcow2,discard<span style="color:#f92672">=</span>unmap,id<span style="color:#f92672">=</span>hda <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device scsi-hd,drive<span style="color:#f92672">=</span>hda,bus<span style="color:#f92672">=</span>scsi0.0 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device virtio-net-pci,netdev<span style="color:#f92672">=</span>net1 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -netdev vmnet-shared,id<span style="color:#f92672">=</span>net1,start-address<span style="color:#f92672">=</span>172.16.0.1,end-address<span style="color:#f92672">=</span>172.31.255.254,subnet-mask<span style="color:#f92672">=</span>255.240.0.0 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device virtio-net-pci,netdev<span style="color:#f92672">=</span>net2 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -netdev vmnet-host,id<span style="color:#f92672">=</span>net2,start-address<span style="color:#f92672">=</span>192.168.2.1,end-address<span style="color:#f92672">=</span>192.168.2.254,subnet-mask<span style="color:#f92672">=</span>255.255.255.0,net-uuid<span style="color:#f92672">=</span>154780B0-F499-4968-9B20-E58C02FDF5FB
+</span></span></code></pre></div><ul>
+<li>Uses sudo to create vmnet interfaces (required on macOS).</li>
+<li>Allocates 2 GB of RAM and 4 vCPUs.</li>
+<li>Opens a serial console in the terminal (handy for copy/paste).</li>
+<li>Attaches two network devices:
+<ul>
+<li>vmnet-shared for simulated external Internet.</li>
+<li>vmnet-host for internal traffic (private LAN).</li>
+</ul>
+</li>
+<li>IP ranges must follow <a href="https://datatracker.ietf.org/doc/html/rfc1918">RFC 1918</a> allocation.</li>
+<li>Using net-uuid disables the macOS DHCP server for the vmnet-host network.
+<ul>
+<li>Required as we want the RouterOS VM to respond with DHCP replies for vmnet-host traffic.</li>
+<li>Generate the UUID with <strong>/usr/bin/uuidgen</strong>.</li>
+</ul>
+</li>
+</ul>
+<p>Once RouterOS boots, log in with username <strong>admin</strong> and press <strong>Enter</strong> for a blank password. You’ll be prompted to set a new one.</p>
+<p>To list interfaces:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /interface print 
+</span></span><span style="display:flex;"><span>Flags: R - RUNNING
+</span></span><span style="display:flex;"><span>Columns: NAME, TYPE, ACTUAL-MTU, MAC-ADDRESS
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#   NAME    TYPE      ACTUAL-MTU  MAC-ADDRESS      </span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">0</span> R ether1  ether           <span style="color:#ae81ff">1500</span>  52:54:00:12:34:56
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span> R ether2  ether           <span style="color:#ae81ff">1500</span>  52:54:00:12:34:57
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2</span> R lo      loopback       <span style="color:#ae81ff">65536</span>  00:00:00:00:00:00
+</span></span></code></pre></div><p>To check assigned IPs:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip/address print
+</span></span><span style="display:flex;"><span>Flags: D - DYNAMIC
+</span></span><span style="display:flex;"><span>Columns: ADDRESS, NETWORK, INTERFACE
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#   ADDRESS        NETWORK     INTERFACE</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">0</span> D 172.16.0.2/12  172.16.0.0  ether1
+</span></span></code></pre></div><p>Only one IP is listed — why?  The vmnet-shared interface (ether1) has DHCP enabled by Apple’s Hypervisor framework. RouterOS sends a DHCP
+request and gets an IP, similar to how a home router works. Meanwhile, vmnet-host has DHCP disabled, so we must assign a static IP to ether2
+on the router.</p>
+<h4 id="minimal-configuration-steps">Minimal Configuration Steps</h4>
+<p>Here are the minimum configuration steps to route traffic:</p>
+<ul>
+<li>assign a static IP on ether2</li>
+<li>create a dhcpd server</li>
+<li>enable NAT</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip address add address<span style="color:#f92672">=</span>192.168.2.1/24 interface<span style="color:#f92672">=</span>ether2 network<span style="color:#f92672">=</span>192.168.2.0
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip pool add name<span style="color:#f92672">=</span>dhcp ranges<span style="color:#f92672">=</span>192.168.2.50-192.168.2.100
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip dhcp-server add address-pool<span style="color:#f92672">=</span>dhcp interface<span style="color:#f92672">=</span>ether2 lease-time<span style="color:#f92672">=</span>1h name<span style="color:#f92672">=</span>defconf
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip dhcp-server network add address<span style="color:#f92672">=</span>192.168.2.0/24 comment<span style="color:#f92672">=</span>defconf dns-server<span style="color:#f92672">=</span>172.16.0.1,1.1.1.1 gateway<span style="color:#f92672">=</span>192.168.2.1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip firewall nat add action<span style="color:#f92672">=</span>masquerade chain<span style="color:#f92672">=</span>srcnat out-interface<span style="color:#f92672">=</span>ether1
+</span></span></code></pre></div><blockquote>
+<p>⚠️ The example does not set any firewall rules. Use it as a starting point only.</p></blockquote>
+<p>To gracefully shutdown the router</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /system shutdown
+</span></span></code></pre></div><p>Answer y when prompted. Or, leave the router running. It will be used again shortly.</p>
+<h3 id="alpine-linux-vm">Alpine Linux VM</h3>
+<p>An Alpine ISO needs to be downloaded and installed onto a virtual hard disk.  I recommend using the <strong>user</strong> network mentioned earlier
+for the install as additional packages will need to be downloaded from the Internet.  The standard x86_64 image can be retrieved from the Alpine Linux <a href="https://alpinelinux.org/downloads/">downloads page</a>.</p>
+<p>Create a disk image to install the OS to with the qemu-img command.  The options will use the qcow2 format with a max size of 2GB.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img create -f qcow2 alpine_disk.qcow2 2G
+</span></span></code></pre></div><p>Next step is to start a VM that boots from the Alpine ISO and connects to the Internet with the user network.  Because versions change, be
+sure to replace the ISO filename in the <strong>-cdrom</strong> option with the one that was downloaded.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-system-x86_64  -m <span style="color:#ae81ff">2048</span> -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial stdio  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -boot once<span style="color:#f92672">=</span>d <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -cdrom ./alpine-standard-3.21.2-x86_64.iso <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -hda ./alpine_disk.qcow2 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -net nic,model<span style="color:#f92672">=</span>virtio -net user
+</span></span></code></pre></div><p>Once the VM has started, login as &ldquo;root&rdquo; and hit Enter for the empty password.  Next run <strong>setup-alpine</strong> and follow the prompts.
+Here are suggested answers to some of the prompts:</p>
+<ul>
+<li>Select <strong>dhcp</strong> for eth0.</li>
+<li>Choose <strong>chrony</strong> as the network time server.</li>
+<li>Accept the default of <strong>1</strong> when asked which &ldquo;apk-mirror&rdquo; to use.</li>
+<li>When prompted about the install disk, select <strong>sda</strong>.</li>
+<li>Answer <strong>sys</strong> to the &ldquo;how would you like to use it&rdquo; question.</li>
+</ul>
+<p>When the installation script is complete, type <strong>reboot</strong> and use the new root password set during the install.  With
+the <code>-boot once=d</code> option, the VM will skip the ISO and boot directly from the newly installed virtual disk.</p>
+<p>Log in as root and install the dig and curl commands.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cmd" data-lang="cmd"><span style="display:flex;"><span># apk add bind-tools curl ca-certificates
+</span></span></code></pre></div><p>When the package install has completed, gracefully shutdown the VM with <strong>poweroff</strong> command.</p>
+<h2 id="testing-the-nat-setup">Testing the NAT Setup</h2>
+<p>Check that the RouterOS VM is still running in the other terminal. It&rsquo;s acting as the NAT gateway for the Alpine VM and must be
+active for Internet access to work.  Then connect the new Alpine Linux VM to Network2 (vmnet-host) with this QEMU command.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% sudo qemu-system-x86_64  -m <span style="color:#ae81ff">2048</span> -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial mon:stdio  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        -boot c <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        -hda alpine_disk.qcow2 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        -device virtio-net-pci,netdev<span style="color:#f92672">=</span>net2 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        -netdev vmnet-host,id<span style="color:#f92672">=</span>net2,start-address<span style="color:#f92672">=</span>192.168.2.1,end-address<span style="color:#f92672">=</span>192.168.2.254,subnet-mask<span style="color:#f92672">=</span>255.255.255.0,net-uuid<span style="color:#f92672">=</span>154780B0-F499-4968-9B20-E58C02FDF5FB
+</span></span></code></pre></div><p>Log into the Alpine VM and verify it can reach the Internet.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>myvm:~$ ip addr show eth0         <span style="color:#75715e"># Confirm the IP is in the 192.168.2.x network range</span>
+</span></span><span style="display:flex;"><span>    ...
+</span></span><span style="display:flex;"><span>    inet 192.168.2.100/24 scope global eth0
+</span></span><span style="display:flex;"><span>    ...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>myvm:~$ ip route show             <span style="color:#75715e"># Confirm the default route is 192.168.2.1</span>
+</span></span><span style="display:flex;"><span>default via 192.168.2.1 dev eth0  metric <span style="color:#ae81ff">202</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>myvm:~$ cat /etc/resolv.conf      <span style="color:#75715e"># Confirm the DNS servers were set</span>
+</span></span><span style="display:flex;"><span>nameserver 172.16.0.1
+</span></span><span style="display:flex;"><span>nameserver 1.1.1.1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>myvm:~$ ping -qc <span style="color:#ae81ff">3</span> 1.1.1.1        <span style="color:#75715e"># test ping to 1.1.1.1 on the Internet</span>
+</span></span><span style="display:flex;"><span>PING 1.1.1.1 <span style="color:#f92672">(</span>1.1.1.1<span style="color:#f92672">)</span>: <span style="color:#ae81ff">56</span> data bytes
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>--- 1.1.1.1 ping statistics ---
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3</span> packets transmitted, <span style="color:#ae81ff">3</span> packets received, 0% packet loss
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>myvm:~$ dig @172.16.0.1 -t a +short www.github.com  <span style="color:#75715e"># test vmnet name resolution works </span>
+</span></span><span style="display:flex;"><span>github.com.
+</span></span><span style="display:flex;"><span>140.82.116.4
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>myvm:~$ curl -I https://www.github.com              <span style="color:#75715e"># test that I can fetch a webpage</span>
+</span></span><span style="display:flex;"><span>HTTP/2 <span style="color:#ae81ff">301</span> 
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>If all of the above checks pass, your Alpine VM is correctly NAT&rsquo;d through the RouterOS VM and can reach the Internet.</p>
+<h2 id="troubleshooting--gotchas">Troubleshooting &amp; Gotchas</h2>
+<h3 id="debugging-with-unified-logging">Debugging with Unified Logging</h3>
+<p>macOS logs a large volume of network-related events, and it can be tricky to isolate the relevant ones. Fortunately, the <code>log show</code>
+and <code>log collect</code> tools make it easier to filter and investigate.</p>
+<p>Start by capturing a snapshot of system logs around the time your VMs are active:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% mkdir ./log_archive
+</span></span><span style="display:flex;"><span>% ./start_lab <span style="color:#75715e"># start the VMs with a shell script</span>
+</span></span><span style="display:flex;"><span>% sudo log collect --output ./log_archive --last 3m  <span style="color:#75715e"># capture the previous 3 minutes of log events.</span>
+</span></span></code></pre></div><p>This captures the previous 3 minutes of logs and stores them in a binary archive. Then query the relevant subsystem:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% log show --archive log_archive/system_logs.logarchive --predicate <span style="color:#e6db74">&#39;subsystem == &#34;com.apple.NetworkSharing&#34;&#39;</span>  
+</span></span></code></pre></div><p>I found the <code>subsystem == &quot;com.apple.NetworkSharing&quot;</code> query provided the most useful results.  Using other filters like <code>subsystem == &quot;com.apple.network&quot;</code>
+or <code>process == &quot;qemu-system-x86_64&quot;</code> included many unrelated events and were a little overwhelming.  This screenshot shows the networks being created
+when the VMs are started and then torn down when the VMs are stopped.</p>
+<p><img alt="network_events" loading="lazy" src="/articles/virtualization/macos_qemu_networks/assets/network_events.png"></p>
+<h3 id="packet-captures-with-wireshark-or-tcpdump">Packet Captures with Wireshark or tcpdump</h3>
+<p>Because QEMU uses virtual network interfaces, it&rsquo;s possible to monitor VM traffic directly from macOS using tools like tcpdump or Wireshark.  Use the
+<code>ifconfig</code> command to identify which vmenet interfaces are active and which bridge they are mapped to.</p>
+<p><img alt="ifconfig output" loading="lazy" src="/articles/virtualization/macos_qemu_networks/assets/ifconfig_out.png"></p>
+<p>Using Wireshark on the correct interface reveals detailed traffic flows. In this example capture, we see:</p>
+<ul>
+<li>ICMP ping requests to the router’s external interface</li>
+<li>A DNS lookup for speedtest.net</li>
+<li>An HTTP GET request initiating the speed test</li>
+</ul>
+<p><img alt="wireshark output" loading="lazy" src="/articles/virtualization/macos_qemu_networks/assets/wireshark.png"></p>
+<h3 id="other-quirks">Other quirks</h3>
+<p>I wrote a simple C program to list the interfaces created by QEMU but ran into permission errors.  It turns out that macOS protects the vmnet APIs
+behind System Integrity Protection (SIP). To access them, binaries must be code-signed with a full Apple Developer certificate,
+which I don’t have (and didn’t want to pay for). Fortunately, macOS’s unified logging system provided helpful insight.</p>
+<hr>
+<p>Another issue I encountered was with subnet settings in the router configs. At one point, I accidentally assigned 192.168.2.1/32 instead
+of 192.168.2.1/24 to the host-only interface on the RouterOS VM. This broke routing for the two VMs, blocking the Alpine VM from reaching the Internet.</p>
+<hr>
+<p>At first glance QEMU’s socket-based networking may seem like a good replacement for bridged networking. It’s built into QEMU and doesn’t require
+elevated privileges. So why not use it? It turns out that socket networking is intended for point-to-point communication between specific QEMU instances, like
+TCP client/server setups. Socket networking doesn’t support general Ethernet bridging or broadcast traffic. For a more flexible setup that allows multiple VMs
+to communicate freely (and with the host), you still need tap or vmnet.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>Running QEMU directly on macOS isn’t the most beginner-friendly experience, but it was a great learning opportunity.  I have a better
+appreciation for why tools like UTM or Multipass exist as wrappers around QEMU.</p>
+<p>Next time I might try replacing the x86 images with arm64 images to explore the performance differences.  I&rsquo;m also considering writing my own QEMU wrapper,
+partly for fun and partly for continuious integration purposes.</p>
+<p>If you enjoyed this or want to follow along with future experiments, follow me on <a href="https://bsky.app/profile/af9.us">Bluesky</a>. Thanks for reading!</p>
+]]></content:encoded>
+    </item>
     <item>
       <title>Tips for working with qemu images</title>
       <link>https://amf3.github.io/articles/virtualization/qemuimage_tips/</link>
@@ -368,7 +636,7 @@ closing with a checklist.</p>
 </ul>
 </li>
 </ul>
-<p>Happy provisioning and good luck!</p>
+<p>Happy provisioning, and follow me on <a href="https://bsky.app/profile/af9.us">Bluesky</a> if you find content like this interesting.</p>
 ]]></content:encoded>
     </item>
     <item>
@@ -626,7 +894,7 @@ it was possible to quickly iterate on autoinstall configurations by modifying th
 how to format storage devices, set up networking, and run shell commands during installation.</p>
 <p>Next steps?  If looking to extend this setup, consider integrating additional automation, such as PXE boot for network-based installs or using cloud-init to
 interact with configuration management systems like Puppet or Chef.  If you have insights from your own experiences, feel free to share them
-on <a href="https://bsky.app/profile/amf3.bsky.social">Bluesky</a>.</p>
+on <a href="https://bsky.app/profile/af9.us">Bluesky</a>.</p>
 ]]></content:encoded>
     </item>
     <item>
@@ -767,7 +1035,7 @@ you&rsquo;ll be downloading packages from the Internet.</p>
 While I understand that installing Docker in my example might not represent the typical workflow.  Combining cloud-init concepts with Multipass
 creates a local mini-cloud on my Macbook.  I can quickly iterate through cloud-init data file changes for other platforms like AWS or on-premise hardware.</p>
 <p>cloud-init is capable of much more, like formatting hard drives or managing network interfaces.  These &amp; other topics will be covered in followups
-which I will announce on <a href="https://bsky.app/profile/amf3.bsky.social">Bluesky</a>.  Follow me for notifications of when its made available.  Otherwise,
+which I will announce on <a href="https://bsky.app/profile/af9.us">Bluesky</a>.  Follow me for notifications of when its made available.  Otherwise,
 try out these examples and let me know what works.</p>
 ]]></content:encoded>
     </item>

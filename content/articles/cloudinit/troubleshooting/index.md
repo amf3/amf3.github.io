@@ -162,4 +162,4 @@ closing with a checklist.
     * Clean logs and reset cloud-init: `cloud-init clean --logs` && reboot
     * Manually rerun a failed module: `cloud-init single -n “some_module_name”`
 
-Happy provisioning and good luck!
+Happy provisioning, and follow me on [Bluesky](https://bsky.app/profile/af9.us) if you find content like this interesting.

@@ -2,7 +2,7 @@
 <html lang="en" dir="auto">
 
 <head>
-	<meta name="generator" content="Hugo 0.145.0"><meta charset="utf-8">
+	<meta name="generator" content="Hugo 0.147.2"><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
@@ -160,6 +160,23 @@
 
 <article class="first-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">Virtual Router Lab on macOS with QEMU
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Introduction UTM and Multipass are great apps for virtualization on macOS.
+But I wanted a lighter-weight approach by invoking QEMU directly. Which meant I needed to understand how QEMU’s networking options interact with the vmnet virtualization API on macOS.
+This becomes especially important when dealing with VM-to-VM connections, network isolation, and bridging on macOS.
+In this post, I’ll walk through creating a simple QEMU-based networking lab.
+Set up RouterOS and Alpine Linux VMs using QEMU on macOS Connect VMs with Apple’s Hypervisor vmnet networking APIs Use unified logging to troubleshoot QEMU network issues on macOS Lab Setup Overview The network diagram shows the network topology used in this lab. Both VMs run on on the same macOS host and connected to virtual network interfaces using QEMU’s support for Apple’s vmnet virtualization API.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-05-14 00:00:00 +0000 UTC'>May 14, 2025</span>&nbsp;·&nbsp;2098 words</footer>
+  <a class="entry-link" aria-label="post link to Virtual Router Lab on macOS with QEMU" href="https://amf3.github.io/articles/virtualization/macos_qemu_networks/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">Tips for working with qemu images
     </h2>
   </header>
@@ -182,7 +199,7 @@ The default format is raw and raw offers the fewest features. It’s just plain 
 Understanding cloud-init execution stages Before continuing, let’s cover some background. cloud-init follows five stages during boot which run sequentially. If a stage completes, output will contain a status that can be used to verify that stage was successful.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-03-21 16:28:54 -0400 -0400'>March 21, 2025</span>&nbsp;·&nbsp;901 words</footer>
+  <footer class="entry-footer"><span title='2025-03-21 16:28:54 -0400 -0400'>March 21, 2025</span>&nbsp;·&nbsp;910 words</footer>
   <a class="entry-link" aria-label="post link to cloud-init troubleshooting" href="https://amf3.github.io/articles/cloudinit/troubleshooting/"></a>
 </article>
 

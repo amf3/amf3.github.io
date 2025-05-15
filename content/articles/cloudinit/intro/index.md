@@ -184,6 +184,6 @@ While I understand that installing Docker in my example might not represent the 
 creates a local mini-cloud on my Macbook.  I can quickly iterate through cloud-init data file changes for other platforms like AWS or on-premise hardware.
 
 cloud-init is capable of much more, like formatting hard drives or managing network interfaces.  These & other topics will be covered in followups
-which I will announce on [Bluesky](https://bsky.app/profile/amf3.bsky.social).  Follow me for notifications of when its made available.  Otherwise,
+which I will announce on [Bluesky](https://bsky.app/profile/af9.us).  Follow me for notifications of when its made available.  Otherwise,
 try out these examples and let me know what works.
 

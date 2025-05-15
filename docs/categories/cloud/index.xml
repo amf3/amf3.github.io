@@ -4,7 +4,7 @@
     <title>Cloud on Adam Faris</title>
     <link>https://amf3.github.io/categories/cloud/</link>
     <description>Recent content in Cloud on Adam Faris</description>
-    <generator>Hugo -- 0.145.0</generator>
+    <generator>Hugo -- 0.147.2</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 06 Apr 2025 07:41:29 -0400</lastBuildDate>
     <atom:link href="https://amf3.github.io/categories/cloud/index.xml" rel="self" type="application/rss+xml" />
@@ -368,7 +368,7 @@ closing with a checklist.</p>
 </ul>
 </li>
 </ul>
-<p>Happy provisioning and good luck!</p>
+<p>Happy provisioning, and follow me on <a href="https://bsky.app/profile/af9.us">Bluesky</a> if you find content like this interesting.</p>
 ]]></content:encoded>
     </item>
     <item>
@@ -626,7 +626,7 @@ it was possible to quickly iterate on autoinstall configurations by modifying th
 how to format storage devices, set up networking, and run shell commands during installation.</p>
 <p>Next steps?  If looking to extend this setup, consider integrating additional automation, such as PXE boot for network-based installs or using cloud-init to
 interact with configuration management systems like Puppet or Chef.  If you have insights from your own experiences, feel free to share them
-on <a href="https://bsky.app/profile/amf3.bsky.social">Bluesky</a>.</p>
+on <a href="https://bsky.app/profile/af9.us">Bluesky</a>.</p>
 ]]></content:encoded>
     </item>
     <item>
@@ -767,7 +767,7 @@ you&rsquo;ll be downloading packages from the Internet.</p>
 While I understand that installing Docker in my example might not represent the typical workflow.  Combining cloud-init concepts with Multipass
 creates a local mini-cloud on my Macbook.  I can quickly iterate through cloud-init data file changes for other platforms like AWS or on-premise hardware.</p>
 <p>cloud-init is capable of much more, like formatting hard drives or managing network interfaces.  These &amp; other topics will be covered in followups
-which I will announce on <a href="https://bsky.app/profile/amf3.bsky.social">Bluesky</a>.  Follow me for notifications of when its made available.  Otherwise,
+which I will announce on <a href="https://bsky.app/profile/af9.us">Bluesky</a>.  Follow me for notifications of when its made available.  Otherwise,
 try out these examples and let me know what works.</p>
 ]]></content:encoded>
     </item>
