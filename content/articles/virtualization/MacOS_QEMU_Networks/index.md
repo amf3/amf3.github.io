@@ -6,8 +6,6 @@ tags: [qemu, macos, mikrotik, routeros, alpine, virtualization, networking]
 showtoc: true
 ---
 
-## Introduction
-
 [UTM](https://github.com/utmapp/UTM) and [Multipass](https://canonical.com/multipass) are great apps for virtualization on macOS.  
 But I wanted a lighter-weight approach by invoking QEMU directly.  Which meant I needed to understand how QEMU's networking options interact 
 with the `vmnet` virtualization API on macOS.  

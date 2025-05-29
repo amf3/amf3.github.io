@@ -4,7 +4,7 @@
     <title>Adam Faris</title>
     <link>https://amf3.github.io/</link>
     <description>Recent content on Adam Faris</description>
-    <generator>Hugo -- 0.147.2</generator>
+    <generator>Hugo -- 0.147.6</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 14 May 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://amf3.github.io/index.xml" rel="self" type="application/rss+xml" />
@@ -14,8 +14,7 @@
       <pubDate>Wed, 14 May 2025 00:00:00 +0000</pubDate>
       <guid>https://amf3.github.io/articles/virtualization/macos_qemu_networks/</guid>
       <description>Debugging macOS QEMU networking with unified logging and lightweight Linux VMs</description>
-      <content:encoded><![CDATA[<h2 id="introduction">Introduction</h2>
-<p><a href="https://github.com/utmapp/UTM">UTM</a> and <a href="https://canonical.com/multipass">Multipass</a> are great apps for virtualization on macOS.<br>
+      <content:encoded><![CDATA[<p><a href="https://github.com/utmapp/UTM">UTM</a> and <a href="https://canonical.com/multipass">Multipass</a> are great apps for virtualization on macOS.<br>
 But I wanted a lighter-weight approach by invoking QEMU directly.  Which meant I needed to understand how QEMU&rsquo;s networking options interact
 with the <code>vmnet</code> virtualization API on macOS.</p>
 <p>This becomes especially important when dealing with VM-to-VM connections, network isolation, and bridging on macOS.</p>
@@ -281,14 +280,8 @@ partly for fun and partly for continuious integration purposes.</p>
       <link>https://amf3.github.io/articles/virtualization/qemuimage_tips/</link>
       <pubDate>Sun, 06 Apr 2025 07:41:29 -0400</pubDate>
       <guid>https://amf3.github.io/articles/virtualization/qemuimage_tips/</guid>
-      <description>&lt;h1 id=&#34;about-qemu-images&#34;&gt;About QEMU images&lt;/h1&gt;
-&lt;p&gt;QEMU uses files to emulate storage devices, and the features available
-depend on how those files are created.  While QEMU can emulate disks from Parallels and VirtualBox, I’m going to
-focus on the formats most commonly used in automation and scripting, &lt;strong&gt;raw&lt;/strong&gt; and &lt;strong&gt;qcow2&lt;/strong&gt;.&lt;/p&gt;
-&lt;p&gt;The default format is raw and raw offers the fewest features.  It&amp;rsquo;s just plain storage.  The other format qcow2
-supports compression, snapshots, and copy-on-write in addition to storage.&lt;/p&gt;</description>
-      <content:encoded><![CDATA[<h1 id="about-qemu-images">About QEMU images</h1>
-<p>QEMU uses files to emulate storage devices, and the features available
+      <description>QEMU image file tips and tricks</description>
+      <content:encoded><![CDATA[<p>QEMU uses files to emulate storage devices, and the features available
 depend on how those files are created.  While QEMU can emulate disks from Parallels and VirtualBox, I’m going to
 focus on the formats most commonly used in automation and scripting, <strong>raw</strong> and <strong>qcow2</strong>.</p>
 <p>The default format is raw and raw offers the fewest features.  It&rsquo;s just plain storage.  The other format qcow2
@@ -500,16 +493,8 @@ the end. If you find this content useful, follow me on <a href="https://@amf3.bs
       <link>https://amf3.github.io/articles/cloudinit/troubleshooting/</link>
       <pubDate>Fri, 21 Mar 2025 16:28:54 -0400</pubDate>
       <guid>https://amf3.github.io/articles/cloudinit/troubleshooting/</guid>
-      <description>&lt;h1 id=&#34;introduction&#34;&gt;Introduction&lt;/h1&gt;
-&lt;p&gt;I previously wrote an &lt;a href=&#34;../../../articles/cloudinit/intro/&#34;&gt;introduction&lt;/a&gt; to cloud-init. I&amp;rsquo;d like to now follow up with a discussion on
-troubleshooting. cloud-init failures on remote hosts can be challenging. Depending on the failure point, cloud-init may or may not
-provide clear error indicators.  These are methods I use during provisioning issues related to cloud-init.&lt;/p&gt;
-&lt;h1 id=&#34;understanding-cloud-init-execution-stages&#34;&gt;Understanding cloud-init execution stages&lt;/h1&gt;
-&lt;p&gt;Before continuing, let&amp;rsquo;s cover some background.  cloud-init follows
-&lt;a href=&#34;https://cloudinit.readthedocs.io/en/latest/explanation/boot.html&#34;&gt;five stages&lt;/a&gt; during boot which run sequentially. If
-a stage completes, output will contain a status that can be used to verify that stage was successful.&lt;/p&gt;</description>
-      <content:encoded><![CDATA[<h1 id="introduction">Introduction</h1>
-<p>I previously wrote an <a href="../../../articles/cloudinit/intro/">introduction</a> to cloud-init. I&rsquo;d like to now follow up with a discussion on
+      <description>A simple workflow in resolving cloud-init deployment problems.</description>
+      <content:encoded><![CDATA[<p>I previously wrote an <a href="../../../articles/cloudinit/intro/">introduction</a> to cloud-init. I&rsquo;d like to now follow up with a discussion on
 troubleshooting. cloud-init failures on remote hosts can be challenging. Depending on the failure point, cloud-init may or may not
 provide clear error indicators.  These are methods I use during provisioning issues related to cloud-init.</p>
 <h1 id="understanding-cloud-init-execution-stages">Understanding cloud-init execution stages</h1>
@@ -644,16 +629,8 @@ closing with a checklist.</p>
       <link>https://amf3.github.io/articles/cloudinit/autoinstall/</link>
       <pubDate>Mon, 03 Mar 2025 23:07:23 -0800</pubDate>
       <guid>https://amf3.github.io/articles/cloudinit/autoinstall/</guid>
-      <description>&lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;
-&lt;p&gt;In a &lt;a href=&#34;../../../articles/cloudinit/intro/&#34;&gt;previous post&lt;/a&gt;, I discussed using cloud-init and Multipass as a method of provisioning
-virtual machines on a local computer with a cloud-like API.  Today I am going
-to dive deeper with Ubuntu and how their autoinstall API can simplify on-premise host provisioning.&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://canonical-subiquity.readthedocs-hosted.com/en/latest/intro-to-autoinstall.html&#34;&gt;autoinstall&lt;/a&gt;
-is a tool that allows for unattended installations of Ubuntu, ensuring consistency, reporducibility, and providing automation
-across a fleet of hosts.  In this post I&amp;rsquo;ll walk through an example of using autoinstall
-to configure networking, local storage, and demonstrate shell command execution during provisioning.&lt;/p&gt;</description>
-      <content:encoded><![CDATA[<h2 id="intro">Intro</h2>
-<p>In a <a href="../../../articles/cloudinit/intro/">previous post</a>, I discussed using cloud-init and Multipass as a method of provisioning
+      <description>Using cloud-init to deploy Linux on either bare-metal or virtual machines</description>
+      <content:encoded><![CDATA[<p>In a <a href="../../../articles/cloudinit/intro/">previous post</a>, I discussed using cloud-init and Multipass as a method of provisioning
 virtual machines on a local computer with a cloud-like API.  Today I am going
 to dive deeper with Ubuntu and how their autoinstall API can simplify on-premise host provisioning.</p>
 <p><a href="https://canonical-subiquity.readthedocs-hosted.com/en/latest/intro-to-autoinstall.html">autoinstall</a>
@@ -902,18 +879,8 @@ on <a href="https://bsky.app/profile/af9.us">Bluesky</a>.</p>
       <link>https://amf3.github.io/articles/cloudinit/intro/</link>
       <pubDate>Fri, 21 Feb 2025 23:06:35 -0800</pubDate>
       <guid>https://amf3.github.io/articles/cloudinit/intro/</guid>
-      <description>&lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;
-&lt;p&gt;Cloud compute companies like GCP, AWS, or Azure offer a management API for allocating resources. In the on-premise space,
-services such as Docker or Incus provide APIs for managing containers or virtual machines (VMs). But what about installing
-the operating system (OS) on bare-metal hosts? What API exists for this task? This is where
-&lt;a href=&#34;https://github.com/canonical/cloud-init&#34;&gt;cloud-init&lt;/a&gt; enters the picture, providing the ability to provision VMs or
-bare-metal hardware.&lt;/p&gt;
-&lt;p&gt;cloud-init is a useful tool that doesn&amp;rsquo;t rely on network services like PXE as a dependency.  Its simplicity saves time by
-removing the need to navigate OS installation menus, while ensuring user accounts and installed software packages are consistent
-across hosts. So why should one bother using cloud-init if they are managing a single host at home? In the event
-the OS needs to be reinstalled due to failure, cloud-init allows one to quickly restore the system to a known state.&lt;/p&gt;</description>
-      <content:encoded><![CDATA[<h2 id="intro">Intro</h2>
-<p>Cloud compute companies like GCP, AWS, or Azure offer a management API for allocating resources. In the on-premise space,
+      <description>An intro to using cloud-init for customizing both on-premise and cloud virtual machines</description>
+      <content:encoded><![CDATA[<p>Cloud compute companies like GCP, AWS, or Azure offer a management API for allocating resources. In the on-premise space,
 services such as Docker or Incus provide APIs for managing containers or virtual machines (VMs). But what about installing
 the operating system (OS) on bare-metal hosts? What API exists for this task? This is where
 <a href="https://github.com/canonical/cloud-init">cloud-init</a> enters the picture, providing the ability to provision VMs or

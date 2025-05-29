@@ -4,7 +4,7 @@
     <title>Routeros on Adam Faris</title>
     <link>https://amf3.github.io/tags/routeros/</link>
     <description>Recent content in Routeros on Adam Faris</description>
-    <generator>Hugo -- 0.147.2</generator>
+    <generator>Hugo -- 0.147.6</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 14 May 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://amf3.github.io/tags/routeros/index.xml" rel="self" type="application/rss+xml" />
@@ -14,8 +14,7 @@
       <pubDate>Wed, 14 May 2025 00:00:00 +0000</pubDate>
       <guid>https://amf3.github.io/articles/virtualization/macos_qemu_networks/</guid>
       <description>Debugging macOS QEMU networking with unified logging and lightweight Linux VMs</description>
-      <content:encoded><![CDATA[<h2 id="introduction">Introduction</h2>
-<p><a href="https://github.com/utmapp/UTM">UTM</a> and <a href="https://canonical.com/multipass">Multipass</a> are great apps for virtualization on macOS.<br>
+      <content:encoded><![CDATA[<p><a href="https://github.com/utmapp/UTM">UTM</a> and <a href="https://canonical.com/multipass">Multipass</a> are great apps for virtualization on macOS.<br>
 But I wanted a lighter-weight approach by invoking QEMU directly.  Which meant I needed to understand how QEMU&rsquo;s networking options interact
 with the <code>vmnet</code> virtualization API on macOS.</p>
 <p>This becomes especially important when dealing with VM-to-VM connections, network isolation, and bridging on macOS.</p>

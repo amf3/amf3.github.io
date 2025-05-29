@@ -2,7 +2,7 @@
 <html lang="en" dir="auto">
 
 <head>
-	<meta name="generator" content="Hugo 0.147.2"><meta charset="utf-8">
+	<meta name="generator" content="Hugo 0.147.6"><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
@@ -13,7 +13,7 @@
 <link rel="canonical" href="https://amf3.github.io/">
 <meta name="google-site-verification" content="6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E">
 <meta name="msvalidate.01" content="C1E02AC59FE7ECBDB6D9EFB7D5E02B65">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.f49d66caae9ea0fd43f21f29e71a8d3e284517ed770f2aa86fa012953ad3c9ef.css" integrity="sha256-9J1myq6eoP1D8h8p5xqNPihFF&#43;13Dyqob6ASlTrTye8=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.8fe10233a706bc87f2e08b3cf97b8bd4c0a80f10675a143675d59212121037c0.css" integrity="sha256-j&#43;ECM6cGvIfy4Is8&#43;XuL1MCoDxBnWhQ2ddWSEhIQN8A=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://amf3.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://amf3.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://amf3.github.io/favicon-32x32.png">
@@ -164,14 +164,14 @@
     </h2>
   </header>
   <div class="entry-content">
-    <p>Introduction UTM and Multipass are great apps for virtualization on macOS.
+    <p>UTM and Multipass are great apps for virtualization on macOS.
 But I wanted a lighter-weight approach by invoking QEMU directly. Which meant I needed to understand how QEMU’s networking options interact with the vmnet virtualization API on macOS.
 This becomes especially important when dealing with VM-to-VM connections, network isolation, and bridging on macOS.
 In this post, I’ll walk through creating a simple QEMU-based networking lab.
 Set up RouterOS and Alpine Linux VMs using QEMU on macOS Connect VMs with Apple’s Hypervisor vmnet networking APIs Use unified logging to troubleshoot QEMU network issues on macOS Lab Setup Overview The network diagram shows the network topology used in this lab. Both VMs run on on the same macOS host and connected to virtual network interfaces using QEMU’s support for Apple’s vmnet virtualization API.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-05-14 00:00:00 +0000 UTC'>May 14, 2025</span>&nbsp;·&nbsp;2098 words</footer>
+  <footer class="entry-footer"><span title='2025-05-14 00:00:00 +0000 UTC'>May 14, 2025</span>&nbsp;·&nbsp;2097 words</footer>
   <a class="entry-link" aria-label="post link to Virtual Router Lab on macOS with QEMU" href="https://amf3.github.io/articles/virtualization/macos_qemu_networks/"></a>
 </article>
 
@@ -181,11 +181,11 @@ Set up RouterOS and Alpine Linux VMs using QEMU on macOS Connect VMs with Apple�
     </h2>
   </header>
   <div class="entry-content">
-    <p>About QEMU images QEMU uses files to emulate storage devices, and the features available depend on how those files are created. While QEMU can emulate disks from Parallels and VirtualBox, I’m going to focus on the formats most commonly used in automation and scripting, raw and qcow2.
+    <p>QEMU uses files to emulate storage devices, and the features available depend on how those files are created. While QEMU can emulate disks from Parallels and VirtualBox, I’m going to focus on the formats most commonly used in automation and scripting, raw and qcow2.
 The default format is raw and raw offers the fewest features. It’s just plain storage. The other format qcow2 supports compression, snapshots, and copy-on-write in addition to storage.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-04-06 07:41:29 -0400 -0400'>April 6, 2025</span>&nbsp;·&nbsp;1361 words</footer>
+  <footer class="entry-footer"><span title='2025-04-06 07:41:29 -0400 -0400'>April 6, 2025</span>&nbsp;·&nbsp;1358 words</footer>
   <a class="entry-link" aria-label="post link to Tips for working with qemu images" href="https://amf3.github.io/articles/virtualization/qemuimage_tips/"></a>
 </article>
 
@@ -195,11 +195,11 @@ The default format is raw and raw offers the fewest features. It’s just plain 
     </h2>
   </header>
   <div class="entry-content">
-    <p>Introduction I previously wrote an introduction to cloud-init. I’d like to now follow up with a discussion on troubleshooting. cloud-init failures on remote hosts can be challenging. Depending on the failure point, cloud-init may or may not provide clear error indicators. These are methods I use during provisioning issues related to cloud-init.
+    <p>I previously wrote an introduction to cloud-init. I’d like to now follow up with a discussion on troubleshooting. cloud-init failures on remote hosts can be challenging. Depending on the failure point, cloud-init may or may not provide clear error indicators. These are methods I use during provisioning issues related to cloud-init.
 Understanding cloud-init execution stages Before continuing, let’s cover some background. cloud-init follows five stages during boot which run sequentially. If a stage completes, output will contain a status that can be used to verify that stage was successful.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-03-21 16:28:54 -0400 -0400'>March 21, 2025</span>&nbsp;·&nbsp;910 words</footer>
+  <footer class="entry-footer"><span title='2025-03-21 16:28:54 -0400 -0400'>March 21, 2025</span>&nbsp;·&nbsp;909 words</footer>
   <a class="entry-link" aria-label="post link to cloud-init troubleshooting" href="https://amf3.github.io/articles/cloudinit/troubleshooting/"></a>
 </article>
 
@@ -209,11 +209,11 @@ Understanding cloud-init execution stages Before continuing, let’s cover some 
     </h2>
   </header>
   <div class="entry-content">
-    <p>Intro In a previous post, I discussed using cloud-init and Multipass as a method of provisioning virtual machines on a local computer with a cloud-like API. Today I am going to dive deeper with Ubuntu and how their autoinstall API can simplify on-premise host provisioning.
+    <p>In a previous post, I discussed using cloud-init and Multipass as a method of provisioning virtual machines on a local computer with a cloud-like API. Today I am going to dive deeper with Ubuntu and how their autoinstall API can simplify on-premise host provisioning.
 autoinstall is a tool that allows for unattended installations of Ubuntu, ensuring consistency, reporducibility, and providing automation across a fleet of hosts. In this post I’ll walk through an example of using autoinstall to configure networking, local storage, and demonstrate shell command execution during provisioning.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-03-03 23:07:23 -0800 PST'>March 3, 2025</span>&nbsp;·&nbsp;2083 words</footer>
+  <footer class="entry-footer"><span title='2025-03-03 23:07:23 -0800 PST'>March 3, 2025</span>&nbsp;·&nbsp;2082 words</footer>
   <a class="entry-link" aria-label="post link to Unattended Ubuntu Installs - Virtual Machines to Bare-Metal" href="https://amf3.github.io/articles/cloudinit/autoinstall/"></a>
 </article>
 
@@ -223,11 +223,11 @@ autoinstall is a tool that allows for unattended installations of Ubuntu, ensuri
     </h2>
   </header>
   <div class="entry-content">
-    <p>Intro Cloud compute companies like GCP, AWS, or Azure offer a management API for allocating resources. In the on-premise space, services such as Docker or Incus provide APIs for managing containers or virtual machines (VMs). But what about installing the operating system (OS) on bare-metal hosts? What API exists for this task? This is where cloud-init enters the picture, providing the ability to provision VMs or bare-metal hardware.
+    <p>Cloud compute companies like GCP, AWS, or Azure offer a management API for allocating resources. In the on-premise space, services such as Docker or Incus provide APIs for managing containers or virtual machines (VMs). But what about installing the operating system (OS) on bare-metal hosts? What API exists for this task? This is where cloud-init enters the picture, providing the ability to provision VMs or bare-metal hardware.
 cloud-init is a useful tool that doesn’t rely on network services like PXE as a dependency. Its simplicity saves time by removing the need to navigate OS installation menus, while ensuring user accounts and installed software packages are consistent across hosts. So why should one bother using cloud-init if they are managing a single host at home? In the event the OS needs to be reinstalled due to failure, cloud-init allows one to quickly restore the system to a known state.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-02-21 23:06:35 -0800 PST'>February 21, 2025</span>&nbsp;·&nbsp;1036 words</footer>
+  <footer class="entry-footer"><span title='2025-02-21 23:06:35 -0800 PST'>February 21, 2025</span>&nbsp;·&nbsp;1035 words</footer>
   <a class="entry-link" aria-label="post link to Getting started with cloud-init for unattended Linux deployments" href="https://amf3.github.io/articles/cloudinit/intro/"></a>
 </article>
     </main>
