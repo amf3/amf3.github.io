@@ -4,7 +4,7 @@
     <title>Tips on Adam Faris</title>
     <link>https://amf3.github.io/categories/tips/</link>
     <description>Recent content in Tips on Adam Faris</description>
-    <generator>Hugo -- 0.147.2</generator>
+    <generator>Hugo -- 0.147.6</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 06 Apr 2025 07:41:29 -0400</lastBuildDate>
     <atom:link href="https://amf3.github.io/categories/tips/index.xml" rel="self" type="application/rss+xml" />
@@ -13,14 +13,8 @@
       <link>https://amf3.github.io/articles/virtualization/qemuimage_tips/</link>
       <pubDate>Sun, 06 Apr 2025 07:41:29 -0400</pubDate>
       <guid>https://amf3.github.io/articles/virtualization/qemuimage_tips/</guid>
-      <description>&lt;h1 id=&#34;about-qemu-images&#34;&gt;About QEMU images&lt;/h1&gt;
-&lt;p&gt;QEMU uses files to emulate storage devices, and the features available
-depend on how those files are created.  While QEMU can emulate disks from Parallels and VirtualBox, I’m going to
-focus on the formats most commonly used in automation and scripting, &lt;strong&gt;raw&lt;/strong&gt; and &lt;strong&gt;qcow2&lt;/strong&gt;.&lt;/p&gt;
-&lt;p&gt;The default format is raw and raw offers the fewest features.  It&amp;rsquo;s just plain storage.  The other format qcow2
-supports compression, snapshots, and copy-on-write in addition to storage.&lt;/p&gt;</description>
-      <content:encoded><![CDATA[<h1 id="about-qemu-images">About QEMU images</h1>
-<p>QEMU uses files to emulate storage devices, and the features available
+      <description>QEMU image file tips and tricks</description>
+      <content:encoded><![CDATA[<p>QEMU uses files to emulate storage devices, and the features available
 depend on how those files are created.  While QEMU can emulate disks from Parallels and VirtualBox, I’m going to
 focus on the formats most commonly used in automation and scripting, <strong>raw</strong> and <strong>qcow2</strong>.</p>
 <p>The default format is raw and raw offers the fewest features.  It&rsquo;s just plain storage.  The other format qcow2

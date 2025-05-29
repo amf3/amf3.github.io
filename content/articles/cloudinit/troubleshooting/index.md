@@ -1,13 +1,12 @@
 ---
 title: "cloud-init troubleshooting"
+description: A simple workflow in resolving cloud-init deployment problems.
 date: 2025-03-21T16:28:54-04:00
 draft: false
 searchHidden: false
 showtoc: true
 categories: [cloud, automation, operations]
 ---
-
-# Introduction
 
 I previously wrote an [introduction](../../../articles/cloudinit/intro/) to cloud-init. I'd like to now follow up with a discussion on
 troubleshooting. cloud-init failures on remote hosts can be challenging. Depending on the failure point, cloud-init may or may not

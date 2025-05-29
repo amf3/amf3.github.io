@@ -1,13 +1,12 @@
 ---
 title: "Getting started with cloud-init for unattended Linux deployments"
+description: An intro to using cloud-init for customizing both on-premise and cloud virtual machines
 date: 2025-02-21T23:06:35-08:00
 draft: false
 searchHidden: false
 showtoc: true
 categories: [cloud, automation, operations]
 ---
-
-## Intro
 
 Cloud compute companies like GCP, AWS, or Azure offer a management API for allocating resources. In the on-premise space,
 services such as Docker or Incus provide APIs for managing containers or virtual machines (VMs). But what about installing 

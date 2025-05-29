@@ -1,13 +1,12 @@
 ---
 title: "Tips for working with qemu images"
+description: QEMU image file tips and tricks
 date: 2025-04-06T07:41:29-04:00
 draft: false
 searchHidden: false
 showtoc: true
-categories: [cloud, virtualization, tips]
+categories: [cloud, virtualization, tips, qemu]
 ---
-
-# About QEMU images
 
 QEMU uses files to emulate storage devices, and the features available
 depend on how those files are created.  While QEMU can emulate disks from Parallels and VirtualBox, I’m going to 

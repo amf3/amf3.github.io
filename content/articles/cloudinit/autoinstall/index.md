@@ -1,13 +1,12 @@
 ---
 title: Unattended Ubuntu Installs - Virtual Machines to Bare-Metal
+description: Using cloud-init to deploy Linux on either bare-metal or virtual machines
 date: 2025-03-03T23:07:23-08:00
 draft: false
 searchHidden: false
 showtoc: true
 categories: [cloud, automation, operations]
 ---
-
-## Intro
 
 In a [previous post](../../../articles/cloudinit/intro/), I discussed using cloud-init and Multipass as a method of provisioning
 virtual machines on a local computer with a cloud-like API.  Today I am going
