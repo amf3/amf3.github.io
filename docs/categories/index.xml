@@ -6,8 +6,22 @@
     <description>Recent content in Categories on Adam Faris</description>
     <generator>Hugo -- 0.147.6</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 06 Apr 2025 07:41:29 -0400</lastBuildDate>
+    <lastBuildDate>Fri, 30 May 2025 16:46:07 -0700</lastBuildDate>
     <atom:link href="https://amf3.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Object Store</title>
+      <link>https://amf3.github.io/categories/object-store/</link>
+      <pubDate>Fri, 30 May 2025 16:46:07 -0700</pubDate>
+      <guid>https://amf3.github.io/categories/object-store/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Storage</title>
+      <link>https://amf3.github.io/categories/storage/</link>
+      <pubDate>Fri, 30 May 2025 16:46:07 -0700</pubDate>
+      <guid>https://amf3.github.io/categories/storage/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Cloud</title>
       <link>https://amf3.github.io/categories/cloud/</link>
