@@ -1,0 +1,9 @@
+{
+  "description": "Example HTTP-backed volume plugin",
+  "interface": {
+    "socket": "myplugin.sock",
+    "types": ["docker.volumedriver/1.0"]
+  },
+  "entrypoint": ["/myplugin"]
+}
+
