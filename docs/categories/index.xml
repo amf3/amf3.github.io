@@ -4,22 +4,29 @@
     <title>Categories on Adam Faris</title>
     <link>https://amf3.github.io/categories/</link>
     <description>Recent content in Categories on Adam Faris</description>
-    <generator>Hugo -- 0.147.6</generator>
+    <generator>Hugo -- 0.147.8</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 30 May 2025 16:46:07 -0700</lastBuildDate>
+    <lastBuildDate>Thu, 26 Jun 2025 22:37:40 -0700</lastBuildDate>
     <atom:link href="https://amf3.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Object Store</title>
-      <link>https://amf3.github.io/categories/object-store/</link>
-      <pubDate>Fri, 30 May 2025 16:46:07 -0700</pubDate>
-      <guid>https://amf3.github.io/categories/object-store/</guid>
+      <title>Docker</title>
+      <link>https://amf3.github.io/categories/docker/</link>
+      <pubDate>Thu, 26 Jun 2025 22:37:40 -0700</pubDate>
+      <guid>https://amf3.github.io/categories/docker/</guid>
       <description></description>
     </item>
     <item>
       <title>Storage</title>
       <link>https://amf3.github.io/categories/storage/</link>
-      <pubDate>Fri, 30 May 2025 16:46:07 -0700</pubDate>
+      <pubDate>Thu, 26 Jun 2025 22:37:40 -0700</pubDate>
       <guid>https://amf3.github.io/categories/storage/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Object Store</title>
+      <link>https://amf3.github.io/categories/object-store/</link>
+      <pubDate>Fri, 30 May 2025 16:46:07 -0700</pubDate>
+      <guid>https://amf3.github.io/categories/object-store/</guid>
       <description></description>
     </item>
     <item>

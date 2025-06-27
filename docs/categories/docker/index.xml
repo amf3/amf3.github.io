@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Docker on Adam Faris</title>
+    <link>https://amf3.github.io/categories/docker/</link>
+    <description>Recent content in Docker on Adam Faris</description>
+    <generator>Hugo -- 0.147.8</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 26 Jun 2025 22:37:40 -0700</lastBuildDate>
+    <atom:link href="https://amf3.github.io/categories/docker/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>DIY Docker Volume Drivers: What&#39;s Missing</title>
+      <link>https://amf3.github.io/articles/storage/docker_volumes/</link>
+      <pubDate>Thu, 26 Jun 2025 22:37:40 -0700</pubDate>
+      <guid>https://amf3.github.io/articles/storage/docker_volumes/</guid>
+      <description>How to write a simple volume plugin. No root, no FUSE, just HTTP and Go</description>
+      <content:encoded><![CDATA[<p>With Docker, it’s not always obvious what storage options exist beyond the built-in <strong>local</strong> volume driver or a traditional <strong>bind mount</strong>.
+Exploring Docker volume drivers often turns up archived GitHub repositories or commercially backed plugins tied to specific cloud storage products. The volume
+ecosystem is especially limited for on-premise storage, and many plugins require more privileges than you&rsquo;d expect.</p>
+<p>In this post, I’ll cover how Docker handles volume storage under the hood. I’ll also walkthrough how to create a volume plugin that interacts with remote
+storage without needing CAP_SYS_ADMIN privileges.</p>
+<h2 id="docker-storage-overview">Docker Storage Overview</h2>
+<ul>
+<li><strong>Graph Drivers</strong> (also known as Storage Drivers) manage image and container layers. Examples include, <strong>overlay2</strong>, <strong>zfs</strong>, or <strong>btrfs</strong>.</li>
+<li><strong>Volume Drivers</strong> manange named volumes and allow data to persist outside of the container lifecycle.</li>
+</ul>
+<p>Plugins for Volume Drivers are usually installed as special containers using the <strong>docker plugin</strong> command. Plugin containers run
+in their own namespaces and don&rsquo;t behave like normal containers. However, if the plugin includes a shell, it&rsquo;s possible to enter the
+namespace using <a href="https://docs.docker.com/engine/extend/#debugging-plugins">runc</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>ubuntu@docker-dev:~/work$ sudo runc --root /run/docker/runtime-runc/plugins.moby list 
+</span></span><span style="display:flex;"><span>ID                                                                 PID         STATUS      BUNDLE                                                                                                                        CREATED                          OWNER
+</span></span><span style="display:flex;"><span>bae595da4deac656921a48f4b3d854992c692777f46db891934310ae863746c1   <span style="color:#ae81ff">24503</span>       running     /run/containerd/io.containerd.runtime.v2.task/plugins.moby/bae595da4deac656921a48f4b3d854992c692777f46db891934310ae863746c1   2025-06-27T03:55:42.927740463Z   root
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ubuntu@docker-dev:~/work$ sudo runc --root /run/docker/runtime-runc/plugins.moby exec -t bae595da4deac656921a48f4b3d854992c692777f46db891934310ae863746c1 /bin/bash
+</span></span><span style="display:flex;"><span>root@docker-dev:/# ls -lh /myplugin
+</span></span><span style="display:flex;"><span>-rwxr-xr-x <span style="color:#ae81ff">1</span> root root 5.0M Jun <span style="color:#ae81ff">24</span> 23:24 /myplugin
+</span></span></code></pre></div><p>The Docker daemon communicates with all plugins over HTTP, using either a Unix socket or a TCP socket.</p>
+<h2 id="whats-missing">What&rsquo;s Missing</h2>
+<p>While the interface is simple, expectations around what happens after a volume is mounted are not. Most plugins end up mounting a remote
+filesystem like NFS or CIFS, manipulating files as root, or interacting with device nodes like /dev/fuse, all requiring elevated privileges.</p>
+<p>To summarize:</p>
+<ul>
+<li>It’s difficult to find unprivileged plugins in the Docker ecosystem.</li>
+<li>Using virtual filesystems (like GlusterFS, SSHFS, or S3FS) requires FUSE, and FUSE needs CAP_SYS_ADMIN.</li>
+<li>A local caching layer for remote storage is not baked into the Docker volume plugin interface.</li>
+</ul>
+<h2 id="the-diy-approach">The DIY Approach</h2>
+<p>Let’s say we want a volume plugin that “mounts” a remote volume by downloading files from a remote server.</p>
+<p>Here’s a basic outline of how it might work:</p>
+<ul>
+<li>Implement a volume plugin that exposes the Volume Plugin API to the Docker daemon.</li>
+<li><strong>Create</strong> volume, populates volume metadata needed to later identify the volume within Docker. (The API allows actual filesystem setup to be deferred until Mount.)</li>
+<li><strong>Mount</strong> volume, will fetch data from the remote server, extract it to a known local path, and return that path to Docker.</li>
+<li><strong>Unmount</strong> volume, either cleans up the local path or repackages and uploads any changes back to the remote server.</li>
+</ul>
+<p>This model avoids the need for root privileges, since it doesn&rsquo;t touch /dev, doesn&rsquo;t rely on FUSE, and doesn’t call mount(2).</p>
+<h2 id="my-interest-in-docker-plugins">My Interest in Docker Plugins</h2>
+<p>I like the simplicity of Docker compared to larger orchestration platforms, but I want more from its storage offerings.
+When I started looking at existing volume plugins, a few things pushed me toward writing my own.</p>
+<p>Many plugins require root-level privileges. I found that avoiding FUSE or skipping filesystems that depend on kernel modules could reduce or eliminate
+this requirement.</p>
+<p>Another issue, most volume plugins on GitHub have been archived by their maintainers. I get it, people move on and the Docker community isn&rsquo;t as large
+as it once was.  That said, I found the developer tooling for writing plugins to be a bit clunky. My hope is this post will help fill in gaps and show
+a practical path forward for building a volume plugin.</p>
+<p>Finally, most active (not archived) volume plugins I find are designed for cloud storage services. There&rsquo;s a lack of unprivileged lightweight volume
+plugins and I think there&rsquo;s a place for something simplier.</p>
+<ul>
+<li>Streaming read-only config bundles</li>
+<li>CI/CD ephemeral volumes</li>
+<li>Lazy-loading assets over HTTP</li>
+</ul>
+<p>These ideas are viable with the current plugin API, just unexplored.</p>
+<h2 id="a-simple-plugin">A simple plugin</h2>
+<p>After digging into Docker plugins and exploring the current state of the ecosystem, I decided to build a simple plugin to see how far I could get
+with minimal privileges and lightweight tooling. I have to admit that the process was both educational and a little frustrating.</p>
+<h3 id="what-didnt-go-smoothly">What Didn&rsquo;t Go Smoothly</h3>
+<p>Docker has a clean CLI and a solid container runtime, but plugin development comes with its share of friction:</p>
+<ul>
+<li>The development loop is slow. Building, loading, and enabling a plugin requires several manual steps. Debugging inside the plugin container via runc (instead of docker plugin) isn’t intuitive.</li>
+<li>Plugin files need to follow a specific directory structure, and you must include an exported container root filesystem in a subdirectory before the plugin can be built.</li>
+<li>The Docker daemon uses a socket path that includes the container ID which is a dynamic value. This caused the daemon to time out when connecting to the plugin until I manually fixed the path. Eventually, I discovered the Go plugin SDK, which handled this more reliably.</li>
+</ul>
+<h3 id="build-steps">Build Steps</h3>
+<p>Here’s a high-level overview of the development loop when creating a Docker volume plugin:</p>
+<ol>
+<li>Write the plugin code.</li>
+<li>Create a Docker image that contains the plugin.</li>
+<li>Create a throwaway container from that image.</li>
+<li>Extract the root filesystem from the container using <strong>docker export</strong>, and untar it into a directory named <strong>rootfs</strong>.</li>
+<li>Finally, run <strong>docker plugin create</strong> to assemble the plugin from the <strong>rootfs</strong> and a <em><strong>config.json</strong></em> file.</li>
+</ol>
+<p><img alt="Docker Documentation Screenshot of Building a Plugin" loading="lazy" src="/articles/storage/docker_volumes/assets/doc.jpg"></p>
+<p>Fortunately, someone wrapped these steps in a <a href="https://github.com/vieux/docker-volume-sshfs/blob/1e0cd2fcb72d6af0a2ad4689faed8c312124517c/Makefile">Makefile</a>
+which can be used as a starting point.  Here&rsquo;s a snippet from the docker-volume-sshfs repo.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-make" data-lang="make"><span style="display:flex;"><span><span style="color:#a6e22e">rootfs</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>	@echo <span style="color:#e6db74">&#34;### docker build: rootfs image with docker-volume-sshfs&#34;</span>
+</span></span><span style="display:flex;"><span>	@docker build -q -t <span style="color:#e6db74">${</span>PLUGIN_NAME<span style="color:#e6db74">}</span>:rootfs .
+</span></span><span style="display:flex;"><span>	@echo <span style="color:#e6db74">&#34;### create rootfs directory in ./plugin/rootfs&#34;</span>
+</span></span><span style="display:flex;"><span>	@mkdir -p ./plugin/rootfs
+</span></span><span style="display:flex;"><span>	@docker create --name tmp <span style="color:#e6db74">${</span>PLUGIN_NAME<span style="color:#e6db74">}</span>:rootfs
+</span></span><span style="display:flex;"><span>	@docker export tmp | tar -x -C ./plugin/rootfs
+</span></span><span style="display:flex;"><span>	@echo <span style="color:#e6db74">&#34;### copy config.json to ./plugin/&#34;</span>
+</span></span><span style="display:flex;"><span>	@cp config.json ./plugin/
+</span></span><span style="display:flex;"><span>	@docker rm -vf tmp
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">create</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>	@echo <span style="color:#e6db74">&#34;### remove existing plugin </span><span style="color:#e6db74">${</span>PLUGIN_NAME<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">${</span>PLUGIN_TAG<span style="color:#e6db74">}</span><span style="color:#e6db74"> if exists&#34;</span>
+</span></span><span style="display:flex;"><span>	@docker plugin rm -f <span style="color:#e6db74">${</span>PLUGIN_NAME<span style="color:#e6db74">}</span>:<span style="color:#e6db74">${</span>PLUGIN_TAG<span style="color:#e6db74">}</span> <span style="color:#f92672">||</span> true
+</span></span><span style="display:flex;"><span>	@echo <span style="color:#e6db74">&#34;### create new plugin </span><span style="color:#e6db74">${</span>PLUGIN_NAME<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">${</span>PLUGIN_TAG<span style="color:#e6db74">}</span><span style="color:#e6db74"> from ./plugin&#34;</span>
+</span></span><span style="display:flex;"><span>	@docker plugin create <span style="color:#e6db74">${</span>PLUGIN_NAME<span style="color:#e6db74">}</span>:<span style="color:#e6db74">${</span>PLUGIN_TAG<span style="color:#e6db74">}</span> ./plugin
+</span></span></code></pre></div><p>You’ll also need a <strong>config.json</strong> file (<a href="https://docs.docker.com/engine/extend/config/">docs</a>) that defines the plugin’s name, entrypoint, socket permissions,
+and other settings. This file goes alongside the rootfs directory when building the plugin.</p>
+<h3 id="plugin-sdk-and-api-documentation">Plugin SDK and API documentation</h3>
+<p>The <a href="https://github.com/docker/go-plugins-helpers/tree/main/volume">go-plugins-helpers</a> SDK was a big help when building my plugin, though
+it&rsquo;s not well advertised.  It provides an interface with method definitions for handling the HTTP communication between the custom plugin and
+the Docker Daemon.</p>
+<p>While plugins can technically be written in any language (since the API is just HTTP), this Go SDK was the only official helper library I found.  That said,
+using it is optional.  I came across several projects like rclone and SeaweedFS that implement the plugin protocol without relying on the SDK.</p>
+<p>Docker’s documentation is spread across a few key pages. The two most useful I found were:</p>
+<ul>
+<li>The <a href="https://docs.docker.com/engine/extend/plugin_api/">Plugin API reference</a> describes the HTTP interface and includes example request and response payloads.</li>
+<li>The <a href="https://docs.docker.com/engine/extend/plugins_volume/">Volume plugin overview</a> includes sections on creating, installing, developing, and debugging plugins.</li>
+</ul>
+<h3 id="code-highlights">Code Highlights</h3>
+<p>The plugin I built is intentionaly minimal.  When a container calls <strong>mount</strong> on the volume, the function creates a hello.txt file in the volume directory.<br>
+It simulates downloading data from remote storage while keeping things simple:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Go" data-lang="Go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">d</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">myDriver</span>) <span style="color:#a6e22e">Mount</span>(<span style="color:#a6e22e">req</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">volume</span>.<span style="color:#a6e22e">MountRequest</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">volume</span>.<span style="color:#a6e22e">MountResponse</span>, <span style="color:#66d9ef">error</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">volPath</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">filepath</span>.<span style="color:#a6e22e">Join</span>(<span style="color:#a6e22e">pluginRoot</span>, <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">Name</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// Write a hello.txt file</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">helloFile</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">filepath</span>.<span style="color:#a6e22e">Join</span>(<span style="color:#a6e22e">volPath</span>, <span style="color:#e6db74">&#34;hello.txt&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">WriteFile</span>(<span style="color:#a6e22e">helloFile</span>, []byte(<span style="color:#e6db74">&#34;Hello, world!\n&#34;</span>), <span style="color:#ae81ff">0644</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>, <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;failed to write hello.txt: %w&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Mount volume: %s -&gt; %s&#34;</span>, <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">Name</span>, <span style="color:#a6e22e">volPath</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">volume</span>.<span style="color:#a6e22e">MountResponse</span>{<span style="color:#a6e22e">Mountpoint</span>: <span style="color:#a6e22e">volPath</span>}, <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Before a container exits, <strong>unmount</strong> is called.  This function deletes the file from the volume, demonstrating that the basic lifecycle works with user level
+permissions. This step could be used to sync local changes back to remote storage in production code.</p>
+<pre tabindex="0"><code>func (d *myDriver) Unmount(req *volume.UnmountRequest) error {
+	volPath := filepath.Join(pluginRoot, req.Name)
+	helloFile := filepath.Join(volPath, &#34;hello.txt&#34;)
+
+	// Simulate cleanup
+	if err := os.Remove(helloFile); err != nil &amp;&amp; !os.IsNotExist(err) {
+		return fmt.Errorf(&#34;unmount cleanup error: %w&#34;, err)
+	}
+
+	log.Printf(&#34;Unmount volume: %s (removed hello.txt)&#34;, req.Name)
+	return nil
+}
+</code></pre><h3 id="build-walkthrough">Build WalkThrough</h3>
+<p>Now for the good part.  A full walkthrough of how I built and tested the custom plugin. Here are the files involved:</p>
+<ul>
+<li><a href="./assets/go.mod">go.mod</a></li>
+<li><a href="./assets/go.sum">go.sum</a></li>
+<li><a href="./assets/myplugin.go">myplugin.go</a></li>
+<li><a href="./assets/Dockerfile">Dockerfile</a></li>
+<li><a href="./assets/config.json">config.json</a></li>
+</ul>
+<ol>
+<li>Build the Go code and create a plugin image</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ docker build -t rootfsimage .
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>+<span style="color:#f92672">]</span> Building 6.1s <span style="color:#f92672">(</span>13/13<span style="color:#f92672">)</span> FINISHED                                                                                                   docker:default
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>internal<span style="color:#f92672">]</span> load build definition from Dockerfile                                                                                 0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; transferring dockerfile: 461B                                                                                                 0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>internal<span style="color:#f92672">]</span> load metadata <span style="color:#66d9ef">for</span> docker.io/library/ubuntu:oracular                                                                   0.9s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>internal<span style="color:#f92672">]</span> load .dockerignore                                                                                                    0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; transferring context: 2B                                                                                                      0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>internal<span style="color:#f92672">]</span> load build context                                                                                                    0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; transferring context: 32.89kB                                                                                                 0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>builder 1/6<span style="color:#f92672">]</span> FROM docker.io/library/ubuntu:oracular@sha256:707879280c0bbfe6cbeb3ae1a85b564ea2356b5310a122c225b92cb3d1ed131b     0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; CACHED <span style="color:#f92672">[</span>builder 2/6<span style="color:#f92672">]</span> RUN apt-get update <span style="color:#f92672">&amp;&amp;</span> apt-get install golang-go ca-certificates -y                                          0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>builder 3/6<span style="color:#f92672">]</span> COPY . /build                                                                                                      0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>builder 4/6<span style="color:#f92672">]</span> WORKDIR /build                                                                                                     0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>builder 5/6<span style="color:#f92672">]</span> RUN go mod tidy                                                                                                    0.7s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>builder 6/6<span style="color:#f92672">]</span> RUN CGO_ENABLED<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> go build -ldflags<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;-s -w -extldflags &#34;</span>-static<span style="color:#e6db74">&#34;&#34;</span> -tags netgo,osusergo -o myplugin                 4.3s 
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; CACHED <span style="color:#f92672">[</span>stage-1 2/3<span style="color:#f92672">]</span> RUN mkdir -p /run/docker/plugins /var/lib/myplugin/volumes                                                  0.0s 
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>stage-1 3/3<span style="color:#f92672">]</span> COPY --from<span style="color:#f92672">=</span>builder /build/myplugin /myplugin                                                                      0.0s 
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; exporting to image                                                                                                               0.0s 
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; exporting layers                                                                                                              0.0s 
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; writing image sha256:a3d2dee4d6cb8112f538a16056dc42b9761bda43f7f279b2a1f202a7a8e5f8ae                                         0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; naming to docker.io/library/rootfsimage      
+</span></span></code></pre></div><ol start="2">
+<li>Create a container from the rootfs image and export the container’s root filesystem to a tar file.</li>
+</ol>
+<pre tabindex="0"><code>$ id=$(docker create rootfsimage true)  
+
+$ echo $id
+13cf6219737999bd54f7fc2537bc1218f42d9c45d92f79c4726c1422e81b348e
+
+$ sudo docker export &#34;$id&#34; -o rootfs.tar 
+
+$ ls -l rootfs.tar 
+-rw------- 1 ubuntu ubuntu 110620160 Jun 26 23:07 rootfs.tar
+</code></pre><ol start="3">
+<li>Docker plugin tooling expects a rootfs directory and a config.json file in the current directory. The config isn’t part of the exported filesystem, so it&rsquo;s
+provided separately:</li>
+</ol>
+<pre tabindex="0"><code>$ cp ~/Downloads/config.json .
+$ sudo tar -xf ./rootfs.tar -C ./rootfs/ 
+
+$ ls -l 
+total 8
+-rw-r--r--  1 root root  183 Jun 23 15:26 config.json
+drwxr-xr-x 17 root root 4096 Jun 24 16:28 rootfs
+
+$ ls rootfs
+bin  boot  dev  etc  home  lib  media  mnt  myplugin  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+</code></pre><ol start="4">
+<li>Create and enable the plugin.</li>
+</ol>
+<pre tabindex="0"><code>$ sudo docker plugin create myplugin . 
+myplugin
+
+$ docker plugin enable myplugin:latest
+myplugin:latest
+
+$ docker plugin ls
+ID             NAME              DESCRIPTION                         ENABLED
+d5f63b80f0b0   myplugin:latest   Example HTTP-backed volume plugin   true
+</code></pre><ol start="5">
+<li>Create a volume with the plugin and inspect it.</li>
+</ol>
+<pre tabindex="0"><code>$ docker volume create -d myplugin:latest abc123
+abc123
+
+$ docker volume ls
+DRIVER            VOLUME NAME
+myplugin:latest   abc123
+
+$ docker volume inspect abc123 
+[
+    {
+        &#34;CreatedAt&#34;: &#34;0001-01-01T00:00:00Z&#34;,
+        &#34;Driver&#34;: &#34;myplugin:latest&#34;,
+        &#34;Labels&#34;: null,
+        &#34;Mountpoint&#34;: &#34;/var/lib/myplugin/volumes/abc123&#34;,
+        &#34;Name&#34;: &#34;abc123&#34;,
+        &#34;Options&#34;: null,
+        &#34;Scope&#34;: &#34;local&#34;
+    }
+]
+</code></pre><ol start="6">
+<li>Mount the volume with a container.</li>
+</ol>
+<pre tabindex="0"><code>$ docker run -it --rm  -v abc123:/mnt alpine
+
+/ # ls -l /mnt
+total 4
+-rw-r--r--    1 root     root            14 Jun 27 06:17 hello.txt
+
+/ # cat /mnt/hello.txt 
+Hello, world!
+</code></pre><ol start="7">
+<li>Additional information for Docker events can be found inside systemd logs.</li>
+</ol>
+<pre tabindex="0"><code>$ journalctl -u docker.service  | tail -3
+Jun 26 23:17:55 docker-dev dockerd[7976]: time=&#34;2025-06-26T23:17:55-07:00&#34; level=error msg=&#34;2025/06/27 06:17:55 Mount volume: abc123 -&gt; /var/lib/myplugin/volumes/abc123&#34; plugin=d5f63b80f0b091582e00bfed7bd6d33e885fef876e151558a37ae5eaf05e5443
+Jun 26 23:18:04 docker-dev dockerd[7976]: time=&#34;2025-06-26T23:18:04.543532903-07:00&#34; level=info msg=&#34;ignoring event&#34; container=0e6fdf10db3da9c9b5bc04bbe6abac6b23225578e796e89fe859c1d17fc57f0f module=libcontainerd namespace=moby topic=/tasks/delete type=&#34;*events.TaskDelete&#34;
+Jun 26 23:18:04 docker-dev dockerd[7976]: time=&#34;2025-06-26T23:18:04-07:00&#34; level=error msg=&#34;2025/06/27 06:18:04 Unmount volume: abc123 (removed hello.txt)&#34; plugin=d5f63b80f0b091582e00bfed7bd6d33e885fef876e151558a37ae5eaf05e5443
+</code></pre><h2 id="closing">Closing</h2>
+<p>I&rsquo;m excited about learning how to create plugins for Docker and turning my notes into this post.</p>
+<p>I made a previous post on using tar archives as an <a href="https://amf3.github.io/articles/storage/tar_objectstore/">object store</a> and I recently posted about compression ratios on Bluesky social.  Stay tuned to find out where these posts are headed.</p>
+<blockquote class="bluesky-embed" data-bluesky-uri="at://did:plc:plt47775q3cx3yw6r2efid2g/app.bsky.feed.post/3lruiz7tels2c" data-bluesky-cid="bafyreifcp7itwnmjzkp3br5rrt6fyyuwgqmegjalumg2cjxbbi2opl327q"><p lang="en">I was curious how snappy compared to lz4 and wrote a go program to find out.  Snappy seems to be a bit better with both compressed data output and resource usage.  
+
+Input is the first 1,000,000 numbers of pi.</p>&mdash; <a href="https://bsky.app/profile/did:plc:plt47775q3cx3yw6r2efid2g?ref_src=embed">Adam Faris (@af9.us)</a> <a href="https://bsky.app/profile/did:plc:plt47775q3cx3yw6r2efid2g/post/3lruiz7tels2c?ref_src=embed">2025-06-18T07:40:31.631Z</a></blockquote><script async src="https://embed.bsky.app/static/embed.js" charset="utf-8"></script>
+<p>If you&rsquo;ver ever built a Docker plugin or struggled with Docker storage, I&rsquo;d like to hear about it.  Any questions or ideas, reach out and
+leave a comment.</p>
+<p>Until next time, keep your volumes clean and your containers stateless.</p>
+]]></content:encoded>
+    </item>
+  </channel>
+</rss>
