@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>OpenAPI in Practice: Go Server &#43; Python Client from Spec | Adam Faris</title>
+<meta name="keywords" content="">
+<meta name="description" content="A practical walkthrough of using OpenAPI to generate cross-language interfaces">
+<meta name="author" content="">
+<link rel="canonical" href="https://amf3.github.io/articles/api/hello_openapi/">
+<meta name="google-site-verification" content="6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E">
+<meta name="msvalidate.01" content="C1E02AC59FE7ECBDB6D9EFB7D5E02B65">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.8fe10233a706bc87f2e08b3cf97b8bd4c0a80f10675a143675d59212121037c0.css" integrity="sha256-j&#43;ECM6cGvIfy4Is8&#43;XuL1MCoDxBnWhQ2ddWSEhIQN8A=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://amf3.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://amf3.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://amf3.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://amf3.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://amf3.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://amf3.github.io/articles/api/hello_openapi/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-MKR06D6KGD"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-MKR06D6KGD');
+        }
+      </script><meta property="og:url" content="https://amf3.github.io/articles/api/hello_openapi/">
+  <meta property="og:site_name" content="Adam Faris">
+  <meta property="og:title" content="OpenAPI in Practice: Go Server &#43; Python Client from Spec">
+  <meta property="og:description" content="A practical walkthrough of using OpenAPI to generate cross-language interfaces">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="articles">
+    <meta property="article:published_time" content="2025-07-04T22:43:09-07:00">
+    <meta property="article:modified_time" content="2025-07-04T22:43:09-07:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OpenAPI in Practice: Go Server &#43; Python Client from Spec">
+<meta name="twitter:description" content="A practical walkthrough of using OpenAPI to generate cross-language interfaces">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "articles",
+      "item": "https://amf3.github.io/articles/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "OpenAPI in Practice: Go Server + Python Client from Spec",
+      "item": "https://amf3.github.io/articles/api/hello_openapi/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "OpenAPI in Practice: Go Server + Python Client from Spec",
+  "name": "OpenAPI in Practice: Go Server \u002b Python Client from Spec",
+  "description": "A practical walkthrough of using OpenAPI to generate cross-language interfaces",
+  "keywords": [
+    
+  ],
+  "articleBody": "OpenAPI is a specification for documenting HTTP APIs for both humans and machines to consume. As OpenAPI is a specification, it is language agnostic. OpenAPI relies on generators for translating the specification. There’s more than just documentation that’s generated. Generators also create language-specific interfaces, tooling, and contracts. In some ways the OpenAPI pattern reminds me of either protobuf with gRPC or ORM schema-first design. As a result, a declarative API is created by the tooling.\nBy the end of this post you’ll have:\nA working Go http server generated from an OpenAPI specification. A Python http client generated from the same specification and authenticates with basic auth. Insight into common OpenAPI pitfalls and how to avoid them. [openapi.yaml] ↓ +--------------+ | oapi-codegen | ---\u003e [Go Server] +--------------+ ↓ +-----------------------+ | openapi-python-client | ---\u003e [Python Client] +-----------------------+ If you would like to follow along, a complete code example can be downloaded and extracted into a temporary working directory.\nGenerators Because generators are consuming the specification, the OpenAPI version is determined by what the generators support.\nFor example, a popular Go generator is oapi-codegen and supports OpenAPI 3.0. Where a popular Python generator named openapi-python-client can support both OpenAPI 3.0 and 3.1 specifications.\nGenerators can be downloaded and managed as part of the languages tooling. For Go, the oapi-codegen generator is managed with Go modules and invoked with go tool oapi-codegen. With Python, creating a virtual environment, using pip install openapi-python-client, and pip freeze \u003e requirements.txt will work nicely.\nOpenAPI Schema At first it wasn’t clear to me on how to get started with OpenAPI or what the benefits were. This is even after reviewing the OpenAPI schema documentation for 3.0.3.\nTo get started one needs to create a specification. A very minimal specification meeting the 3.0.x requirements is listed below. It’s not a very interesting example as endpoints in the application server aren’t defined, but it shows how minimal a specification can be that meets schema requirements.\nopenapi: \"3.0.3\" info: version: 1.0.0 title: My Contrived Server paths: Let’s get started by extending the simple example defining a path named /status. It will return a 200 response code with a JSON resonse.\npaths: /status: get: responses: '200': description: Get status of the application server content: application/json: schema: $ref: '#/components/schemas/status' The JSON response is documented in a separate YAML block named components. It defines the response containing a JSON map containing the keys “state” and “message”, both of which have a string value.\ncomponents: schemas: status: type: object properties: state: type: string example: \"GOOD\" message: type: string example: \"App running within parameters\" OpenAPI supports tags, which let you group related endpoints. This example creates a data grouping and puts create_bucket in the group.\ntags: - name: data description: data manipulation endpoints paths: /create_bucket: post: tags: - data requestBody: required: true content: application/json: schema: $ref: '#/components/schemas/create_bucket' responses: '200': description: Create a storage object The OpenAPI specification also provides a definition for authentication to the web application.\ncomponents: securitySchemes: basicAuth: type: http scheme: basic description: Endpoints protected by basic auth base64 encoded credentials. paths: /status: get: security: - basicAuth: [] responses: '200': description: Get status of the application server content: application/json: schema: $ref: '#/components/schemas/status' Earlier I mentioned the generators will create interface files. Declarations which are considered middleware like authentication or logging are out of scope for OpenAPI. In this example, the security entries are there to document that the endpoints require basic authentication.\nGenerate Server Interfaces (Go) The server walkthrough presumes one has both Make and Go installed, and the example code (tar.gz file) has been downloaded and extracted into a temp/work directory.\nDownload the Go dependencies, including oapi-codegen, by running make tidy. Generate the server interfaces by running make server-codegen, which calls go tool oapi-codegen. Feel free to inspect the api/http.gen.go file before proceeding. You’ll see it contains an interface named ServerInterface, which has the GetStatus or PostStatus endpoints from the OpenAPI specification. http.gen.go also contains a struct named Status that was defined from components -\u003e schema -\u003e status.\ntype Status struct { Message string `json:\"message\"` State string `json:\"state\"` } To see the working application server, run make server-run.\nThe server has Basic Auth enabled with hardcoded credentials. The user is “alice” and the password “mySecretPW”. Curl can be used to see the response.\n% curl --basic -u alice:mySecretPW http://localhost:8080/status {\"message\":\"Initializing\",\"state\":\"Unknown\"} Generate Client Interfaces (Python) This is where OpenAPI really shines. I was able to use a generator to create Python libraries to be used by the client implementation code. The walkthrough presumes a recent version of Python3 and pip are installed.\nFirst, create a virtual environment and install the openapi-python-client dependencies. This shell snippet presumes the current working directory is already hello_openapi.\n% python3 -mvenv $PWD/.venv % source $PWD/.venv/bin/activate % pip install -r requirements.txt Then run make client-codegen to build the Python client libraries located in cmd/client/my_contrived_server.\nGenerating the client was easy, but figuring out how to pass authentication took some trial and error. I eventually realized that the token is just a base64-encoded username:password string, and the prefix should be set to Basic.\nclient = AuthenticatedClient( base_url=\"http://127.0.0.1:8080\", headers={\"Content-Type\": \"application/json\", \"Accept\": \"application/json\"}, token=\"YWxpY2U6bXlTZWNyZXRQVw==\", # Token string is a base64 string containing alice:mySecretPW prefix=\"Basic\" ) To see the client in action, run make client-run. Also take a look at cmd/client/client.py. It only took a few lines of python code to implement what the openapi-python-client generator had created.\nGotchas \u0026 Lessons Learned One issue I have with OpenAPI is the illusion of simplicty. When I first started working with OpenAPI, I noticed the Status struct had keys referencing a pointer of strings which wasn’t ideal.\ntype Status struct { Message *string `json:\"message\"` State *string `json:\"state\"` } It took some fiddling with the OpenAPI specification to make the generator use strings instead of pointers to strings. Adding ‘required’ to the schema made the generator do what I wanted.\ncomponents: status: type: object properties: state: type: string example: \"GOOD\" message: type: string example: \"App within parameters\" required: - state - message Another issue was not knowing that in Paths, GETs should have a responses entry and POSTS should have a RequestBody entry. It makes sense, but it wasn’t obvious to me when stumbling through hello-world.\nThe main takeaway? Always inspect the generated code. If something doesn’t look right, like unexpected pointers or missing method args, chances are your spec needs tweaking.\nWrapping Up Even though I hit some issues with a fairly simple example, I’m going to continue using OpenAPI specifcations. Being able to easily generate client code in a different language was a real win. And let’s not forget the free API documentation and contract definitions which comes with OpenAPI. I have a more complex OpenAPI project coming up. I’m sure I’ll have more notes (and probably more gotchas) to share. Stay tuned.\nIf you’ve had similar struggles with OpenAPI or tips for improving schema design, I’d love to hear them on Bluesky Social.\n",
+  "wordCount" : "1149",
+  "inLanguage": "en",
+  "datePublished": "2025-07-04T22:43:09-07:00",
+  "dateModified": "2025-07-04T22:43:09-07:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://amf3.github.io/articles/api/hello_openapi/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Adam Faris",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://amf3.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://amf3.github.io/" accesskey="h" title="Adam Faris (Alt + H)">Adam Faris</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://amf3.github.io/search/" title="search (Alt &#43; /)" accesskey=/>
+                    <span>search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/articles/" title="articles">
+                    <span>articles</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/about/" title="about">
+                    <span>about</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://amf3.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://amf3.github.io/articles/">articles</a></div>
+    <h1 class="post-title entry-hint-parent">
+      OpenAPI in Practice: Go Server &#43; Python Client from Spec
+    </h1>
+    <div class="post-description">
+      A practical walkthrough of using OpenAPI to generate cross-language interfaces
+    </div>
+    <div class="post-meta"><span title='2025-07-04 22:43:09 -0700 PDT'>July 4, 2025</span>&nbsp;·&nbsp;1149 words
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#generators" aria-label="Generators">Generators</a></li>
+                <li>
+                    <a href="#openapi-schema" aria-label="OpenAPI Schema">OpenAPI Schema</a></li>
+                <li>
+                    <a href="#generate-server-interfaces-go" aria-label="Generate Server Interfaces (Go)">Generate Server Interfaces (Go)</a></li>
+                <li>
+                    <a href="#generate-client-interfaces-python" aria-label="Generate Client Interfaces (Python)">Generate Client Interfaces (Python)</a></li>
+                <li>
+                    <a href="#gotchas--lessons-learned" aria-label="Gotchas &amp; Lessons Learned">Gotchas &amp; Lessons Learned</a></li>
+                <li>
+                    <a href="#wrapping-up" aria-label="Wrapping Up">Wrapping Up</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>OpenAPI is a specification for documenting HTTP APIs for both humans and machines to consume.  As OpenAPI is a specification,
+it is language agnostic. OpenAPI relies on generators for translating the specification.  There&rsquo;s more
+than just documentation that&rsquo;s generated. Generators also create language-specific interfaces, tooling, and contracts.  In some
+ways the OpenAPI pattern reminds me of either protobuf with gRPC or ORM schema-first design.  As a result, a declarative API is
+created by the tooling.</p>
+<p>By the end of this post you&rsquo;ll have:</p>
+<ul>
+<li>A working Go http server generated from an OpenAPI specification.</li>
+<li>A Python http client generated from the same specification and authenticates with basic auth.</li>
+<li>Insight into common OpenAPI pitfalls and how to avoid them.</li>
+</ul>
+<pre tabindex="0"><code class="language-ascii" data-lang="ascii">[openapi.yaml]
+     ↓
++--------------+
+| oapi-codegen | ---&gt; [Go Server]
++--------------+
+     ↓
++-----------------------+
+| openapi-python-client | ---&gt; [Python Client]
++-----------------------+
+</code></pre><p>If you would like to follow along, a complete code example can be <a href="./assets/hello_openapi.tar.gz"><strong>downloaded</strong></a> and extracted
+into a temporary working directory.</p>
+<h2 id="generators">Generators<a hidden class="anchor" aria-hidden="true" href="#generators">#</a></h2>
+<p>Because generators are consuming the specification, the OpenAPI version is determined by what the generators support.</p>
+<p>For example, a popular Go generator is <a href="https://github.com/oapi-codegen/oapi-codegen">oapi-codegen</a> and supports
+OpenAPI 3.0.  Where a popular Python generator named
+<a href="https://github.com/openapi-generators/openapi-python-client">openapi-python-client</a> can support both OpenAPI 3.0 and 3.1 specifications.</p>
+<p>Generators can be downloaded and managed as part of the languages tooling.  For Go, the oapi-codegen generator is managed with Go
+modules and invoked with <code>go tool oapi-codegen</code>.  With Python, creating a virtual environment, using
+pip install openapi-python-client, and pip freeze &gt; requirements.txt will work nicely.</p>
+<h2 id="openapi-schema">OpenAPI Schema<a hidden class="anchor" aria-hidden="true" href="#openapi-schema">#</a></h2>
+<p>At first it wasn&rsquo;t clear to me on how to get started with OpenAPI or what the benefits were.  This is even after reviewing the
+OpenAPI <a href="https://spec.openapis.org/oas/v3.0.3.html">schema documentation</a> for 3.0.3.</p>
+<p>To get started one needs to create a specification.  A very minimal specification meeting the 3.0.x requirements is listed below.
+It&rsquo;s not a very interesting example as endpoints in the application server aren&rsquo;t defined, but it shows how minimal a
+specification can be that meets schema requirements.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">openapi</span>: <span style="color:#e6db74">&#34;3.0.3&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">info</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">version</span>: <span style="color:#ae81ff">1.0.0</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">title</span>: <span style="color:#ae81ff">My Contrived Server</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">paths</span>:
+</span></span></code></pre></div><p>Let&rsquo;s get started by extending the simple example defining a path named /status. It will return a 200 response code with a JSON resonse.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">paths</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">/status</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">get</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">responses</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#39;200&#39;</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">description</span>: <span style="color:#ae81ff">Get status of the application server</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">content</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">application/json</span>:
+</span></span><span style="display:flex;"><span>              <span style="color:#f92672">schema</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">$ref</span>: <span style="color:#e6db74">&#39;#/components/schemas/status&#39;</span>
+</span></span></code></pre></div><p>The JSON response is documented in a separate YAML block named components. It defines the response containing a JSON
+map containing the keys &ldquo;state&rdquo; and &ldquo;message&rdquo;, both of which have a string value.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>: 
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">schemas</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">status</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">type</span>: <span style="color:#ae81ff">object</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">properties</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">state</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">example</span>: <span style="color:#e6db74">&#34;GOOD&#34;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">message</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">example</span>: <span style="color:#e6db74">&#34;App running within parameters&#34;</span>
+</span></span></code></pre></div><p>OpenAPI supports tags, which let you group related endpoints. This example creates a data grouping and puts create_bucket in the group.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">tags</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">data</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">description</span>:  <span style="color:#ae81ff">data manipulation endpoints</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">paths</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">/create_bucket</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">post</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">tags</span>:
+</span></span><span style="display:flex;"><span>            - <span style="color:#ae81ff">data</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">requestBody</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">required</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">content</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">application/json</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">schema</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">$ref</span>: <span style="color:#e6db74">&#39;#/components/schemas/create_bucket&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">responses</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#39;200&#39;</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">description</span>: <span style="color:#ae81ff">Create a storage object</span>
+</span></span></code></pre></div><p>The OpenAPI specification also provides a definition for authentication to the web application.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">securitySchemes</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">basicAuth</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">type</span>: <span style="color:#ae81ff">http</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">scheme</span>: <span style="color:#ae81ff">basic</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">description</span>: <span style="color:#ae81ff">Endpoints protected by basic auth base64 encoded credentials.</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">paths</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">/status</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">get</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">security</span>:
+</span></span><span style="display:flex;"><span>                - <span style="color:#f92672">basicAuth</span>: []
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">responses</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#39;200&#39;</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">description</span>: <span style="color:#ae81ff">Get status of the application server</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">content</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">application/json</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">schema</span>:
+</span></span><span style="display:flex;"><span>                    <span style="color:#f92672">$ref</span>: <span style="color:#e6db74">&#39;#/components/schemas/status&#39;</span>
+</span></span></code></pre></div><p>Earlier I mentioned the generators will create interface files. Declarations which are considered middleware like
+authentication or logging are out of scope for OpenAPI.
+In this example, the security entries are there to document that the endpoints require basic authentication.</p>
+<h2 id="generate-server-interfaces-go">Generate Server Interfaces (Go)<a hidden class="anchor" aria-hidden="true" href="#generate-server-interfaces-go">#</a></h2>
+<p>The server walkthrough presumes one has both Make and Go installed, and the <a href="./assets/hello_openapi.tar.gz">example code</a> (tar.gz file)
+has been downloaded and extracted into a temp/work directory.</p>
+<ul>
+<li>Download the Go dependencies, including oapi-codegen, by running <code>make tidy</code>.</li>
+<li>Generate the server interfaces by running <code>make server-codegen</code>, which calls <code>go tool oapi-codegen</code>.</li>
+</ul>
+<p>Feel free to inspect the api/http.gen.go file before proceeding. You&rsquo;ll see it contains an interface named ServerInterface,
+which has the GetStatus or PostStatus endpoints from the OpenAPI specification.  http.gen.go also contains a struct named Status
+that was defined from components -&gt; schema -&gt; status.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Status</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Message</span> <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;message&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">State</span>   <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;state&#34;`</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>To see the working application server, run <code>make server-run</code>.</p>
+<p>The server has Basic Auth enabled with hardcoded credentials. The user is &ldquo;alice&rdquo; and the password &ldquo;mySecretPW&rdquo;.  Curl can be
+used to see the response.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% curl --basic -u alice:mySecretPW  http://localhost:8080/status
+</span></span><span style="display:flex;"><span><span style="color:#f92672">{</span><span style="color:#e6db74">&#34;message&#34;</span>:<span style="color:#e6db74">&#34;Initializing&#34;</span>,<span style="color:#e6db74">&#34;state&#34;</span>:<span style="color:#e6db74">&#34;Unknown&#34;</span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><h2 id="generate-client-interfaces-python">Generate Client Interfaces (Python)<a hidden class="anchor" aria-hidden="true" href="#generate-client-interfaces-python">#</a></h2>
+<p>This is where OpenAPI really shines.  I was able to use a generator to create Python libraries
+to be used by the client implementation code.  The walkthrough presumes a recent version of Python3 and pip are installed.</p>
+<p>First, create a virtual environment and install the openapi-python-client dependencies.  This shell snippet
+presumes the current working directory is already hello_openapi.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% python3 -mvenv $PWD/.venv
+</span></span><span style="display:flex;"><span>% source $PWD/.venv/bin/activate
+</span></span><span style="display:flex;"><span>% pip install -r requirements.txt
+</span></span></code></pre></div><p>Then run <code>make client-codegen</code> to build the Python client libraries located in cmd/client/my_contrived_server.</p>
+<p>Generating the client was easy, but figuring out how to pass authentication took some trial and error. I eventually
+realized that the <code>token</code> is just a base64-encoded <code>username:password</code> string, and the <code>prefix</code> should be set to <code>Basic</code>.</p>
+<pre tabindex="0"><code>client = AuthenticatedClient(
+    base_url=&#34;http://127.0.0.1:8080&#34;,
+    headers={&#34;Content-Type&#34;: &#34;application/json&#34;, &#34;Accept&#34;: &#34;application/json&#34;},
+    token=&#34;YWxpY2U6bXlTZWNyZXRQVw==&#34;,  # Token string is a base64 string containing alice:mySecretPW
+    prefix=&#34;Basic&#34;
+)
+</code></pre><p>To see the client in action, run <code>make client-run</code>.  Also take a look at cmd/client/client.py.  It
+only took a few lines of python code to implement what the openapi-python-client generator had created.</p>
+<h2 id="gotchas--lessons-learned">Gotchas &amp; Lessons Learned<a hidden class="anchor" aria-hidden="true" href="#gotchas--lessons-learned">#</a></h2>
+<p>One issue I have with OpenAPI is the illusion of simplicty. When I first started working with OpenAPI, I noticed the Status struct
+had keys referencing a pointer of strings which wasn&rsquo;t ideal.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Status</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Message</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;message&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">State</span>   <span style="color:#f92672">*</span><span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;state&#34;`</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>It took some fiddling with the OpenAPI specification to make the generator use strings instead of pointers to strings.
+Adding &lsquo;required&rsquo; to the schema made the generator do what I wanted.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">status</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">type</span>: <span style="color:#ae81ff">object</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">properties</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">state</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">example</span>: <span style="color:#e6db74">&#34;GOOD&#34;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">message</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">example</span>: <span style="color:#e6db74">&#34;App within parameters&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">required</span>:
+</span></span><span style="display:flex;"><span>          - <span style="color:#ae81ff">state</span>
+</span></span><span style="display:flex;"><span>          - <span style="color:#ae81ff">message</span>
+</span></span></code></pre></div><p>Another issue was not knowing that in Paths, GETs should have a <strong>responses</strong> entry and POSTS should have a <strong>RequestBody</strong> entry.
+It makes sense, but it wasn&rsquo;t obvious to me when stumbling through hello-world.</p>
+<p>The main takeaway? Always inspect the generated code. If something doesn’t look right, like unexpected pointers or missing method args,
+chances are your spec needs tweaking.</p>
+<h2 id="wrapping-up">Wrapping Up<a hidden class="anchor" aria-hidden="true" href="#wrapping-up">#</a></h2>
+<p>Even though I hit some issues with a fairly simple example, I&rsquo;m going to continue using OpenAPI specifcations.  Being able to easily generate
+client code in a different language was a real win. And let&rsquo;s not forget the free API documentation and contract definitions which comes with OpenAPI.
+I have a more complex OpenAPI project coming up. I&rsquo;m sure I&rsquo;ll have more notes (and probably more gotchas) to share.  Stay tuned.</p>
+<p>If you&rsquo;ve had similar struggles with OpenAPI or tips for improving schema design, I’d love to hear them on <a href="https://bsky.app/profile/af9.us">Bluesky Social</a>.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+
+<ul class="share-buttons">
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://amf3.github.io/">Adam Faris</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
