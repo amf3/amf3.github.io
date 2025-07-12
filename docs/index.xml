@@ -6,8 +6,74 @@
     <description>Recent content on Adam Faris</description>
     <generator>Hugo -- 0.147.9</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 04 Jul 2025 22:43:09 -0700</lastBuildDate>
+    <lastBuildDate>Fri, 11 Jul 2025 21:11:43 -0700</lastBuildDate>
     <atom:link href="https://amf3.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go Generics: A Real World Use Case</title>
+      <link>https://amf3.github.io/articles/code/go/real_world_generics/</link>
+      <pubDate>Fri, 11 Jul 2025 21:11:43 -0700</pubDate>
+      <guid>https://amf3.github.io/articles/code/go/real_world_generics/</guid>
+      <description>Using Generics for Testing Pointers In Structs</description>
+      <content:encoded><![CDATA[<p>Until recently, I haven&rsquo;t had many opportunities to use Go&rsquo;s generics.  I ran into
+a case where generics make sense.  Best of all, this isn&rsquo;t a contrived example.</p>
+<p>I&rsquo;m working on a project and using openAPI to generate API contracts.  One of the generated
+structs contains optional fields implemented as pointers. The only required field is Name.</p>
+<pre tabindex="0"><code>const (
+	Gzip PostPailsCompression = &#34;gzip&#34;
+	None PostPailsCompression = &#34;none&#34;
+)
+
+type PostPails struct {
+	Compression *PostPailsCompression `json:&#34;compression,omitempty&#34;`
+
+	// MaxArchiveSize Max size (bytes) before rotating to a new archive.
+	MaxArchiveSize *int `json:&#34;max_archive_size,omitempty&#34;`
+
+	// Name Name of the new pail
+	Name string `json:&#34;name&#34;`
+}
+</code></pre><p>I need to populate the struct with values when writing unit tests. But dealing with pointers in Go
+test code usually results in using temporary variables.  It&rsquo;s not bad, but there&rsquo;s some visual noise.</p>
+<pre tabindex="0"><code>gzip := PostPailsCompression(&#34;gzip&#34;)
+size := 1000000
+payload := PostPails{
+    Name: &#34;testpail&#34;
+    Compression: &amp;gzip,
+    MaxArchiveSize: &amp;size,
+}
+</code></pre><p>Implementing a helper function using generics, provides a much cleaner solution.</p>
+<ul>
+<li>The temporary variables are no longer needed.</li>
+<li>Test code becomes much easier to read by naming the helper function ptr.</li>
+</ul>
+<pre tabindex="0"><code>func ptr[T any](v T) *T {
+	return &amp;v
+}
+
+func TestPostPails_CreatesDirectory(t *testing.T) {
+	tmpStorage := t.TempDir()
+	server := NewServer(tmpStorage)
+
+	payload := PostPails{
+		Name:           &#34;testpail&#34;,
+		Compression:    ptr(PostPailsCompression(&#34;gzip&#34;)),
+		MaxArchiveSize: ptr(1000000),
+        ... 
+}
+</code></pre><p>Let&rsquo;s discuss the ptr function.</p>
+<ul>
+<li>T is a type parameter and is a placeholder for any type.</li>
+<li>The any constraint means T can be anything and is equivalent to interface{}.</li>
+<li>Inside the function, we take a value v and return its pointer.</li>
+</ul>
+<hr>
+<p>Using generics avoids the temporary variable pattern and provides a means to write cleaner test code.
+The benefit becomes obvious when dealing with many optional fields.</p>
+<p>Until now, generics didn&rsquo;t seem to be a feature I needed.  The examples I read about didn&rsquo;t feel relevant.  This one clicked because
+it solved a real issue while writing unit tests.</p>
+<p>Any thoughts or clever uses of Go generics? Drop me a line on <a href="https://bsky.app/profile/af9.us">Bluesky</a>.</p>
+]]></content:encoded>
+    </item>
     <item>
       <title>OpenAPI in Practice: Go Server &#43; Python Client from Spec</title>
       <link>https://amf3.github.io/articles/api/hello_openapi/</link>

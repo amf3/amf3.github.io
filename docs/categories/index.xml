@@ -6,20 +6,27 @@
     <description>Recent content in Categories on Adam Faris</description>
     <generator>Hugo -- 0.147.9</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 04 Jul 2025 22:43:09 -0700</lastBuildDate>
+    <lastBuildDate>Fri, 11 Jul 2025 21:11:43 -0700</lastBuildDate>
     <atom:link href="https://amf3.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>API</title>
-      <link>https://amf3.github.io/categories/api/</link>
-      <pubDate>Fri, 04 Jul 2025 22:43:09 -0700</pubDate>
-      <guid>https://amf3.github.io/categories/api/</guid>
+      <title>Code</title>
+      <link>https://amf3.github.io/categories/code/</link>
+      <pubDate>Fri, 11 Jul 2025 21:11:43 -0700</pubDate>
+      <guid>https://amf3.github.io/categories/code/</guid>
       <description></description>
     </item>
     <item>
       <title>Go</title>
       <link>https://amf3.github.io/categories/go/</link>
-      <pubDate>Fri, 04 Jul 2025 22:43:09 -0700</pubDate>
+      <pubDate>Fri, 11 Jul 2025 21:11:43 -0700</pubDate>
       <guid>https://amf3.github.io/categories/go/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>API</title>
+      <link>https://amf3.github.io/categories/api/</link>
+      <pubDate>Fri, 04 Jul 2025 22:43:09 -0700</pubDate>
+      <guid>https://amf3.github.io/categories/api/</guid>
       <description></description>
     </item>
     <item>
