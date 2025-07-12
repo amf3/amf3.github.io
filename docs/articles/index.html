@@ -165,6 +165,21 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">Go Generics: A Real World Use Case
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Until recently, I haven’t had many opportunities to use Go’s generics. I ran into a case where generics make sense. Best of all, this isn’t a contrived example.
+I’m working on a project and using openAPI to generate API contracts. One of the generated structs contains optional fields implemented as pointers. The only required field is Name.
+const ( Gzip PostPailsCompression = &#34;gzip&#34; None PostPailsCompression = &#34;none&#34; ) type PostPails struct { Compression *PostPailsCompression `json:&#34;compression,omitempty&#34;` // MaxArchiveSize Max size (bytes) before rotating to a new archive. MaxArchiveSize *int `json:&#34;max_archive_size,omitempty&#34;` // Name Name of the new pail Name string `json:&#34;name&#34;` } I need to populate the struct with values when writing unit tests. But dealing with pointers in Go test code usually results in using temporary variables. It’s not bad, but there’s some visual noise.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-07-11 21:11:43 -0700 PDT'>July 11, 2025</span>&nbsp;·&nbsp;325 words</footer>
+  <a class="entry-link" aria-label="post link to Go Generics: A Real World Use Case" href="https://amf3.github.io/articles/code/go/real_world_generics/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">OpenAPI in Practice: Go Server &#43; Python Client from Spec
     </h2>
   </header>
