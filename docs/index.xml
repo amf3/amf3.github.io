@@ -6,8 +6,27 @@
     <description>Recent content on Adam Faris</description>
     <generator>Hugo -- 0.147.9</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 11 Jul 2025 21:11:43 -0700</lastBuildDate>
+    <lastBuildDate>Mon, 14 Jul 2025 09:04:02 -0700</lastBuildDate>
     <atom:link href="https://amf3.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Contact</title>
+      <link>https://amf3.github.io/about/contact/</link>
+      <pubDate>Mon, 14 Jul 2025 09:04:02 -0700</pubDate>
+      <guid>https://amf3.github.io/about/contact/</guid>
+      <description>&lt;h3 id=&#34;how-to-get-in-touch&#34;&gt;How to get in touch&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;GitHub: &lt;a href=&#34;https://github.com/amf3&#34;&gt;https://github.com/amf3&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;LinkedIn: &lt;a href=&#34;https://www.linkedin.com/in/adammfaris/&#34;&gt;https://www.linkedin.com/in/adammfaris/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;BlueSky Social: &lt;a href=&#34;https://bsky.app/profile/af9.us&#34;&gt;https://bsky.app/profile/af9.us&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description>
+      <content:encoded><![CDATA[<h3 id="how-to-get-in-touch">How to get in touch</h3>
+<ul>
+<li>GitHub: <a href="https://github.com/amf3">https://github.com/amf3</a></li>
+<li>LinkedIn: <a href="https://www.linkedin.com/in/adammfaris/">https://www.linkedin.com/in/adammfaris/</a></li>
+<li>BlueSky Social: <a href="https://bsky.app/profile/af9.us">https://bsky.app/profile/af9.us</a></li>
+</ul>
+]]></content:encoded>
+    </item>
     <item>
       <title>Go Generics: A Real World Use Case</title>
       <link>https://amf3.github.io/articles/code/go/real_world_generics/</link>
@@ -1680,25 +1699,6 @@ creates a local mini-cloud on my Macbook.  I can quickly iterate through cloud-i
 <p>cloud-init is capable of much more, like formatting hard drives or managing network interfaces.  These &amp; other topics will be covered in followups
 which I will announce on <a href="https://bsky.app/profile/af9.us">Bluesky</a>.  Follow me for notifications of when its made available.  Otherwise,
 try out these examples and let me know what works.</p>
-]]></content:encoded>
-    </item>
-    <item>
-      <title>Contact</title>
-      <link>https://amf3.github.io/about/contact/</link>
-      <pubDate>Fri, 21 Feb 2025 22:58:02 -0700</pubDate>
-      <guid>https://amf3.github.io/about/contact/</guid>
-      <description>&lt;h3 id=&#34;how-to-get-in-touch&#34;&gt;How to get in touch&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;GitHub: &lt;a href=&#34;https://github.com/amf3&#34;&gt;https://github.com/amf3&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;LinkedIn: &lt;a href=&#34;https://www.linkedin.com/in/adammfaris/&#34;&gt;https://www.linkedin.com/in/adammfaris/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;BlueSky Social: &lt;a href=&#34;https://@amf3.bsky.social&#34;&gt;https://@amf3.bsky.social&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</description>
-      <content:encoded><![CDATA[<h3 id="how-to-get-in-touch">How to get in touch</h3>
-<ul>
-<li>GitHub: <a href="https://github.com/amf3">https://github.com/amf3</a></li>
-<li>LinkedIn: <a href="https://www.linkedin.com/in/adammfaris/">https://www.linkedin.com/in/adammfaris/</a></li>
-<li>BlueSky Social: <a href="https://@amf3.bsky.social">https://@amf3.bsky.social</a></li>
-</ul>
 ]]></content:encoded>
     </item>
     <item>

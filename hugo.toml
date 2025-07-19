@@ -25,18 +25,14 @@ weight = 30
 
 [outputs]
 home = [ "HTML", "RSS", "JSON" ]
-# home =  ["HTML", "RSS", "JSON"]
 rss = ['rss']
-# page =  ["HTML", "RSS", "JSON"]
-# section =  ["HTML", "RSS", "JSON"]
-# taxonomy =  ["HTML", "RSS", "JSON"]
-# term =  ["HTML", "RSS", "JSON"]
 
 [params]
 ShowBreadCrumbs = 'false'
 ShowShareButtons = 'true'
 ShareButtons = ['rss']
-ShowFullTextinRSS = 'true'
+ShowRssButtonInSectionTermList = 'true'
+ShowFullTextinRSS = 'false'
 mainSections = ['articles']
 analytics.google.SiteVerificationTag = '6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E'
 analytics.bing.SiteVerificationTag = 'C1E02AC59FE7ECBDB6D9EFB7D5E02B65'
@@ -58,7 +54,7 @@ keys = [ "title", "permalink", "summary", "content" ]
   
 [[params.socialIcons]]
 name = 'rss'
-url = 'https://amf3.github.io/index.xml'
+url = '/index.xml'
 
 [markup.goldmark.renderer]
 unsafe = false
