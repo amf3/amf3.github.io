@@ -1,20 +1,249 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-  <channel>
-    <title>Go on Adam Faris</title>
-    <link>https://amf3.github.io/categories/go/</link>
-    <description>Recent content in Go on Adam Faris</description>
-    <generator>Hugo -- 0.150.1</generator>
-    <language>en-us</language>
-    <lastBuildDate>Mon, 29 Sep 2025 17:17:10 -0400</lastBuildDate>
-    <atom:link href="https://amf3.github.io/categories/go/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Go CLIs: Creating Subcommands and Flags</title>
-      <link>https://amf3.github.io/articles/code/go/cli_args/</link>
-      <pubDate>Mon, 29 Sep 2025 17:17:10 -0400</pubDate>
-      <guid>https://amf3.github.io/articles/code/go/cli_args/</guid>
-      <description>Using urfave/cli to create polished CLI applications</description>
-      <content:encoded><![CDATA[<h2 id="adding-subcommands-to-go-clis">Adding Subcommands to Go CLIs</h2>
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Go CLIs: Creating Subcommands and Flags | Adam Faris</title>
+<meta name="keywords" content="">
+<meta name="description" content="Using urfave/cli to create polished CLI applications">
+<meta name="author" content="">
+<link rel="canonical" href="https://amf3.github.io/articles/code/go/cli_args/">
+<meta name="google-site-verification" content="6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E">
+<meta name="msvalidate.01" content="C1E02AC59FE7ECBDB6D9EFB7D5E02B65">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.2211ca3164be7830024f6aad2b3a2e520843a64f8f048445c3401c1249aa051d.css" integrity="sha256-IhHKMWS&#43;eDACT2qtKzouUghDpk&#43;PBIRFw0AcEkmqBR0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://amf3.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://amf3.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://amf3.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://amf3.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://amf3.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://amf3.github.io/articles/code/go/cli_args/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-MKR06D6KGD"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-MKR06D6KGD');
+        }
+      </script><meta property="og:url" content="https://amf3.github.io/articles/code/go/cli_args/">
+  <meta property="og:site_name" content="Adam Faris">
+  <meta property="og:title" content="Go CLIs: Creating Subcommands and Flags">
+  <meta property="og:description" content="Using urfave/cli to create polished CLI applications">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="articles">
+    <meta property="article:published_time" content="2025-09-29T17:17:10-04:00">
+    <meta property="article:modified_time" content="2025-09-29T17:17:10-04:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Go CLIs: Creating Subcommands and Flags">
+<meta name="twitter:description" content="Using urfave/cli to create polished CLI applications">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "articles",
+      "item": "https://amf3.github.io/articles/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Go CLIs: Creating Subcommands and Flags",
+      "item": "https://amf3.github.io/articles/code/go/cli_args/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Go CLIs: Creating Subcommands and Flags",
+  "name": "Go CLIs: Creating Subcommands and Flags",
+  "description": "Using urfave/cli to create polished CLI applications",
+  "keywords": [
+    
+  ],
+  "articleBody": "Adding Subcommands to Go CLIs Command Line Interfaces (CLIs) use subcommands and flags to enable different program features. A subcommand is a grouping of related features, and flags are options for controlling those features. The openssl command provides a great example of subcommands and flags. openssl rand -base64 8 will generate 8 random bytes of data with hexadecimal output. The subcommand is “rand” and “-base64” is the flag. Other openssl subcommands like “s_client” or “x509”, provide different features and each has their own options.\nWhen running the openssl command, the shell passes each space separated value into an argument list. It’s possible to parse the list by checking if the second value is a subcommand, then looping over the rest to figure out which are flags. Some programs like git take this further by treating subcommands as seperate executables. git status actually runs the git-status command in a subshell. The approach works but keeping help output and flag parsing consistent between executables gets messy.\nFortunately several libraries are available to make subcommands and flags easier to manage. The one that I finally chose is urfave/cli which offers a builder style API. The examples below use version 3 of the library which can be imported as:\nimport \"github.com/urfave/cli/v3\" urfave/cli with flags This is how simple the urfave/cli library is to use. I configure a cli.Command struct, then call Run() to execute it.\nfunc main() { cmd := \u0026cli.Command{ ... struct goes here ... } if err := cmd.Run(context.Background(), os.Args); err != nil { log.Fatal(err) } } So what does the struct inside cli.Command look like? It’s a slice of Flag interfaces. allowing us to freely mix different flag types like StringFlag, BoolFlag, or IntFlag.\nFlags: []cli.Flag{ \u0026cli.IntFlag{ ... }, \u0026cli.BoolFlag{ ... }, }, The other struct field is Action which runs a function after parsing the flags. The function can either be inline or passed as a reference. Here is an inline example.\nAction: func(ctx context.Context, cmd *cli.Command) error { if cmd.Bool(\"hello\") { hello(cmd.String(\"name\"), cmd.Int(\"count\")) } return nil }, This is what my populated main() looks like.\nfunc main() { cmd := \u0026cli.Command{ Flags: []cli.Flag{ \u0026cli.BoolFlag{ Name: \"hello\", Required: false, Usage: \"Will greet a person with 'Hello'\", }, \u0026cli.BoolFlag{ Name: \"goodbye\", Required: false, Usage: \"Will tell a person 'Goodbye'\", }, \u0026cli.IntFlag{ Name: \"count\", Usage: \"How many times to invoke function\", Required: false, Value: 1, }, \u0026cli.StringFlag{ Name: \"name\", Usage: \"Tell me your name\", Required: true, // \u003c- throws an error and prints help statement if name is not defined }, }, Action: func(ctx context.Context, cmd *cli.Command) error { if cmd.Bool(\"hello\") { hello(cmd.String(\"name\"), cmd.Int(\"count\")) } return nil }, } if err := cmd.Run(context.Background(), os.Args); err != nil { log.Fatal(err) } } A complete working example using flags can be downloaded.\nFlags Demo When invoked without the –name flag which is marked required, urfave/cli will throw an error and print the help statement.\n$ go run flag_example.go --count 2 --hello NAME: flag_example - A new cli application USAGE: flag_example OPTIONS: --hello Will greet a person with 'Hello' (default: false) --goodbye Will tell a person 'Goodbye' (default: false) --count int How many times to invoke function (default: 1) --name string Tell me your name --help, -h show help 2025/10/02 08:36:19 Required flag \"name\" not set exit status 1 Adding the –name flag results in it working as expected.\n$ go run flag_example.go --count 2 --hello --name Adam Hello Adam Hello Adam urfave/cli with subcommands Subcommands are added in a similar way, except instead of using a slice of Flag, we are using a slice of Command which I described above. Instead of using –hello or –goodbye as a flag, this example creates the hello and goodbye subcommands.\nfunc hello(ctx context.Context, cmd *cli.Command) error { fmt.Println(\"Hello\") return nil } func goodbye(ctx context.Context, cmd *cli.Command) error { fmt.Println(\"Goodbye\") return nil } func main() { cmd := \u0026cli.Command{ Commands: []*cli.Command{ { Name: \"hello\", Usage: \"Greets a person with 'Hello'\", Action: hello, }, { Name: \"goodbye\", Usage: \"Tells a person 'Goodbye'\", Action: goodbye, }, }, } if err := cmd.Run(context.Background(), os.Args); err != nil { log.Fatal(err) } } Commands Demo The autogenerated help statement when a subcommand isn’t used.\n$ go run command_example.go NAME: command_example - A new cli application USAGE: command_example [global options] [command [command options]] COMMANDS: hello Greets a person with 'Hello' goodbye Tells a person 'Goodbye' help, h Shows a list of commands or help for one command GLOBAL OPTIONS: --help, -h show help Invoking the goodbye subcommand\n$ go run command_example.go goodbye Goodbye Combining flags and subcommands Now that we know how flags and subcommands work, lets combine them to get that openssl like experience. But this is the great part, because subcommands are a slice of Command, and we know that Command accepts a slice of Flag, we already know how this works. Simply define a Flag for each subcommand.\nHere’s an example where the hello subcommand supports a name flag and the goodbye subcommand supports a count flag.\nfunc main() { cmd := \u0026cli.Command{ Commands: []*cli.Command{ { Name: \"hello\", Usage: \"Greets a person with 'Hello'\", Action: runIt, Flags: []cli.Flag{ \u0026cli.StringFlag{ Name: \"name\", Usage: \"Tell me your name\", Required: true, // \u003c- throws an error and prints help statement if name is not defined }, }, }, { Name: \"goodbye\", Usage: \"Tells a person 'Goodbye'\", Action: runIt, Flags: []cli.Flag{ \u0026cli.IntFlag{ Name: \"count\", Usage: \"How many times to invoke function\", Required: false, Value: 1, }, }, }, }, } A complete example that combines flags and subcommands is available for download.\nCombination Demo Running the demo without any options\n$ go run combo_example.go NAME: combo_example - A new cli application USAGE: combo_example [global options] [command [command options]] COMMANDS: hello Greets a person with 'Hello' goodbye Tells a person 'Goodbye' help, h Shows a list of commands or help for one command GLOBAL OPTIONS: --help, -h show help Running the demo with a subcommand missing a required flag\n$ go run combo_example.go hello NAME: combo_example hello - Greets a person with 'Hello' USAGE: combo_example hello OPTIONS: --name string Tell me your name --help, -h show help 2025/10/05 09:33:19 Required flag \"name\" not set exit status 1 Running the demo successfully\n% go run combo_example.go hello --name Adam Hello Adam urfave is now myfave I started this post as a few notes for myself while learning urfave/cli, but it turned into a great reminder of how flexible the library is. It keeps command structure clear, couples help statements and actions to flags and subcommands, resulting in polished CLIs.\nIf you’re building a Go CLI and want a simple API for managing subcommands and options, give urfave/cli a try. You’ll spend more time thinking about command logic and less time manaaging subcommands or flag options.\nI can be found on Bluesky if you want to trade notes on building CLIs.\n",
+  "wordCount" : "1133",
+  "inLanguage": "en",
+  "datePublished": "2025-09-29T17:17:10-04:00",
+  "dateModified": "2025-09-29T17:17:10-04:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://amf3.github.io/articles/code/go/cli_args/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Adam Faris",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://amf3.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://amf3.github.io/" accesskey="h" title="Adam Faris (Alt + H)">Adam Faris</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://amf3.github.io/search/" title="search (Alt &#43; /)" accesskey=/>
+                    <span>search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/articles/" title="articles">
+                    <span>articles</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/about/" title="about">
+                    <span>about</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://amf3.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://amf3.github.io/articles/">articles</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Go CLIs: Creating Subcommands and Flags
+    </h1>
+    <div class="post-description">
+      Using urfave/cli to create polished CLI applications
+    </div>
+    <div class="post-meta"><span title='2025-09-29 17:17:10 -0400 EDT'>September 29, 2025</span>&nbsp;·&nbsp;1133 words
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#adding-subcommands-to-go-clis" aria-label="Adding Subcommands to Go CLIs">Adding Subcommands to Go CLIs</a></li>
+                <li>
+                    <a href="#urfavecli-with-flags" aria-label="urfave/cli with flags">urfave/cli with flags</a><ul>
+                        
+                <li>
+                    <a href="#flags-demo" aria-label="Flags Demo">Flags Demo</a></li></ul>
+                </li>
+                <li>
+                    <a href="#urfavecli-with-subcommands" aria-label="urfave/cli with subcommands">urfave/cli with subcommands</a><ul>
+                        
+                <li>
+                    <a href="#commands-demo" aria-label="Commands Demo">Commands Demo</a></li></ul>
+                </li>
+                <li>
+                    <a href="#combining-flags-and-subcommands" aria-label="Combining flags and subcommands">Combining flags and subcommands</a><ul>
+                        
+                <li>
+                    <a href="#combination-demo" aria-label="Combination Demo">Combination Demo</a></li></ul>
+                </li>
+                <li>
+                    <a href="#urfave-is-now-myfave" aria-label="urfave is now myfave">urfave is now myfave</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="adding-subcommands-to-go-clis">Adding Subcommands to Go CLIs<a hidden class="anchor" aria-hidden="true" href="#adding-subcommands-to-go-clis">#</a></h2>
 <p>Command Line Interfaces (CLIs) use subcommands and flags to enable different program features.  A
 subcommand is a grouping of related features, and flags are options for controlling those features.  The openssl
 command provides a great example of subcommands and flags. <code>openssl rand -base64 8</code> will generate 8 random bytes of
@@ -28,7 +257,7 @@ flag parsing consistent between executables gets messy.</p>
 <p>Fortunately several libraries are available to make subcommands and flags easier to manage.  The one that I finally chose is <a href="https://cli.urfave.org">urfave/cli</a> which offers a builder style API.  The examples below use
 version 3 of the library which can be imported as:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;github.com/urfave/cli/v3&#34;</span>
-</span></span></code></pre></div><h2 id="urfavecli-with-flags">urfave/cli with flags</h2>
+</span></span></code></pre></div><h2 id="urfavecli-with-flags">urfave/cli with flags<a hidden class="anchor" aria-hidden="true" href="#urfavecli-with-flags">#</a></h2>
 <p>This is how simple the urfave/cli library is to use. I configure a <a href="https://pkg.go.dev/github.com/urfave/cli#Command">cli.Command</a>
 struct, then call <a href="https://pkg.go.dev/github.com/urfave/cli#App.Run">Run()</a> to execute it.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
@@ -98,7 +327,7 @@ The function can either be inline or passed as a reference. Here is an inline ex
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>A complete working example using flags can be <a href="./assets/flag_example.go">downloaded</a>.</p>
-<h3 id="flags-demo">Flags Demo</h3>
+<h3 id="flags-demo">Flags Demo<a hidden class="anchor" aria-hidden="true" href="#flags-demo">#</a></h3>
 <p>When invoked without the &ndash;name flag which is marked required, urfave/cli will throw an error and print the help statement.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run flag_example.go --count <span style="color:#ae81ff">2</span> --hello 
 </span></span><span style="display:flex;"><span>NAME:
@@ -119,7 +348,7 @@ The function can either be inline or passed as a reference. Here is an inline ex
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run flag_example.go --count <span style="color:#ae81ff">2</span> --hello --name Adam
 </span></span><span style="display:flex;"><span>Hello Adam
 </span></span><span style="display:flex;"><span>Hello Adam
-</span></span></code></pre></div><h2 id="urfavecli-with-subcommands">urfave/cli with subcommands</h2>
+</span></span></code></pre></div><h2 id="urfavecli-with-subcommands">urfave/cli with subcommands<a hidden class="anchor" aria-hidden="true" href="#urfavecli-with-subcommands">#</a></h2>
 <p>Subcommands are added in a similar way, except instead of using a slice of Flag, we are using a slice of
 Command which I described above.  Instead of using &ndash;hello or &ndash;goodbye as a flag, this example creates the
 hello and goodbye subcommands.</p>
@@ -153,7 +382,7 @@ hello and goodbye subcommands.</p>
 </span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="commands-demo">Commands Demo</h3>
+</span></span></code></pre></div><h3 id="commands-demo">Commands Demo<a hidden class="anchor" aria-hidden="true" href="#commands-demo">#</a></h3>
 <p>The autogenerated help statement when a subcommand isn&rsquo;t used.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run command_example.go
 </span></span><span style="display:flex;"><span>NAME:
@@ -172,7 +401,7 @@ hello and goodbye subcommands.</p>
 </span></span></code></pre></div><p>Invoking the goodbye subcommand</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run command_example.go goodbye
 </span></span><span style="display:flex;"><span>Goodbye
-</span></span></code></pre></div><h2 id="combining-flags-and-subcommands">Combining flags and subcommands</h2>
+</span></span></code></pre></div><h2 id="combining-flags-and-subcommands">Combining flags and subcommands<a hidden class="anchor" aria-hidden="true" href="#combining-flags-and-subcommands">#</a></h2>
 <p>Now that we know how flags and subcommands work, lets combine them to get that openssl like experience.
 But this is the great part, because subcommands are a slice of Command, and we know that Command accepts
 a slice of Flag, we already know how this works.  Simply define a Flag for each subcommand.</p>
@@ -209,7 +438,7 @@ a slice of Flag, we already know how this works.  Simply define a Flag for each 
 </span></span><span style="display:flex;"><span>        },
 </span></span><span style="display:flex;"><span>    }
 </span></span></code></pre></div><p>A complete example that combines flags and subcommands is available for <a href="./assets/combo_example.go">download</a>.</p>
-<h3 id="combination-demo">Combination Demo</h3>
+<h3 id="combination-demo">Combination Demo<a hidden class="anchor" aria-hidden="true" href="#combination-demo">#</a></h3>
 <p>Running the demo without any options</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run combo_example.go 
 </span></span><span style="display:flex;"><span>NAME:
@@ -241,264 +470,144 @@ a slice of Flag, we already know how this works.  Simply define a Flag for each 
 </span></span></code></pre></div><p>Running the demo successfully</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% go run combo_example.go hello --name Adam
 </span></span><span style="display:flex;"><span>Hello Adam
-</span></span></code></pre></div><h2 id="urfave-is-now-myfave">urfave is now myfave</h2>
+</span></span></code></pre></div><h2 id="urfave-is-now-myfave">urfave is now myfave<a hidden class="anchor" aria-hidden="true" href="#urfave-is-now-myfave">#</a></h2>
 <p>I started this post as a few notes for myself while learning <strong>urfave/cli</strong>, but it turned into a great reminder
 of how flexible the library is.  It keeps command structure clear, couples help statements and actions to flags and subcommands,
 resulting in polished CLIs.</p>
 <p>If you&rsquo;re building a Go CLI and want a simple API for managing subcommands and options, give <strong>urfave/cli</strong> a try.
 You&rsquo;ll spend more time thinking about command logic and less time manaaging subcommands or flag options.</p>
 <p>I can be found on <a href="https://bsky.app/profile/af9.us">Bluesky</a> if you want to trade notes on building CLIs.</p>
-]]></content:encoded>
-    </item>
-    <item>
-      <title>Go Generics: A Real World Use Case</title>
-      <link>https://amf3.github.io/articles/code/go/real_world_generics/</link>
-      <pubDate>Fri, 11 Jul 2025 21:11:43 -0700</pubDate>
-      <guid>https://amf3.github.io/articles/code/go/real_world_generics/</guid>
-      <description>Using Generics for Testing Pointers In Structs</description>
-      <content:encoded><![CDATA[<p>Until recently, I haven&rsquo;t had many opportunities to use Go&rsquo;s generics.  I ran into
-a case where generics make sense.  Best of all, this isn&rsquo;t a contrived example.</p>
-<p>I&rsquo;m working on a project and using openAPI to generate API contracts.  One of the generated
-structs contains optional fields implemented as pointers. The only required field is Name.</p>
-<pre tabindex="0"><code>const (
-	Gzip PostPailsCompression = &#34;gzip&#34;
-	None PostPailsCompression = &#34;none&#34;
-)
 
-type PostPails struct {
-	Compression *PostPailsCompression `json:&#34;compression,omitempty&#34;`
 
-	// MaxArchiveSize Max size (bytes) before rotating to a new archive.
-	MaxArchiveSize *int `json:&#34;max_archive_size,omitempty&#34;`
+  </div>
 
-	// Name Name of the new pail
-	Name string `json:&#34;name&#34;`
-}
-</code></pre><p>I need to populate the struct with values when writing unit tests. But dealing with pointers in Go
-test code usually results in using temporary variables.  It&rsquo;s not bad, but there&rsquo;s some visual noise.</p>
-<pre tabindex="0"><code>gzip := PostPailsCompression(&#34;gzip&#34;)
-size := 1000000
-payload := PostPails{
-    Name: &#34;testpail&#34;
-    Compression: &amp;gzip,
-    MaxArchiveSize: &amp;size,
-}
-</code></pre><p>Implementing a helper function using generics, provides a much cleaner solution.</p>
-<ul>
-<li>The temporary variables are no longer needed.</li>
-<li>Test code becomes much easier to read by naming the helper function ptr.</li>
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+
+<ul class="share-buttons">
 </ul>
-<pre tabindex="0"><code>func ptr[T any](v T) *T {
-	return &amp;v
-}
 
-func TestPostPails_CreatesDirectory(t *testing.T) {
-	tmpStorage := t.TempDir()
-	server := NewServer(tmpStorage)
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://amf3.github.io/">Adam Faris</a></span> · 
 
-	payload := PostPails{
-		Name:           &#34;testpail&#34;,
-		Compression:    ptr(PostPailsCompression(&#34;gzip&#34;)),
-		MaxArchiveSize: ptr(1000000),
-        ... 
-}
-</code></pre><p>Let&rsquo;s discuss the ptr function.</p>
-<ul>
-<li>T is a type parameter and is a placeholder for any type.</li>
-<li>The any constraint means T can be anything and is equivalent to interface{}.</li>
-<li>Inside the function, we take a value v and return its pointer.</li>
-</ul>
-<hr>
-<p>Using generics avoids the temporary variable pattern and provides a means to write cleaner test code.
-The benefit becomes obvious when dealing with many optional fields.</p>
-<p>Until now, generics didn&rsquo;t seem to be a feature I needed.  The examples I read about didn&rsquo;t feel relevant.  This one clicked because
-it solved a real issue while writing unit tests.</p>
-<p>Any thoughts or clever uses of Go generics? Drop me a line on <a href="https://bsky.app/profile/af9.us">Bluesky</a>.</p>
-]]></content:encoded>
-    </item>
-    <item>
-      <title>OpenAPI in Practice: Go Server &#43; Python Client from Spec</title>
-      <link>https://amf3.github.io/articles/api/hello_openapi/</link>
-      <pubDate>Fri, 04 Jul 2025 22:43:09 -0700</pubDate>
-      <guid>https://amf3.github.io/articles/api/hello_openapi/</guid>
-      <description>A practical walkthrough of using OpenAPI to generate cross-language interfaces</description>
-      <content:encoded><![CDATA[<p>OpenAPI is a specification for documenting HTTP APIs for both humans and machines to consume.  As OpenAPI is a specification,
-it is language agnostic. OpenAPI relies on generators for translating the specification.  There&rsquo;s more
-than just documentation that&rsquo;s generated. Generators also create language-specific interfaces, tooling, and contracts.  In some
-ways the OpenAPI pattern reminds me of either protobuf with gRPC or ORM schema-first design.  As a result, a declarative API is
-created by the tooling.</p>
-<p>By the end of this post you&rsquo;ll have:</p>
-<ul>
-<li>A working Go http server generated from an OpenAPI specification.</li>
-<li>A Python http client generated from the same specification and authenticates with basic auth.</li>
-<li>Insight into common OpenAPI pitfalls and how to avoid them.</li>
-</ul>
-<pre tabindex="0"><code class="language-ascii" data-lang="ascii">[openapi.yaml]
-     ↓
-+--------------+
-| oapi-codegen | ---&gt; [Go Server]
-+--------------+
-     ↓
-+-----------------------+
-| openapi-python-client | ---&gt; [Python Client]
-+-----------------------+
-</code></pre><p>If you would like to follow along, a complete code example can be <a href="./assets/hello_openapi.tar.gz"><strong>downloaded</strong></a> and extracted
-into a temporary working directory.</p>
-<h2 id="generators">Generators</h2>
-<p>Because generators are consuming the specification, the OpenAPI version is determined by what the generators support.</p>
-<p>For example, a popular Go generator is <a href="https://github.com/oapi-codegen/oapi-codegen">oapi-codegen</a> and supports
-OpenAPI 3.0.  Where a popular Python generator named
-<a href="https://github.com/openapi-generators/openapi-python-client">openapi-python-client</a> can support both OpenAPI 3.0 and 3.1 specifications.</p>
-<p>Generators can be downloaded and managed as part of the languages tooling.  For Go, the oapi-codegen generator is managed with Go
-modules and invoked with <code>go tool oapi-codegen</code>.  With Python, creating a virtual environment, using
-pip install openapi-python-client, and pip freeze &gt; requirements.txt will work nicely.</p>
-<h2 id="openapi-schema">OpenAPI Schema</h2>
-<p>At first it wasn&rsquo;t clear to me on how to get started with OpenAPI or what the benefits were.  This is even after reviewing the
-OpenAPI <a href="https://spec.openapis.org/oas/v3.0.3.html">schema documentation</a> for 3.0.3.</p>
-<p>To get started one needs to create a specification.  A very minimal specification meeting the 3.0.x requirements is listed below.
-It&rsquo;s not a very interesting example as endpoints in the application server aren&rsquo;t defined, but it shows how minimal a
-specification can be that meets schema requirements.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">openapi</span>: <span style="color:#e6db74">&#34;3.0.3&#34;</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">info</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">version</span>: <span style="color:#ae81ff">1.0.0</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">title</span>: <span style="color:#ae81ff">My Contrived Server</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">paths</span>:
-</span></span></code></pre></div><p>Let&rsquo;s get started by extending the simple example defining a path named /status. It will return a 200 response code with a JSON resonse.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">paths</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">/status</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">get</span>:
-</span></span><span style="display:flex;"><span>      <span style="color:#f92672">responses</span>:
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#39;200&#39;</span>:
-</span></span><span style="display:flex;"><span>          <span style="color:#f92672">description</span>: <span style="color:#ae81ff">Get status of the application server</span>
-</span></span><span style="display:flex;"><span>          <span style="color:#f92672">content</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">application/json</span>:
-</span></span><span style="display:flex;"><span>              <span style="color:#f92672">schema</span>:
-</span></span><span style="display:flex;"><span>                <span style="color:#f92672">$ref</span>: <span style="color:#e6db74">&#39;#/components/schemas/status&#39;</span>
-</span></span></code></pre></div><p>The JSON response is documented in a separate YAML block named components. It defines the response containing a JSON
-map containing the keys &ldquo;state&rdquo; and &ldquo;message&rdquo;, both of which have a string value.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>: 
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">schemas</span>:
-</span></span><span style="display:flex;"><span>      <span style="color:#f92672">status</span>:
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">type</span>: <span style="color:#ae81ff">object</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">properties</span>:
-</span></span><span style="display:flex;"><span>          <span style="color:#f92672">state</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">example</span>: <span style="color:#e6db74">&#34;GOOD&#34;</span>
-</span></span><span style="display:flex;"><span>          <span style="color:#f92672">message</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">example</span>: <span style="color:#e6db74">&#34;App running within parameters&#34;</span>
-</span></span></code></pre></div><p>OpenAPI supports tags, which let you group related endpoints. This example creates a data grouping and puts create_bucket in the group.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">tags</span>:
-</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">data</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">description</span>:  <span style="color:#ae81ff">data manipulation endpoints</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">paths</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">/create_bucket</span>:
-</span></span><span style="display:flex;"><span>      <span style="color:#f92672">post</span>:
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">tags</span>:
-</span></span><span style="display:flex;"><span>            - <span style="color:#ae81ff">data</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">requestBody</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">required</span>: <span style="color:#66d9ef">true</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">content</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">application/json</span>:
-</span></span><span style="display:flex;"><span>                <span style="color:#f92672">schema</span>:
-</span></span><span style="display:flex;"><span>                <span style="color:#f92672">$ref</span>: <span style="color:#e6db74">&#39;#/components/schemas/create_bucket&#39;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">responses</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#39;200&#39;</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">description</span>: <span style="color:#ae81ff">Create a storage object</span>
-</span></span></code></pre></div><p>The OpenAPI specification also provides a definition for authentication to the web application.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">securitySchemes</span>:
-</span></span><span style="display:flex;"><span>      <span style="color:#f92672">basicAuth</span>:
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">type</span>: <span style="color:#ae81ff">http</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">scheme</span>: <span style="color:#ae81ff">basic</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">description</span>: <span style="color:#ae81ff">Endpoints protected by basic auth base64 encoded credentials.</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">paths</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">/status</span>:
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">get</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">security</span>:
-</span></span><span style="display:flex;"><span>                - <span style="color:#f92672">basicAuth</span>: []
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">responses</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#39;200&#39;</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">description</span>: <span style="color:#ae81ff">Get status of the application server</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">content</span>:
-</span></span><span style="display:flex;"><span>                <span style="color:#f92672">application/json</span>:
-</span></span><span style="display:flex;"><span>                <span style="color:#f92672">schema</span>:
-</span></span><span style="display:flex;"><span>                    <span style="color:#f92672">$ref</span>: <span style="color:#e6db74">&#39;#/components/schemas/status&#39;</span>
-</span></span></code></pre></div><p>Earlier I mentioned the generators will create interface files. Declarations which are considered middleware like
-authentication or logging are out of scope for OpenAPI.
-In this example, the security entries are there to document that the endpoints require basic authentication.</p>
-<h2 id="generate-server-interfaces-go">Generate Server Interfaces (Go)</h2>
-<p>The server walkthrough presumes one has both Make and Go installed, and the <a href="./assets/hello_openapi.tar.gz">example code</a> (tar.gz file)
-has been downloaded and extracted into a temp/work directory.</p>
-<ul>
-<li>Download the Go dependencies, including oapi-codegen, by running <code>make tidy</code>.</li>
-<li>Generate the server interfaces by running <code>make server-codegen</code>, which calls <code>go tool oapi-codegen</code>.</li>
-</ul>
-<p>Feel free to inspect the api/http.gen.go file before proceeding. You&rsquo;ll see it contains an interface named ServerInterface,
-which has the GetStatus or PostStatus endpoints from the OpenAPI specification.  http.gen.go also contains a struct named Status
-that was defined from components -&gt; schema -&gt; status.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Status</span> <span style="color:#66d9ef">struct</span> {
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Message</span> <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;message&#34;`</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">State</span>   <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;state&#34;`</span>
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>To see the working application server, run <code>make server-run</code>.</p>
-<p>The server has Basic Auth enabled with hardcoded credentials. The user is &ldquo;alice&rdquo; and the password &ldquo;mySecretPW&rdquo;.  Curl can be
-used to see the response.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% curl --basic -u alice:mySecretPW  http://localhost:8080/status
-</span></span><span style="display:flex;"><span><span style="color:#f92672">{</span><span style="color:#e6db74">&#34;message&#34;</span>:<span style="color:#e6db74">&#34;Initializing&#34;</span>,<span style="color:#e6db74">&#34;state&#34;</span>:<span style="color:#e6db74">&#34;Unknown&#34;</span><span style="color:#f92672">}</span>
-</span></span></code></pre></div><h2 id="generate-client-interfaces-python">Generate Client Interfaces (Python)</h2>
-<p>This is where OpenAPI really shines.  I was able to use a generator to create Python libraries
-to be used by the client implementation code.  The walkthrough presumes a recent version of Python3 and pip are installed.</p>
-<p>First, create a virtual environment and install the openapi-python-client dependencies.  This shell snippet
-presumes the current working directory is already hello_openapi.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% python3 -mvenv $PWD/.venv
-</span></span><span style="display:flex;"><span>% source $PWD/.venv/bin/activate
-</span></span><span style="display:flex;"><span>% pip install -r requirements.txt
-</span></span></code></pre></div><p>Then run <code>make client-codegen</code> to build the Python client libraries located in cmd/client/my_contrived_server.</p>
-<p>Generating the client was easy, but figuring out how to pass authentication took some trial and error. I eventually
-realized that the <code>token</code> is just a base64-encoded <code>username:password</code> string, and the <code>prefix</code> should be set to <code>Basic</code>.</p>
-<pre tabindex="0"><code>client = AuthenticatedClient(
-    base_url=&#34;http://127.0.0.1:8080&#34;,
-    headers={&#34;Content-Type&#34;: &#34;application/json&#34;, &#34;Accept&#34;: &#34;application/json&#34;},
-    token=&#34;YWxpY2U6bXlTZWNyZXRQVw==&#34;,  # Token string is a base64 string containing alice:mySecretPW
-    prefix=&#34;Basic&#34;
-)
-</code></pre><p>To see the client in action, run <code>make client-run</code>.  Also take a look at cmd/client/client.py.  It
-only took a few lines of python code to implement what the openapi-python-client generator had created.</p>
-<h2 id="gotchas--lessons-learned">Gotchas &amp; Lessons Learned</h2>
-<p>One issue I have with OpenAPI is the illusion of simplicty. When I first started working with OpenAPI, I noticed the Status struct
-had keys referencing a pointer of strings which wasn&rsquo;t ideal.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Status</span> <span style="color:#66d9ef">struct</span> {
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Message</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;message&#34;`</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">State</span>   <span style="color:#f92672">*</span><span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;state&#34;`</span>
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>It took some fiddling with the OpenAPI specification to make the generator use strings instead of pointers to strings.
-Adding &lsquo;required&rsquo; to the schema made the generator do what I wanted.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>:
-</span></span><span style="display:flex;"><span>      <span style="color:#f92672">status</span>:
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">type</span>: <span style="color:#ae81ff">object</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">properties</span>:
-</span></span><span style="display:flex;"><span>          <span style="color:#f92672">state</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">example</span>: <span style="color:#e6db74">&#34;GOOD&#34;</span>
-</span></span><span style="display:flex;"><span>          <span style="color:#f92672">message</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">example</span>: <span style="color:#e6db74">&#34;App within parameters&#34;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">required</span>:
-</span></span><span style="display:flex;"><span>          - <span style="color:#ae81ff">state</span>
-</span></span><span style="display:flex;"><span>          - <span style="color:#ae81ff">message</span>
-</span></span></code></pre></div><p>Another issue was not knowing that in Paths, GETs should have a <strong>responses</strong> entry and POSTS should have a <strong>RequestBody</strong> entry.
-It makes sense, but it wasn&rsquo;t obvious to me when stumbling through hello-world.</p>
-<p>The main takeaway? Always inspect the generated code. If something doesn’t look right, like unexpected pointers or missing method args,
-chances are your spec needs tweaking.</p>
-<h2 id="wrapping-up">Wrapping Up</h2>
-<p>Even though I hit some issues with a fairly simple example, I&rsquo;m going to continue using OpenAPI specifcations.  Being able to easily generate
-client code in a different language was a real win. And let&rsquo;s not forget the free API documentation and contract definitions which comes with OpenAPI.
-I have a more complex OpenAPI project coming up. I&rsquo;m sure I&rsquo;ll have more notes (and probably more gotchas) to share.  Stay tuned.</p>
-<p>If you&rsquo;ve had similar struggles with OpenAPI or tips for improving schema design, I’d love to hear them on <a href="https://bsky.app/profile/af9.us">Bluesky Social</a>.</p>
-]]></content:encoded>
-    </item>
-  </channel>
-</rss>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
