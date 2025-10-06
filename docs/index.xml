@@ -4,10 +4,252 @@
     <title>Adam Faris</title>
     <link>https://amf3.github.io/</link>
     <description>Recent content on Adam Faris</description>
-    <generator>Hugo -- 0.147.9</generator>
+    <generator>Hugo -- 0.150.1</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 14 Jul 2025 09:04:02 -0700</lastBuildDate>
+    <lastBuildDate>Mon, 29 Sep 2025 17:17:10 -0400</lastBuildDate>
     <atom:link href="https://amf3.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go CLIs: Creating Subcommands and Flags</title>
+      <link>https://amf3.github.io/articles/code/go/cli_args/</link>
+      <pubDate>Mon, 29 Sep 2025 17:17:10 -0400</pubDate>
+      <guid>https://amf3.github.io/articles/code/go/cli_args/</guid>
+      <description>Using urfave/cli to create polished CLI applications</description>
+      <content:encoded><![CDATA[<h2 id="adding-subcommands-to-go-clis">Adding Subcommands to Go CLIs</h2>
+<p>Command Line Interfaces (CLIs) use subcommands and flags to enable different program features.  A
+subcommand is a grouping of related features, and flags are options for controlling those features.  The openssl
+command provides a great example of subcommands and flags. <code>openssl rand -base64 8</code> will generate 8 random bytes of
+data with hexadecimal output.  The subcommand is &ldquo;rand&rdquo; and &ldquo;-base64&rdquo; is the flag.  Other openssl subcommands
+like &ldquo;s_client&rdquo; or &ldquo;x509&rdquo;, provide different features and each has their own options.</p>
+<p>When running the openssl command, the shell passes each space separated value into an argument list.  It&rsquo;s possible to
+parse the list by checking if the second value is a subcommand, then looping over the rest to figure out
+which are flags.  Some programs like <code>git</code> take this further by treating subcommands as seperate executables.
+<code>git status</code> actually runs the <code>git-status</code> command in a subshell.  The approach works but keeping help output and
+flag parsing consistent between executables gets messy.</p>
+<p>Fortunately several libraries are available to make subcommands and flags easier to manage.  The one that I finally chose is <a href="https://cli.urfave.org">urfave/cli</a> which offers a builder style API.  The examples below use
+version 3 of the library which can be imported as:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;github.com/urfave/cli/v3&#34;</span>
+</span></span></code></pre></div><h2 id="urfavecli-with-flags">urfave/cli with flags</h2>
+<p>This is how simple the urfave/cli library is to use. I configure a <a href="https://pkg.go.dev/github.com/urfave/cli#Command">cli.Command</a>
+struct, then call <a href="https://pkg.go.dev/github.com/urfave/cli#App.Run">Run()</a> to execute it.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">...</span> <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">goes</span> <span style="color:#a6e22e">here</span> <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">Run</span>(<span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>(), <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Args</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>So what does the struct inside cli.Command look like? It&rsquo;s a slice of <a href="https://pkg.go.dev/github.com/urfave/cli#Flag">Flag</a> interfaces.
+allowing us to freely mix different flag types like
+<a href="https://pkg.go.dev/github.com/urfave/cli#StringFlag">StringFlag</a>, <a href="https://pkg.go.dev/github.com/urfave/cli#BoolFlag">BoolFlag</a>,
+or <a href="https://pkg.go.dev/github.com/urfave/cli#IntFlag">IntFlag</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>    <span style="color:#a6e22e">Flags</span>: []<span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Flag</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">IntFlag</span>{
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">BoolFlag</span>{
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    },
+</span></span></code></pre></div><p>The other struct field is <a href="https://pkg.go.dev/github.com/urfave/cli/v3#ActionFunc">Action</a> which runs a function after parsing the flags.
+The function can either be inline or passed as a reference. Here is an inline example.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>    <span style="color:#a6e22e">Action</span>: <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">Bool</span>(<span style="color:#e6db74">&#34;hello&#34;</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">String</span>(<span style="color:#e6db74">&#34;name&#34;</span>), <span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">Int</span>(<span style="color:#e6db74">&#34;count&#34;</span>))
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>    },
+</span></span></code></pre></div><p>This is what my populated main() looks like.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Flags</span>: []<span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Flag</span>{
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">BoolFlag</span>{
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Name</span>:     <span style="color:#e6db74">&#34;hello&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Required</span>: <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Usage</span>:    <span style="color:#e6db74">&#34;Will greet a person with &#39;Hello&#39;&#34;</span>,
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">BoolFlag</span>{
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Name</span>:     <span style="color:#e6db74">&#34;goodbye&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Required</span>: <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Usage</span>:    <span style="color:#e6db74">&#34;Will tell a person &#39;Goodbye&#39;&#34;</span>,
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">IntFlag</span>{
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Name</span>:     <span style="color:#e6db74">&#34;count&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Usage</span>:    <span style="color:#e6db74">&#34;How many times to invoke function&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Required</span>: <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Value</span>:    <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">StringFlag</span>{
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Name</span>:     <span style="color:#e6db74">&#34;name&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Usage</span>:    <span style="color:#e6db74">&#34;Tell me your name&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Required</span>: <span style="color:#66d9ef">true</span>, <span style="color:#75715e">// &lt;- throws an error and prints help statement if name is not defined</span>
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Action</span>: <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">Bool</span>(<span style="color:#e6db74">&#34;hello&#34;</span>) {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">String</span>(<span style="color:#e6db74">&#34;name&#34;</span>), <span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">Int</span>(<span style="color:#e6db74">&#34;count&#34;</span>))
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">Run</span>(<span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>(), <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Args</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>A complete working example using flags can be <a href="./assets/flag_example.go">downloaded</a>.</p>
+<h3 id="flags-demo">Flags Demo</h3>
+<p>When invoked without the &ndash;name flag which is marked required, urfave/cli will throw an error and print the help statement.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run flag_example.go --count <span style="color:#ae81ff">2</span> --hello 
+</span></span><span style="display:flex;"><span>NAME:
+</span></span><span style="display:flex;"><span>   flag_example - A new cli application
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>USAGE:
+</span></span><span style="display:flex;"><span>   flag_example
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>OPTIONS:
+</span></span><span style="display:flex;"><span>   --hello        Will greet a person with <span style="color:#e6db74">&#39;Hello&#39;</span> <span style="color:#f92672">(</span>default: false<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>   --goodbye      Will tell a person <span style="color:#e6db74">&#39;Goodbye&#39;</span> <span style="color:#f92672">(</span>default: false<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>   --count int    How many times to invoke <span style="color:#66d9ef">function</span> <span style="color:#f92672">(</span>default: 1<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>   --name string  Tell me your name
+</span></span><span style="display:flex;"><span>   --help, -h     show help
+</span></span><span style="display:flex;"><span>2025/10/02 08:36:19 Required flag <span style="color:#e6db74">&#34;name&#34;</span> not set
+</span></span><span style="display:flex;"><span>exit status <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Adding the &ndash;name flag results in it working as expected.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run flag_example.go --count <span style="color:#ae81ff">2</span> --hello --name Adam
+</span></span><span style="display:flex;"><span>Hello Adam
+</span></span><span style="display:flex;"><span>Hello Adam
+</span></span></code></pre></div><h2 id="urfavecli-with-subcommands">urfave/cli with subcommands</h2>
+<p>Subcommands are added in a similar way, except instead of using a slice of Flag, we are using a slice of
+Command which I described above.  Instead of using &ndash;hello or &ndash;goodbye as a flag, this example creates the
+hello and goodbye subcommands.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Hello&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">goodbye</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Goodbye&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Commands</span>: []<span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>{
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Name</span>:   <span style="color:#e6db74">&#34;hello&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Usage</span>:  <span style="color:#e6db74">&#34;Greets a person with &#39;Hello&#39;&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Action</span>: <span style="color:#a6e22e">hello</span>,
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Name</span>:   <span style="color:#e6db74">&#34;goodbye&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Usage</span>:  <span style="color:#e6db74">&#34;Tells a person &#39;Goodbye&#39;&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Action</span>: <span style="color:#a6e22e">goodbye</span>,
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">Run</span>(<span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>(), <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Args</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="commands-demo">Commands Demo</h3>
+<p>The autogenerated help statement when a subcommand isn&rsquo;t used.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run command_example.go
+</span></span><span style="display:flex;"><span>NAME:
+</span></span><span style="display:flex;"><span>   command_example - A new cli application
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>USAGE:
+</span></span><span style="display:flex;"><span>   command_example <span style="color:#f92672">[</span>global options<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>command <span style="color:#f92672">[</span>command options<span style="color:#f92672">]]</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>COMMANDS:
+</span></span><span style="display:flex;"><span>   hello    Greets a person with <span style="color:#e6db74">&#39;Hello&#39;</span>
+</span></span><span style="display:flex;"><span>   goodbye  Tells a person <span style="color:#e6db74">&#39;Goodbye&#39;</span>
+</span></span><span style="display:flex;"><span>   help, h  Shows a list of commands or help <span style="color:#66d9ef">for</span> one command
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>GLOBAL OPTIONS:
+</span></span><span style="display:flex;"><span>   --help, -h  show help
+</span></span></code></pre></div><p>Invoking the goodbye subcommand</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run command_example.go goodbye
+</span></span><span style="display:flex;"><span>Goodbye
+</span></span></code></pre></div><h2 id="combining-flags-and-subcommands">Combining flags and subcommands</h2>
+<p>Now that we know how flags and subcommands work, lets combine them to get that openssl like experience.
+But this is the great part, because subcommands are a slice of Command, and we know that Command accepts
+a slice of Flag, we already know how this works.  Simply define a Flag for each subcommand.</p>
+<p>Here&rsquo;s an example where the hello subcommand supports a name flag and the goodbye subcommand supports a count flag.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Commands</span>: []<span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>{
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Name</span>:   <span style="color:#e6db74">&#34;hello&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Usage</span>:  <span style="color:#e6db74">&#34;Greets a person with &#39;Hello&#39;&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Action</span>: <span style="color:#a6e22e">runIt</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Flags</span>: []<span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Flag</span>{
+</span></span><span style="display:flex;"><span>                    <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">StringFlag</span>{
+</span></span><span style="display:flex;"><span>                        <span style="color:#a6e22e">Name</span>:     <span style="color:#e6db74">&#34;name&#34;</span>,
+</span></span><span style="display:flex;"><span>                        <span style="color:#a6e22e">Usage</span>:    <span style="color:#e6db74">&#34;Tell me your name&#34;</span>,
+</span></span><span style="display:flex;"><span>                        <span style="color:#a6e22e">Required</span>: <span style="color:#66d9ef">true</span>, <span style="color:#75715e">// &lt;- throws an error and prints help statement if name is not defined</span>
+</span></span><span style="display:flex;"><span>                    },
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Name</span>:   <span style="color:#e6db74">&#34;goodbye&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Usage</span>:  <span style="color:#e6db74">&#34;Tells a person &#39;Goodbye&#39;&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">Action</span>: <span style="color:#a6e22e">runIt</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Flags</span>: []<span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Flag</span>{
+</span></span><span style="display:flex;"><span>                        <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">IntFlag</span>{
+</span></span><span style="display:flex;"><span>                            <span style="color:#a6e22e">Name</span>:     <span style="color:#e6db74">&#34;count&#34;</span>,
+</span></span><span style="display:flex;"><span>                            <span style="color:#a6e22e">Usage</span>:    <span style="color:#e6db74">&#34;How many times to invoke function&#34;</span>,
+</span></span><span style="display:flex;"><span>                            <span style="color:#a6e22e">Required</span>: <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>                            <span style="color:#a6e22e">Value</span>:    <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>                        },
+</span></span><span style="display:flex;"><span>                    },
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>A complete example that combines flags and subcommands is available for <a href="./assets/combo_example.go">download</a>.</p>
+<h3 id="combination-demo">Combination Demo</h3>
+<p>Running the demo without any options</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run combo_example.go 
+</span></span><span style="display:flex;"><span>NAME:
+</span></span><span style="display:flex;"><span>   combo_example - A new cli application
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>USAGE:
+</span></span><span style="display:flex;"><span>   combo_example <span style="color:#f92672">[</span>global options<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>command <span style="color:#f92672">[</span>command options<span style="color:#f92672">]]</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>COMMANDS:
+</span></span><span style="display:flex;"><span>   hello    Greets a person with <span style="color:#e6db74">&#39;Hello&#39;</span>
+</span></span><span style="display:flex;"><span>   goodbye  Tells a person <span style="color:#e6db74">&#39;Goodbye&#39;</span>
+</span></span><span style="display:flex;"><span>   help, h  Shows a list of commands or help <span style="color:#66d9ef">for</span> one command
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>GLOBAL OPTIONS:
+</span></span><span style="display:flex;"><span>   --help, -h  show help
+</span></span></code></pre></div><p>Running the demo with a subcommand missing a required flag</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run combo_example.go hello                                                 
+</span></span><span style="display:flex;"><span>NAME:
+</span></span><span style="display:flex;"><span>   combo_example hello - Greets a person with <span style="color:#e6db74">&#39;Hello&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>USAGE:
+</span></span><span style="display:flex;"><span>   combo_example hello
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>OPTIONS:
+</span></span><span style="display:flex;"><span>   --name string  Tell me your name
+</span></span><span style="display:flex;"><span>   --help, -h     show help
+</span></span><span style="display:flex;"><span>2025/10/05 09:33:19 Required flag <span style="color:#e6db74">&#34;name&#34;</span> not set
+</span></span><span style="display:flex;"><span>exit status <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Running the demo successfully</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% go run combo_example.go hello --name Adam
+</span></span><span style="display:flex;"><span>Hello Adam
+</span></span></code></pre></div><h2 id="urfave-is-now-myfave">urfave is now myfave</h2>
+<p>I started this post as a few notes for myself while learning <strong>urfave/cli</strong>, but it turned into a great reminder
+of how flexible the library is.  It keeps command structure clear, couples help statements and actions to flags and subcommands,
+resulting in polished CLIs.</p>
+<p>If you&rsquo;re building a Go CLI and want a simple API for managing subcommands and options, give <strong>urfave/cli</strong> a try.
+You&rsquo;ll spend more time thinking about command logic and less time manaaging subcommands or flag options.</p>
+<p>I can be found on <a href="https://bsky.app/profile/af9.us">Bluesky</a> if you want to trade notes on building CLIs.</p>
+]]></content:encoded>
+    </item>
     <item>
       <title>Contact</title>
       <link>https://amf3.github.io/about/contact/</link>
