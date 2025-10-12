@@ -4,7 +4,7 @@
     <title>articles on Adam Faris</title>
     <link>https://amf3.github.io/articles/</link>
     <description>Recent content in articles on Adam Faris</description>
-    <generator>Hugo -- 0.150.1</generator>
+    <generator>Hugo -- 0.151.0</generator>
     <language>en-us</language>
     <lastBuildDate>Mon, 29 Sep 2025 17:17:10 -0400</lastBuildDate>
     <atom:link href="https://amf3.github.io/articles/index.xml" rel="self" type="application/rss+xml" />
@@ -241,7 +241,32 @@ a slice of Flag, we already know how this works.  Simply define a Flag for each 
 </span></span></code></pre></div><p>Running the demo successfully</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% go run combo_example.go hello --name Adam
 </span></span><span style="display:flex;"><span>Hello Adam
-</span></span></code></pre></div><h2 id="urfave-is-now-myfave">urfave is now myfave</h2>
+</span></span></code></pre></div><h2 id="accessing-set-values">Accessing Set Values</h2>
+<p>The urfave API offers several functions to access the set values, which are found in
+online <a href="https://pkg.go.dev/github.com/urfave/cli/v3#pkg-index">documentation</a>.</p>
+<p>These are the functions I find myself using:</p>
+<ul>
+<li><a href="https://pkg.go.dev/github.com/urfave/cli/v3#Command.Names">func (cmd *Command) Names() []string</a></li>
+<li><a href="https://pkg.go.dev/github.com/urfave/cli/v3#Command.String">func (cmd *Command) String(name string) string</a></li>
+<li><a href="https://pkg.go.dev/github.com/urfave/cli/v3#Command.Bool">func (cmd *Command) Bool(name string) bool</a></li>
+<li><a href="https://pkg.go.dev/github.com/urfave/cli/v3#Command.Int">func (cmd *Command) Int(name string) int</a></li>
+</ul>
+<p>Let&rsquo;s go back to the earlier <em>combo</em> example using these CLI options <code>go run combo_example.go hello --name Adam</code>.
+This is the code block used in the example.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">runIt</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">switch</span> <span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">Name</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;hello&#34;</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">String</span>(<span style="color:#e6db74">&#34;name&#34;</span>))
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;goodbye&#34;</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">goodbye</span>(<span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">Int</span>(<span style="color:#e6db74">&#34;count&#34;</span>))
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">default</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Unknown command&#34;</span>)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>I use cmd.Name to access the user provided subcommand.  To access user provided options (flags), use
+cmd.String, cmd.Int, or cmd.Bool. Other variations like cmd.Int64 do exist. Check online documentation if needed.</p>
+<h2 id="urfave-is-now-myfave">urfave is now myfave</h2>
 <p>I started this post as a few notes for myself while learning <strong>urfave/cli</strong>, but it turned into a great reminder
 of how flexible the library is.  It keeps command structure clear, couples help statements and actions to flags and subcommands,
 resulting in polished CLIs.</p>
