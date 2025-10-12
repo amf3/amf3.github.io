@@ -303,6 +303,38 @@ Running the demo successfully
 Hello Adam
 ```
 
+## Accessing Set Values
+
+The urfave API offers several functions to access the set values, which are found in
+online [documentation](https://pkg.go.dev/github.com/urfave/cli/v3#pkg-index).
+
+These are the functions I find myself using:
+
+* [func (cmd *Command) Names() []string](https://pkg.go.dev/github.com/urfave/cli/v3#Command.Names)
+* [func (cmd *Command) String(name string) string](https://pkg.go.dev/github.com/urfave/cli/v3#Command.String)
+* [func (cmd *Command) Bool(name string) bool](https://pkg.go.dev/github.com/urfave/cli/v3#Command.Bool)
+* [func (cmd *Command) Int(name string) int](https://pkg.go.dev/github.com/urfave/cli/v3#Command.Int)
+
+Let's go back to the earlier *combo* example using these CLI options `go run combo_example.go hello --name Adam`.
+This is the code block used in the example.
+
+```go
+    func runIt(ctx context.Context, cmd *cli.Command) error {
+        switch cmd.Name {
+        case "hello":
+            hello(cmd.String("name"))
+        case "goodbye":
+            goodbye(cmd.Int("count"))
+        default:
+            fmt.Println("Unknown command")
+        }
+        return nil
+    }
+```
+
+I use cmd.Name to access the user provided subcommand.  To access user provided options (flags), use
+cmd.String, cmd.Int, or cmd.Bool. Other variations like cmd.Int64 do exist. Check online documentation if needed.
+
 ## urfave is now myfave
 
 I started this post as a few notes for myself while learning **urfave/cli**, but it turned into a great reminder
