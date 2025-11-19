@@ -1,7 +1,7 @@
 ---
 title: Uh-oh. Is the router down? 
 description: Easy roll back by managing home networks like a software project
-date: 2025-08-12T21:13:09-07:00
+date: 2025-11-19T00:06:09-08:00
 draft: false
 tags: [qemu, linux, mikrotik, routeros, networking, virtualization]
 showtoc: true

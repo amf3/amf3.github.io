@@ -6,12 +6,12 @@
     <description>Recent content in Mikrotik on Adam Faris</description>
     <generator>Hugo -- 0.152.2</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 12 Aug 2025 21:13:09 -0700</lastBuildDate>
+    <lastBuildDate>Wed, 19 Nov 2025 00:06:09 -0800</lastBuildDate>
     <atom:link href="https://amf3.github.io/tags/mikrotik/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Uh-oh. Is the router down?</title>
       <link>https://amf3.github.io/articles/virtualization/virtual_router/</link>
-      <pubDate>Tue, 12 Aug 2025 21:13:09 -0700</pubDate>
+      <pubDate>Wed, 19 Nov 2025 00:06:09 -0800</pubDate>
       <guid>https://amf3.github.io/articles/virtualization/virtual_router/</guid>
       <description>Easy roll back by managing home networks like a software project</description>
       <content:encoded><![CDATA[<p>This post is the README for my home network and something I can refer to later.  It&rsquo;s
