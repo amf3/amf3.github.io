@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Uh-oh. Is the router down? | Adam Faris</title>
+<meta name="keywords" content="qemu, linux, mikrotik, routeros, networking, virtualization">
+<meta name="description" content="Easy roll back by managing home networks like a software project">
+<meta name="author" content="">
+<link rel="canonical" href="https://amf3.github.io/articles/virtualization/virtual_router/">
+<meta name="google-site-verification" content="6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E">
+<meta name="msvalidate.01" content="C1E02AC59FE7ECBDB6D9EFB7D5E02B65">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.2211ca3164be7830024f6aad2b3a2e520843a64f8f048445c3401c1249aa051d.css" integrity="sha256-IhHKMWS&#43;eDACT2qtKzouUghDpk&#43;PBIRFw0AcEkmqBR0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://amf3.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://amf3.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://amf3.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://amf3.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://amf3.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://amf3.github.io/articles/virtualization/virtual_router/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-MKR06D6KGD"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-MKR06D6KGD');
+        }
+      </script><meta property="og:url" content="https://amf3.github.io/articles/virtualization/virtual_router/">
+  <meta property="og:site_name" content="Adam Faris">
+  <meta property="og:title" content="Uh-oh. Is the router down?">
+  <meta property="og:description" content="Easy roll back by managing home networks like a software project">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="articles">
+    <meta property="article:published_time" content="2025-08-12T21:13:09-07:00">
+    <meta property="article:modified_time" content="2025-08-12T21:13:09-07:00">
+    <meta property="article:tag" content="Qemu">
+    <meta property="article:tag" content="Linux">
+    <meta property="article:tag" content="Mikrotik">
+    <meta property="article:tag" content="Routeros">
+    <meta property="article:tag" content="Networking">
+    <meta property="article:tag" content="Virtualization">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Uh-oh. Is the router down?">
+<meta name="twitter:description" content="Easy roll back by managing home networks like a software project">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "articles",
+      "item": "https://amf3.github.io/articles/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Uh-oh. Is the router down?",
+      "item": "https://amf3.github.io/articles/virtualization/virtual_router/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Uh-oh. Is the router down?",
+  "name": "Uh-oh. Is the router down?",
+  "description": "Easy roll back by managing home networks like a software project",
+  "keywords": [
+    "qemu", "linux", "mikrotik", "routeros", "networking", "virtualization"
+  ],
+  "articleBody": "This post is the README for my home network and something I can refer to later. It’s the story of how I replaced a underperforming consumer-grade router with a fully virtualized RouterOS instance using QEMU and PCI passthrough for the network.\nLike any software project, this project is source controlled and rebuildable from scratch. If the router dies, I simply deploy a new router instance. This is the reproducibility you’d expect in a datacenter, not a home office.\nThis guide will cover hardware planning, automating the installation process, and disaster recovery. Even if you’re not an operations person, you’ll have the tools to build and rebuild your network.\nWhy a Virtual Router? Using a virtual router allows me to perform experiments or make basic changes against a test instance before taking down the Internet. I’ve written about these benefits before.\nHardware upgrades are simple as I’m not locked into a vendor’s hardware platform. Instead I can use a more powerful x86 CPU or faster network cards. I frequently find used 8th or 10th generation Intel CPUs on Ebay can be less expensive then purchasing the latest consumer grade router.\nIn my case, I noticed both VPN traffic and QoS performance were lagging with the MIPS based CPU inside my consumer router. It seemed like a great opportunity to put this virtual router idea into action as I had old desktop parts in storage.\nArchitecture \u0026 Planning I upgraded from a MIPS based Mikrotik Hex-S by migrating to a PC built with old parts. The CPU is a 7th Gen (2017) Intel Celeron (G3930), with 4GB of memory, and a 1GB SSD. I wanted additional network ports and purchased a dual 1Gb Intel network card (I350) for $27 on Ebay. None of these parts would be considered high-end today.\nIn this wiring diagram, you’ll see the virtual router has the dual port PCI card assigned to it. The host OS is using only the onboard ethernet controller for connectivity. This allows me to isolate the dual port PCI card from the host OS, ensuring host OS traffic going to the Internet is passing through the switch and then the PCI card assigned to the router. There are no network shortcuts which could allow the host OS to bypass the virtual router.\nThe media converter is something like a DOCIS cable modem or a copper to fiber converter.\nFor controlling the VM itself, I’m using QEMU commands (with KVM extensions) inside a Systemd Unit file. Of course there are abstractions like libvirt which wrap QEMU, but it felt unnecessary for this simple use case. Invoking QEMU directly also provides a learning opportunity to understand what’s being abstracted.\nPreparing the Host I started by assembling my PC parts into a working desktop computer and installed Ubuntu server image 25.10 as the host OS. Make sure the qemu-utils and qemu-system-x86 packages are installed. I wanted a service account to run the virtual router process. I created a user named qemu and gave it access to the kvm group.\nIf doing this by hand:\nsudo useradd -r -s /usr/sbin/nologin qemu sudo usermod -aG kvm qemu Isolating Network Cards This step is generic to isolating PCI cards for any type of virtual machine. The first step is to get the PCI ID tuple that’s burned into the card’s firmware.\n$ lspci -nn | grep Ethernet 01:00.0 Ethernet controller [0200]: Intel Corporation I350 Gigabit Network Connection [8086:1521] (rev 01) 01:00.1 Ethernet controller [0200]: Intel Corporation I350 Gigabit Network Connection [8086:1521] (rev 01) 06:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller [10ec:8168] (rev 0c) The first column shows the card location on the PCI bus. We’ll need those values later but not now. The numbers we are interested in are the “8086:1521” tuple. The first value (8086) in the tuple is registered to Intel, the second value is the cards model number which maps to the i350 family of network controllers.\nBecause I want to assign the Intel network card to the router VM, I first need to denylist the IGB driver to prevent the host OS from using it.\necho \"blacklist igb\" | sudo tee /etc/modprobe.d/blacklist-igb.conf sudo update-initramfs -u Next I need to load the vfio-pci module at boot time so the network card can be assigned to the VM.\necho 'GRUB_CMDLINE_LINUX_DEFAULT=\"$GRUB_CMDLINE_LINUX intel_iommu=on vfio-pci.ids=8086:1521\"' | sudo tee /etc/default/grub.d/virtualRouterNic.cfg sudo update-grub sudo reboot Now the steps I listed aren’t ideal for everyone but they work for me. Deny listing the IGB kernel module impacts all Intel network cards needing that driver. My motherboard has a Realtek NIC and I have a single Intel PCI network card that’s assigned to the router VM, so this approach works for me.\nBut let’s pretend that instead, the motherboard has a Intel NIC that also uses the IGB kernel module. The listed steps would prevent the host OS from using the network adaptor that’s on the motherboard because we globally deny listed the IGB driver. If this was the case, I’d purchase a second PCI network card that didn’t use the IGB kernel module and use that for the host OS. It’s something to plan for when selecting hardware for this project.\nFinally, I need to create a few udev rules. udev is responsible for detecting new hardware being plugged in and using custom rules can modify behavior during hardware detection. The qemu user, a member of the kvm group, is running the router VM process and normally doesn’t have write access to the Intel network card being assigned to the router VM. The updated udev rules will grant the kvm group members write permissions to the vfio device.\n$ sudo vi /etc/udev/rules.d/99-qemu-vfio.rules KERNEL==\"vfio\", GROUP=\"kvm\", MODE=\"0660\" KERNEL==\"[0-9]*\", SUBSYSTEM==\"vfio\", GROUP=\"kvm\", MODE=\"0660\" KERNEL==\"kvm\", GROUP=\"kvm\", MODE=\"0660\" Reload the udev rules with:\nsudo udevadm control --reload-rules sudo udevadm trigger --action=add /dev/vfio/1 Then validate that members of the kvm group can write to the vfio device.\n$ id qemu uid=999(qemu) gid=987(qemu) groups=987(qemu),993(kvm) $ ls -l /dev/vfio/ total 0 crw-rw---- 1 root kvm 241, 0 Aug 11 19:23 1 drwxr-xr-x 2 root root 80 Aug 11 19:23 devices crw-rw---- 1 root kvm 10, 196 Aug 11 19:23 vfio Network Time Protocol Due to clock drift on virtual machines, ensure a time service like NTP is enabled on both the host and within the virtual router.\nDocumentation for the host OS will explain how this is enabled. For example, Ubuntu previsouly used systemd-timesyncd but later switched to the chrony package with Ubuntu 25.10. Similarly, the router software should include a NTP client so check it’s documentation as well.\nRouting software Mikrotik has a virtual machine image and being familiar with their command line, it seemed like a good place for me to start. I was asked in a Bluesky thread on why I use a Mikrotik VM when a basic Linux VM with traffic-control (tc) can act as a router. I responded by stating that I agree, but familarity with the Mikrotik CLI won out. A second bonus is should this virtualized router not work out, I can always go back to the Mips based Hex-S router I previously used.\nOther platforms like OpenWRT or OpnSense also have x86 virtual machine images available and would work for this project.\nI ended up using the stable 7.x release of Mikrotik’s CHR (Cloud Hosted Router) product and downloaded the raw image which I later converted into a qcow2 image that allows taking snapshots. Network card drivers included with CHR are the default drivers from the Linux kernel and a few others. Here’s a partial module list from one of Mikrotik’s change log entries (v7.12).\nx86 - added support for Mellanox ConnectX-6 Dx NIC; *) x86 - i40e updated driver to 2.23.17 version; *) x86 - igb updated driver to 5.14.16 version; *) x86 - igbvf updated driver from in-tree Linux kernel; *) x86 - igc updated driver to 5.10.194 version; *) x86 - ixgbe updated driver to 5.19.6 version; *) x86 - Realtek r8169 updated driver; Configuring the router itself is out of scope for this document, but this is the high level overview. The router configuration is a text file I keep in git. The file format is fairly simple with each line having a RouterOS command. During initialization, I can upload the text file to the router and have the router execute all the commands in the text file.\nThe config file can be checked into git and used as the source of truth.\nOne consideration with text based configs is managing secrets, which is covered in the next section.\nSecrets With the plain text router config file being checked into git, how are secrets handled?\nI’m a fan of using 1Password for managing secrets and this is why. 1Password provides a CLI which reads vault secrets and is able to inject them into templates or environment variables. Additionally if a reference in the template file is missing from the vault, the CLI will fail to generate any output. This prevents generating router configs with incomplete or missing commands.\nHere’s an example where I declare a secret reference in a file called router_config.tmpl. I then use the op command to generate a new file containing plain-text secrets named router_config.rsc. router_config.rsc is what’s uploaded to the router.\n$ cat router_config.templ /user set [find name=admin] password={{ op://API_Vault/Test_Login/password }} $ op inject -i router_config.templ -o router_config.rsc /Users/adam/work/public/amf3.github.io/router_config.rsc $ cat router_config.rsc /user set [find name=admin] password=my_secret_password A .gitignore entry prevents me from commiting the router_config.rsc file with plain text secrets into git. I still have to remember to delete the .rsc file so it’s not perfect. But the process is simple and it works.\nQemu and Systemd Because CHR is distributed as a virtual disk image, there’s nothing to install. Treat it like a OS disk when invoking QEMU.\nThese are the qemu options I use when starting the router VM.\n-machine q35 emulates a newer southbridge chipset for better PCI support. -device entries specify the Intel PCI card bus ID. If the card were moved to a different motherboard slot, those values would need to be updated. -serial and -monitor options create sockets to the VM’s and QEMU’s console that I can access with socat. $ /usr/bin/qemu-system-x86_64 \\ -machine q35,accel=kvm \\ -cpu host -smp cpus=2 \\ -m 512M -boot c \\ -nic none \\ -drive file=/srv/virtual_machines/routeros/chr-7.19.3.qcow2,if=virtio,format=qcow2 \\ -serial unix:/srv/virtual_machines/routeros/console.sock,server,nowait \\ -monitor unix:/srv/virtual_machines/routeros/monitor.sock,server,nowait \\ -display none -vga none \\ -device vfio-pci,host=01:00.0 \\ -device vfio-pci,host=01:00.1 And the socat command to access the VM console or QEMU monitor.\nsudo -u qemu socat STDIO,cfmakeraw,isig=1 UNIX:/srv/virtual_machines/routeros/console.sock To ensure the router is automatically started on reboots, I wrapped the qemu command inside a systemd service unit named routeros.service.\n[Unit] Description=RouterOS VM (QEMU) After=network-online.target Wants=network-online.target StartLimitIntervalSec=60 StartLimitBurst=5 [Service] # Run as unprivileged user/group User=qemu Group=kvm # Resources / limits LimitMEMLOCK=infinity LimitNOFILE=1048576 OOMScoreAdjust=-1000 # Set CAP_SYS_NICE for qemu process. CapabilityBoundingSet=CAP_SYS_NICE AmbientCapabilities=CAP_SYS_NICE # Keep the rest of the system protected; allow explicit VM path writable ProtectSystem=strict ReadWritePaths=/srv/virtual_machines/routeros ProtectHome=yes PrivateTmp=yes # Allow QEMU process to gain capabilities from AmbientCapabilities above NoNewPrivileges=no # Execution: adjust memory/cpu/paths/PCI IDs to your environment ExecStart=/usr/bin/qemu-system-x86_64 \\ -machine q35,accel=kvm \\ -cpu host -smp cpus=2 \\ -m 512M -boot c \\ -nic none \\ -drive file=/srv/virtual_machines/routeros/chr-7.19.3.qcow2,if=virtio,format=qcow2 \\ -serial unix:/srv/virtual_machines/routeros/console.sock,server,nowait \\ -monitor unix:/srv/virtual_machines/routeros/monitor.sock,server,nowait \\ -display none -vga none \\ -device vfio-pci,host=01:00.0 \\ -device vfio-pci,host=01:00.1 # After process starts, restrict access to console and monitor sockets via filesystem permissions ExecStartPost=/bin/sh -c 'while [ ! -S /srv/virtual_machines/routeros/monitor.sock ]; do sleep 0.5; done; chmod 600 /srv/virtual_machines/routeros/*.sock' # Attempt a graceful shutdown by sending a powerdown event to the QEMU monitor. ExecStop=/bin/sh -c 'echo \"system_powerdown\" | socat - UNIX-CONNECT:/srv/virtual_machines/routeros/monitor.sock || true' TimeoutStopSec=120 KillMode=mixed Restart=on-failure RestartSec=5 [Install] WantedBy=multi-user.target Don’t forget to refresh systemd to pick up the changes before issuing enable or restart commands for the new service.\nsudo systemctl daemon-reload Maintenance and Recovery Monitoring/Alerting I keep alerting for the router uncomplicated. If the Internet stops working, I know there’s a problem.\nThis decision is partly due to a alerting design issue. If the Internet is down, local services are unable to post events to Slack channels which is how my phone receives alerts.\nFor a home network, user reports works well enough.\nGeneral Maintenance Maintenance on the host OS means possible downtime for the router if a reboot is required. Conceptually this is no different from a consumer router appliance. Download and apply the updates, reboot the host when network usage is low. When possible, I test updates to router configs in a virtual machine using QEMU. The router only cares about interfaces being available, not that it’s using a vfio device.\nWhen configuring the router software, I use a config file instead of making changes in the web UI. Using a config file allows me to track changes in a git repo. Mikrotik uses a script-like text file format where CLI commands are applied as the file is processed. This example shows how the external interface receives a DHCP address from my Internet provider while defining a RFC 1918 address for internal use on a second interface.\n/ip dhcp-client add comment=admin_interface disabled=no interface=ether1 use-peer-dns=yes /ip address add address=192.168.10.1/24 interface=ether2 network=192.168.10.0 The file is transferred to the router’s local filesystem by either using the web interface to upload the file or scp. Once stored on the router, I issue a router reset command that wipes all settings and reapplies the configuration.\n/system/reset-configuration keep-users=no no-defaults=yes skip-backup=yes run-after-reset=router_config.rsc Other routing projects offer similar features. OpenWRT supports text based configs with it’s Unified Configuration Interface API and Opnsense can be configured with it’s config.xml file. Meaning this approach isn’t limited to Mikrotik software.\nRouter Recovery The virtual router is using a QCOW2 formated file as a virtual disk. This allows one to create restore points by taking point-in-time snapshots of content on the disk before making changes to the router.\nTo take a snapshot with the qemu-img command, stop the virtual router by issuing a shutdown command with systemd, systemctl stop routeros.service. This is needed so qemu-img can get a write lock on the qcow2 file.\nNext, to create a snapshot within the qcow2 file, run qemu-img snapshot -c mySnapshotLabel /path/to/routeros.qcow2. The label “mySnapshotLabel” should be unique and meaningful so it can be located later.\nFinally start the virtual machine with systemd and continue with patching the router OS or updating it’s configurations.\nIf an error occurs during or after router maintenance, stop the virtual router and apply the most recent snapshot in the qcow2 image to revert the change.\nUse qemu-img snapshot -l /path/to/routeros.qcow2 to view existing snapshots. Then apply the snapshot with qemu-img snapshot -a myGoodSnapshot /path/to/router.qcow2. When the old snapshot is applied, start the router to resume services.\nSometimes when performing maintenance and while the router VM is stopped, I copy the qcow2 file to a local NAS to have a second copy in case of a disk failure.\nHost OS Recovery Things get more complicated if the host OS fails. You need to know what PCI ids are used by which cards and this is why I’m approaching this article from manual configuration. It would be simple to point to an Ansible repo specific to my setup, but that doesn’t help the reader.\nAlso Ansible needs a working system to apply changes. Because a rebuild implies installing the OS on new hardware, cloud-init is my preferred method to automate recovery.\nOnce the host OS is configured, I can copy the qcow2 image from my NAS and apply my text based router config to the new virtual router instance. While the process isn’t fully automated, it’s simple and reproducible. While I haven’t needed to do a full host rebuild, the process has been tested in VMs.\nIt’s important to remember that the internet is unavailable during this time, so having a local copy of host OS ISO’s or router images is important.\nLessons Learned I was expecting to hit performance issues due to old CPU and limited RAM. After several of months of use, the virtual router has been a success. It’s a stable service and VPN connections are much more performant.\nWhether this is something someone should try themselves is debateable. While the setup is more complicated there are benefits of doing this. Getting faster router hardware or possibly repairing failed hardware with spare on-site commodity components.\nFor future upgrades, I’m going to explore using newer generation CPUs. The idle power consumption on 12th generation Intel CPUs is significantly less than the 17-20 watts my 7th generation Celeron system is currently using. A 12th gen i5 desktop I borrowed, went as low as 3-5 watts during idle. My eventual power goal is to get consumption under 10 watts.\nIf you try this approach and have questions, feel free to reach out on Bluesky social. Otherwise, let me know how it worked.\n",
+  "wordCount" : "2794",
+  "inLanguage": "en",
+  "datePublished": "2025-08-12T21:13:09-07:00",
+  "dateModified": "2025-08-12T21:13:09-07:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://amf3.github.io/articles/virtualization/virtual_router/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Adam Faris",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://amf3.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://amf3.github.io/" accesskey="h" title="Adam Faris (Alt + H)">Adam Faris</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://amf3.github.io/search/" title="search (Alt &#43; /)" accesskey=/>
+                    <span>search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/articles/" title="articles">
+                    <span>articles</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/about/" title="about">
+                    <span>about</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://amf3.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://amf3.github.io/articles/">articles</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Uh-oh. Is the router down?
+    </h1>
+    <div class="post-description">
+      Easy roll back by managing home networks like a software project
+    </div>
+    <div class="post-meta"><span title='2025-08-12 21:13:09 -0700 PDT'>August 12, 2025</span>&nbsp;·&nbsp;2794 words
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#why-a-virtual-router" aria-label="Why a Virtual Router?">Why a Virtual Router?</a></li>
+                <li>
+                    <a href="#architecture--planning" aria-label="Architecture &amp; Planning">Architecture &amp; Planning</a></li>
+                <li>
+                    <a href="#preparing-the-host" aria-label="Preparing the Host">Preparing the Host</a><ul>
+                        
+                <li>
+                    <a href="#isolating-network-cards" aria-label="Isolating Network Cards">Isolating Network Cards</a></li>
+                <li>
+                    <a href="#network-time-protocol" aria-label="Network Time Protocol">Network Time Protocol</a></li>
+                <li>
+                    <a href="#routing-software" aria-label="Routing software">Routing software</a></li>
+                <li>
+                    <a href="#secrets" aria-label="Secrets">Secrets</a></li>
+                <li>
+                    <a href="#qemu-and-systemd" aria-label="Qemu and Systemd">Qemu and Systemd</a></li></ul>
+                </li>
+                <li>
+                    <a href="#maintenance-and-recovery" aria-label="Maintenance and Recovery">Maintenance and Recovery</a><ul>
+                        
+                <li>
+                    <a href="#monitoringalerting" aria-label="Monitoring/Alerting">Monitoring/Alerting</a></li>
+                <li>
+                    <a href="#general-maintenance" aria-label="General Maintenance">General Maintenance</a></li>
+                <li>
+                    <a href="#router-recovery" aria-label="Router Recovery">Router Recovery</a></li>
+                <li>
+                    <a href="#host-os-recovery" aria-label="Host OS Recovery">Host OS Recovery</a></li></ul>
+                </li>
+                <li>
+                    <a href="#lessons-learned" aria-label="Lessons Learned">Lessons Learned</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>This post is the README for my home network and something I can refer to later.  It&rsquo;s
+the story of how I replaced a underperforming consumer-grade router with a fully virtualized RouterOS instance
+using QEMU and PCI passthrough for the network.</p>
+<p>Like any software project, this project is source controlled and rebuildable from scratch.  If the
+router dies, I simply deploy a new router instance.  This is the reproducibility you&rsquo;d expect
+in a datacenter, not a home office.</p>
+<p>This guide will cover hardware planning, automating the installation process, and disaster recovery. Even if you&rsquo;re
+not an operations person, you&rsquo;ll have the tools to build and rebuild your network.</p>
+<hr>
+<h2 id="why-a-virtual-router">Why a Virtual Router?<a hidden class="anchor" aria-hidden="true" href="#why-a-virtual-router">#</a></h2>
+<p>Using a virtual router allows me to perform experiments or make basic changes against a test instance before taking down the
+Internet.  I&rsquo;ve written about these benefits <a href="../MacOS_QEMU_Networks/">before</a>.</p>
+<p>Hardware upgrades are simple as I&rsquo;m not locked into a vendor&rsquo;s hardware platform. Instead I can use a more powerful x86 CPU or faster
+network cards. I frequently find used 8th or 10th generation Intel CPUs on Ebay can be less expensive then purchasing the latest
+consumer grade router.</p>
+<p>In my case, I noticed both VPN traffic and QoS performance were lagging with the MIPS based CPU inside my consumer router.  It seemed
+like a great opportunity to put this virtual router idea into action as I had old desktop parts in storage.</p>
+<h2 id="architecture--planning">Architecture &amp; Planning<a hidden class="anchor" aria-hidden="true" href="#architecture--planning">#</a></h2>
+<p>I upgraded from a MIPS based Mikrotik Hex-S by migrating to a PC built with old parts. The CPU is a 7th Gen (2017)
+Intel Celeron (G3930), with 4GB of memory, and a 1GB SSD.  I wanted additional network ports and purchased a dual 1Gb Intel network
+card (I350) for $27 on Ebay.  None of these parts would be considered high-end today.</p>
+<p>In this wiring diagram, you&rsquo;ll see the virtual router has the dual port PCI card assigned to it.  The host OS is
+using only the onboard ethernet controller for connectivity.  This allows me to isolate the dual port PCI card from the
+host OS, ensuring host OS traffic going to the Internet is passing through the switch and then the PCI card assigned to the router.
+There are no network shortcuts which could allow the host OS to bypass the virtual router.</p>
+<p>The media converter is something like a DOCIS cable modem or a copper to fiber converter.</p>
+<p><img alt="Network Connection Diagram" loading="lazy" src="/articles/virtualization/virtual_router/assets/Hardware-Diagram.png"></p>
+<p>For controlling the VM itself, I&rsquo;m using QEMU commands (with KVM extensions) inside a Systemd Unit file.  Of course there are abstractions like libvirt which
+wrap QEMU, but it felt unnecessary for this simple use case.  Invoking QEMU directly also provides a learning opportunity to understand what&rsquo;s being abstracted.</p>
+<h2 id="preparing-the-host">Preparing the Host<a hidden class="anchor" aria-hidden="true" href="#preparing-the-host">#</a></h2>
+<p>I started by assembling my PC parts into a working desktop computer and installed Ubuntu server image 25.10 as the host OS. Make
+sure the qemu-utils and qemu-system-x86 packages are installed.  I wanted a service account to run the virtual router process.  I
+created a user named <strong>qemu</strong> and gave it access to the <strong>kvm</strong> group.</p>
+<p>If doing this by hand:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo useradd -r -s /usr/sbin/nologin qemu
+</span></span><span style="display:flex;"><span>sudo usermod -aG kvm qemu
+</span></span></code></pre></div><h3 id="isolating-network-cards">Isolating Network Cards<a hidden class="anchor" aria-hidden="true" href="#isolating-network-cards">#</a></h3>
+<p>This step is generic to isolating PCI cards for any type of virtual machine.   The first step is to get the PCI ID tuple that&rsquo;s
+burned into the card&rsquo;s firmware.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ lspci -nn | grep Ethernet
+</span></span><span style="display:flex;"><span>01:00.0 Ethernet controller <span style="color:#f92672">[</span>0200<span style="color:#f92672">]</span>: Intel Corporation I350 Gigabit Network Connection <span style="color:#f92672">[</span>8086:1521<span style="color:#f92672">]</span> <span style="color:#f92672">(</span>rev 01<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>01:00.1 Ethernet controller <span style="color:#f92672">[</span>0200<span style="color:#f92672">]</span>: Intel Corporation I350 Gigabit Network Connection <span style="color:#f92672">[</span>8086:1521<span style="color:#f92672">]</span> <span style="color:#f92672">(</span>rev 01<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>06:00.0 Ethernet controller <span style="color:#f92672">[</span>0200<span style="color:#f92672">]</span>: Realtek Semiconductor Co., Ltd. RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller <span style="color:#f92672">[</span>10ec:8168<span style="color:#f92672">]</span> <span style="color:#f92672">(</span>rev 0c<span style="color:#f92672">)</span>
+</span></span></code></pre></div><p>The first column shows the card location on the PCI bus.  We&rsquo;ll need those values later but not now. The numbers we are interested in
+are the &ldquo;8086:1521&rdquo; tuple.  The first value (8086) in the tuple is registered to Intel, the second value is the cards
+<a href="https://github.com/pciutils/pciids/blob/461b41990a0e4d4165e21a2f4ce91ba6ca7fea9d/pci.ids#L31634">model number</a> which maps to the i350
+family of network controllers.</p>
+<p>Because I want to assign the Intel network card to the router VM, I first need to denylist the IGB driver to prevent the host OS
+from using it.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;blacklist igb&#34;</span> | sudo tee /etc/modprobe.d/blacklist-igb.conf
+</span></span><span style="display:flex;"><span>sudo update-initramfs -u
+</span></span></code></pre></div><p>Next I need to load the vfio-pci module at boot time so the network card can be assigned to the VM.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#39;GRUB_CMDLINE_LINUX_DEFAULT=&#34;$GRUB_CMDLINE_LINUX intel_iommu=on vfio-pci.ids=8086:1521&#34;&#39;</span> | sudo tee /etc/default/grub.d/virtualRouterNic.cfg
+</span></span><span style="display:flex;"><span>sudo update-grub
+</span></span><span style="display:flex;"><span>sudo reboot
+</span></span></code></pre></div><p>Now the steps I listed aren&rsquo;t ideal for everyone but they work for me. Deny listing the IGB kernel module impacts all Intel
+network cards needing that driver.  My motherboard has a Realtek NIC and I have a single Intel PCI network card that&rsquo;s assigned to
+the router VM, so this approach works for me.</p>
+<p>But let&rsquo;s pretend that instead, the motherboard has a Intel NIC that also uses the
+IGB kernel module. The listed steps would prevent the host OS from using the network adaptor that&rsquo;s on the motherboard because
+we globally deny listed the IGB driver.  If this was the case, I&rsquo;d purchase a second PCI network card that didn&rsquo;t use the
+IGB kernel module and use that for the host OS.  It&rsquo;s something to plan for when selecting hardware for this project.</p>
+<p>Finally, I need to create a few udev rules. udev is responsible for detecting new hardware being plugged in and using custom rules
+can modify behavior during hardware detection.  The qemu user, a member of the kvm group, is running the router VM process and
+normally doesn&rsquo;t have write access to the Intel network card being assigned to the router VM.  The updated udev rules will grant
+the kvm group members write permissions to the vfio device.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo vi /etc/udev/rules.d/99-qemu-vfio.rules 
+</span></span><span style="display:flex;"><span>KERNEL<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;vfio&#34;</span>, GROUP<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;kvm&#34;</span>, MODE<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;0660&#34;</span>
+</span></span><span style="display:flex;"><span>KERNEL<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;[0-9]*&#34;</span>, SUBSYSTEM<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;vfio&#34;</span>, GROUP<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;kvm&#34;</span>, MODE<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;0660&#34;</span>
+</span></span><span style="display:flex;"><span>KERNEL<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;kvm&#34;</span>, GROUP<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;kvm&#34;</span>, MODE<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;0660&#34;</span>
+</span></span></code></pre></div><p>Reload the udev rules with:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo udevadm control --reload-rules
+</span></span><span style="display:flex;"><span>sudo udevadm trigger --action<span style="color:#f92672">=</span>add /dev/vfio/1
+</span></span></code></pre></div><p>Then validate that members of the kvm group can write to the vfio device.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ id qemu
+</span></span><span style="display:flex;"><span>uid<span style="color:#f92672">=</span>999<span style="color:#f92672">(</span>qemu<span style="color:#f92672">)</span> gid<span style="color:#f92672">=</span>987<span style="color:#f92672">(</span>qemu<span style="color:#f92672">)</span> groups<span style="color:#f92672">=</span>987<span style="color:#f92672">(</span>qemu<span style="color:#f92672">)</span>,993<span style="color:#f92672">(</span>kvm<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ ls -l /dev/vfio/
+</span></span><span style="display:flex;"><span>total <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>crw-rw---- <span style="color:#ae81ff">1</span> root kvm  241,   <span style="color:#ae81ff">0</span> Aug <span style="color:#ae81ff">11</span> 19:23 <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>drwxr-xr-x <span style="color:#ae81ff">2</span> root root       <span style="color:#ae81ff">80</span> Aug <span style="color:#ae81ff">11</span> 19:23 devices
+</span></span><span style="display:flex;"><span>crw-rw---- <span style="color:#ae81ff">1</span> root kvm   10, <span style="color:#ae81ff">196</span> Aug <span style="color:#ae81ff">11</span> 19:23 vfio
+</span></span></code></pre></div><h3 id="network-time-protocol">Network Time Protocol<a hidden class="anchor" aria-hidden="true" href="#network-time-protocol">#</a></h3>
+<p>Due to clock drift on virtual machines, ensure a time service like NTP is enabled on both the host and within the virtual router.</p>
+<p>Documentation for the host OS will explain how this is enabled. For example, Ubuntu previsouly used systemd-timesyncd but
+later switched to the chrony package with Ubuntu 25.10.  Similarly, the router software should include a NTP client so check
+it&rsquo;s documentation as well.</p>
+<h3 id="routing-software">Routing software<a hidden class="anchor" aria-hidden="true" href="#routing-software">#</a></h3>
+<p>Mikrotik has a virtual machine image and being familiar with their command line, it seemed like a good place for me to start.
+I was asked in a <a href="https://bsky.app/profile/coverfire.com/post/3lvw4fwf2222t">Bluesky thread</a> on why I use a Mikrotik
+VM when a basic Linux VM with traffic-control (tc) can act as a
+router.  I responded by stating that I agree, but familarity with the Mikrotik CLI won out.  A second bonus is should this virtualized
+router not work out, I can always go back to the Mips based Hex-S router I previously used.</p>
+<p>Other platforms like OpenWRT or OpnSense also have x86 virtual machine images available and would work for this project.</p>
+<p>I ended up using the stable 7.x release of Mikrotik&rsquo;s CHR (Cloud Hosted Router) product and downloaded
+the <a href="https://mikrotik.com/download">raw image</a> which
+I later <a href="https://amf3.github.io/articles/virtualization/qemuimage_tips/#tip-four---transfer-a-qemu-image-to-bare-metal">converted into a qcow2 image</a>
+that allows taking snapshots.  Network card drivers included with CHR are the default drivers from the Linux kernel and a few others.
+Here&rsquo;s a partial module list from one of <a href="https://mikrotik.com/download/changelogs">Mikrotik&rsquo;s change log</a> entries (v7.12).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>x86 - added support for Mellanox ConnectX-6 Dx NIC;
+</span></span><span style="display:flex;"><span> *) x86 - i40e updated driver to 2.23.17 version;
+</span></span><span style="display:flex;"><span> *) x86 - igb updated driver to 5.14.16 version;
+</span></span><span style="display:flex;"><span> *) x86 - igbvf updated driver from in-tree Linux kernel;
+</span></span><span style="display:flex;"><span> *) x86 - igc updated driver to 5.10.194 version;
+</span></span><span style="display:flex;"><span> *) x86 - ixgbe updated driver to 5.19.6 version;
+</span></span><span style="display:flex;"><span> *) x86 - Realtek r8169 updated driver;
+</span></span></code></pre></div><p>Configuring the router itself is out of scope for this document, but this is the high level overview.  The router configuration
+is a text file I keep in git.  The file format is fairly simple with each line having a RouterOS command.  During
+initialization, I can upload the text file to the router and have the router execute all the commands in the text file.<br>
+The config file can be checked into git and used as the source of truth.</p>
+<p>One consideration with text based configs is managing secrets, which is covered in the next section.</p>
+<h3 id="secrets">Secrets<a hidden class="anchor" aria-hidden="true" href="#secrets">#</a></h3>
+<p>With the plain text router config file being checked into git, how are secrets handled?</p>
+<p>I&rsquo;m a fan of using 1Password for
+managing secrets and this is why.  1Password provides a <a href="https://developer.1password.com/docs/cli/secret-references/">CLI</a>
+which reads vault secrets and is able to inject them into templates or environment variables.  Additionally if a
+reference in the template file is missing from the vault, the CLI will fail to generate any output.
+This prevents generating router configs with incomplete or missing commands.</p>
+<p>Here&rsquo;s an example where I declare a secret reference in a file called router_config.tmpl. I then use the op command to generate
+a new file containing plain-text secrets named router_config.rsc.  router_config.rsc is what&rsquo;s uploaded to the router.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ cat router_config.templ
+</span></span><span style="display:flex;"><span>/user set <span style="color:#f92672">[</span>find name<span style="color:#f92672">=</span>admin<span style="color:#f92672">]</span> password<span style="color:#f92672">={{</span> op://API_Vault/Test_Login/password <span style="color:#f92672">}}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ op inject -i router_config.templ -o router_config.rsc   
+</span></span><span style="display:flex;"><span>/Users/adam/work/public/amf3.github.io/router_config.rsc
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ cat router_config.rsc
+</span></span><span style="display:flex;"><span>/user set <span style="color:#f92672">[</span>find name<span style="color:#f92672">=</span>admin<span style="color:#f92672">]</span> password<span style="color:#f92672">=</span>my_secret_password
+</span></span></code></pre></div><p>A .gitignore entry prevents me from commiting the router_config.rsc file with plain text secrets into git.  I still have to
+remember to delete the .rsc file so it&rsquo;s not perfect. But the process is simple and it works.</p>
+<h3 id="qemu-and-systemd">Qemu and Systemd<a hidden class="anchor" aria-hidden="true" href="#qemu-and-systemd">#</a></h3>
+<p>Because CHR is distributed as a virtual disk image, there&rsquo;s nothing to install.  Treat it like a OS disk when invoking QEMU.<br>
+These are the qemu options I use when starting the router VM.</p>
+<ul>
+<li><strong>-machine q35</strong> emulates a newer southbridge chipset for better PCI support.</li>
+<li><strong>-device</strong> entries specify the Intel PCI card bus ID.  If the card were moved to a different motherboard slot, those values would need to be updated.</li>
+<li><strong>-serial</strong> and <strong>-monitor</strong> options create sockets to the VM&rsquo;s and QEMU&rsquo;s console that I can access with socat.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ /usr/bin/qemu-system-x86_64 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -machine q35,accel<span style="color:#f92672">=</span>kvm <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -cpu host -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -m 512M -boot c <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -nic none <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -drive file<span style="color:#f92672">=</span>/srv/virtual_machines/routeros/chr-7.19.3.qcow2,if<span style="color:#f92672">=</span>virtio,format<span style="color:#f92672">=</span>qcow2 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -serial unix:/srv/virtual_machines/routeros/console.sock,server,nowait <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -monitor unix:/srv/virtual_machines/routeros/monitor.sock,server,nowait <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -display none -vga none <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device vfio-pci,host<span style="color:#f92672">=</span>01:00.0 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device vfio-pci,host<span style="color:#f92672">=</span>01:00.1
+</span></span></code></pre></div><p>And the socat command to access the VM console or QEMU monitor.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo -u qemu socat STDIO,cfmakeraw,isig<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> UNIX:/srv/virtual_machines/routeros/console.sock
+</span></span></code></pre></div><p>To ensure the router is automatically started on reboots, I wrapped the qemu command inside a systemd service unit named routeros.service.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#66d9ef">[Unit]</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Description</span><span style="color:#f92672">=</span><span style="color:#e6db74">RouterOS VM (QEMU)</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">After</span><span style="color:#f92672">=</span><span style="color:#e6db74">network-online.target</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Wants</span><span style="color:#f92672">=</span><span style="color:#e6db74">network-online.target</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">StartLimitIntervalSec</span><span style="color:#f92672">=</span><span style="color:#e6db74">60</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">StartLimitBurst</span><span style="color:#f92672">=</span><span style="color:#e6db74">5</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">[Service]</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Run as unprivileged user/group</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">User</span><span style="color:#f92672">=</span><span style="color:#e6db74">qemu</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Group</span><span style="color:#f92672">=</span><span style="color:#e6db74">kvm</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Resources / limits</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">LimitMEMLOCK</span><span style="color:#f92672">=</span><span style="color:#e6db74">infinity</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">LimitNOFILE</span><span style="color:#f92672">=</span><span style="color:#e6db74">1048576</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">OOMScoreAdjust</span><span style="color:#f92672">=</span><span style="color:#e6db74">-1000</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Set CAP_SYS_NICE for qemu process.</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">CapabilityBoundingSet</span><span style="color:#f92672">=</span><span style="color:#e6db74">CAP_SYS_NICE </span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">AmbientCapabilities</span><span style="color:#f92672">=</span><span style="color:#e6db74">CAP_SYS_NICE</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Keep the rest of the system protected; allow explicit VM path writable</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">ProtectSystem</span><span style="color:#f92672">=</span><span style="color:#e6db74">strict</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">ReadWritePaths</span><span style="color:#f92672">=</span><span style="color:#e6db74">/srv/virtual_machines/routeros</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">ProtectHome</span><span style="color:#f92672">=</span><span style="color:#e6db74">yes</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">PrivateTmp</span><span style="color:#f92672">=</span><span style="color:#e6db74">yes</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Allow QEMU process to gain capabilities from AmbientCapabilities above</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">NoNewPrivileges</span><span style="color:#f92672">=</span><span style="color:#e6db74">no</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Execution: adjust memory/cpu/paths/PCI IDs to your environment</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">ExecStart</span><span style="color:#f92672">=</span><span style="color:#e6db74">/usr/bin/qemu-system-x86_64 \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  -machine q35,accel=kvm \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  -cpu host -smp cpus=2 \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  -m 512M -boot c \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  -nic none \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  -drive file=/srv/virtual_machines/routeros/chr-7.19.3.qcow2,if=virtio,format=qcow2 \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  -serial unix:/srv/virtual_machines/routeros/console.sock,server,nowait \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  -monitor unix:/srv/virtual_machines/routeros/monitor.sock,server,nowait \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  -display none -vga none \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  -device vfio-pci,host=01:00.0 \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  -device vfio-pci,host=01:00.1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># After process starts, restrict access to console and monitor sockets via filesystem permissions</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">ExecStartPost</span><span style="color:#f92672">=</span><span style="color:#e6db74">/bin/sh -c &#39;while [ ! -S /srv/virtual_machines/routeros/monitor.sock ]; do sleep 0.5; done; chmod 600 /srv/virtual_machines/routeros/*.sock&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Attempt a graceful shutdown by sending a powerdown event to the QEMU monitor.</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">ExecStop</span><span style="color:#f92672">=</span><span style="color:#e6db74">/bin/sh -c &#39;echo &#34;system_powerdown&#34; | socat - UNIX-CONNECT:/srv/virtual_machines/routeros/monitor.sock || true&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">TimeoutStopSec</span><span style="color:#f92672">=</span><span style="color:#e6db74">120</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">KillMode</span><span style="color:#f92672">=</span><span style="color:#e6db74">mixed</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Restart</span><span style="color:#f92672">=</span><span style="color:#e6db74">on-failure</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">RestartSec</span><span style="color:#f92672">=</span><span style="color:#e6db74">5</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">[Install]</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">WantedBy</span><span style="color:#f92672">=</span><span style="color:#e6db74">multi-user.target</span>
+</span></span></code></pre></div><p>Don&rsquo;t forget to refresh systemd to pick up the changes before issuing enable or restart commands for the new service.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo systemctl daemon-reload
+</span></span></code></pre></div><h2 id="maintenance-and-recovery">Maintenance and Recovery<a hidden class="anchor" aria-hidden="true" href="#maintenance-and-recovery">#</a></h2>
+<h3 id="monitoringalerting">Monitoring/Alerting<a hidden class="anchor" aria-hidden="true" href="#monitoringalerting">#</a></h3>
+<p>I keep alerting for the router uncomplicated.  If the Internet stops working, I know there&rsquo;s a problem.</p>
+<p>This decision is partly due to a alerting design issue.  If the Internet is down, local services are unable to post
+events to Slack channels which is how my phone receives alerts.</p>
+<p>For a home network, user reports works well enough.</p>
+<h3 id="general-maintenance">General Maintenance<a hidden class="anchor" aria-hidden="true" href="#general-maintenance">#</a></h3>
+<p>Maintenance on the host OS means possible downtime for the router if a reboot is required. Conceptually this is no different
+from a consumer router appliance.  Download and apply the updates, reboot the host when network usage is low.  When possible,
+<a href="https://amf3.github.io/articles/virtualization/macos_qemu_networks/">I test updates to router configs</a> in a
+virtual machine using QEMU.  The router only cares about interfaces being available, not that it&rsquo;s using a vfio device.</p>
+<p>When configuring the router software, I use a config file instead of making changes in the web UI.  Using a
+config file allows me to track changes in a git repo.  Mikrotik uses a script-like text file format where CLI commands
+are applied as the file is processed.  This example shows how the external interface receives a DHCP address from my Internet provider
+while defining a RFC 1918 address for internal use on a second interface.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>/ip dhcp-client add comment<span style="color:#f92672">=</span>admin_interface disabled<span style="color:#f92672">=</span>no interface<span style="color:#f92672">=</span>ether1  use-peer-dns<span style="color:#f92672">=</span>yes 
+</span></span><span style="display:flex;"><span>/ip address add address<span style="color:#f92672">=</span>192.168.10.1/24 interface<span style="color:#f92672">=</span>ether2 network<span style="color:#f92672">=</span>192.168.10.0
+</span></span></code></pre></div><p>The file is transferred to the router&rsquo;s local filesystem by either using the web interface to upload the file or scp.  Once
+stored on the router, I issue a router reset command that wipes all settings and reapplies the configuration.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>/system/reset-configuration keep-users<span style="color:#f92672">=</span>no no-defaults<span style="color:#f92672">=</span>yes skip-backup<span style="color:#f92672">=</span>yes run-after-reset<span style="color:#f92672">=</span>router_config.rsc
+</span></span></code></pre></div><p>Other routing projects offer similar features.  OpenWRT supports text based configs with it&rsquo;s Unified Configuration Interface API
+and Opnsense can be configured with it&rsquo;s config.xml file.  Meaning this approach isn&rsquo;t limited to Mikrotik software.</p>
+<h3 id="router-recovery">Router Recovery<a hidden class="anchor" aria-hidden="true" href="#router-recovery">#</a></h3>
+<p>The virtual router is using a QCOW2 formated file as a virtual disk.  This allows one to create restore points by
+taking point-in-time <a href="https://amf3.github.io/articles/virtualization/qemuimage_tips/#tip-two---snapshots">snapshots</a>
+of content on the disk before making changes to the router.</p>
+<p>To take a snapshot with the qemu-img command, <strong>stop the virtual router</strong> by issuing a shutdown command with systemd,
+<code>systemctl stop routeros.service</code>.  This is needed so qemu-img can get a write lock on the qcow2 file.</p>
+<p>Next, to create a snapshot within the qcow2 file, run <code>qemu-img snapshot -c mySnapshotLabel /path/to/routeros.qcow2</code>. The label
+&ldquo;mySnapshotLabel&rdquo; should be unique and meaningful so it can be located later.</p>
+<p>Finally start the virtual machine with systemd and continue with patching the router OS or updating it&rsquo;s configurations.</p>
+<p>If an error occurs during or after router maintenance, stop the virtual router and apply the most recent snapshot in the qcow2
+image to revert the change.</p>
+<p>Use <code>qemu-img snapshot -l /path/to/routeros.qcow2</code> to view existing snapshots. Then apply the snapshot with
+<code>qemu-img snapshot -a myGoodSnapshot /path/to/router.qcow2</code>.  When the old snapshot is applied, start the router to resume
+services.</p>
+<p>Sometimes when performing maintenance and while the router VM is stopped, I copy the qcow2 file to a local NAS to have a second
+copy in case of a disk failure.</p>
+<h3 id="host-os-recovery">Host OS Recovery<a hidden class="anchor" aria-hidden="true" href="#host-os-recovery">#</a></h3>
+<p>Things get more complicated if the host OS fails.  You need to know what PCI ids are used by which cards and this is
+why I&rsquo;m approaching this article from manual configuration.  It would be simple to point to an Ansible repo specific to my
+setup, but that doesn&rsquo;t help the reader.</p>
+<p>Also Ansible needs a working system to apply changes.  Because a rebuild implies installing the OS on new hardware,
+<a href="https://amf3.github.io/articles/cloudinit/autoinstall/">cloud-init</a> is my preferred method to automate recovery.</p>
+<p>Once the host OS is configured, I can copy the qcow2 image from my NAS and apply my text based router config to the new virtual
+router instance.  While the process isn&rsquo;t fully automated, it&rsquo;s simple and reproducible.  While I haven&rsquo;t needed to do a full
+host rebuild, the process has been tested in VMs.</p>
+<p>It&rsquo;s important to remember that the internet is unavailable during this time, so having a local copy of
+host OS ISO&rsquo;s or router images is important.</p>
+<h2 id="lessons-learned">Lessons Learned<a hidden class="anchor" aria-hidden="true" href="#lessons-learned">#</a></h2>
+<p>I was expecting to hit performance issues due to old CPU and limited RAM.  After several of months of use, the virtual router has been
+a success. It&rsquo;s a stable service and VPN connections are much more performant.</p>
+<p>Whether this is something someone should try themselves is debateable. While the setup is more complicated there are benefits of doing
+this. Getting faster router hardware or possibly repairing failed hardware with spare on-site commodity components.</p>
+<p>For future upgrades, I&rsquo;m going to explore using newer generation CPUs.  The idle power consumption on 12th generation Intel CPUs is
+significantly less than the 17-20 watts my 7th generation Celeron system is currently using.  A 12th gen i5 desktop I borrowed, went
+as low as 3-5 watts during idle. My eventual power goal is to get consumption under 10 watts.</p>
+<p>If you try this approach and have questions, feel free to reach out on <a href="https://bsky.app/profile/af9.us">Bluesky</a> social.
+Otherwise, let me know how it worked.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://amf3.github.io/tags/qemu/">Qemu</a></li>
+      <li><a href="https://amf3.github.io/tags/linux/">Linux</a></li>
+      <li><a href="https://amf3.github.io/tags/mikrotik/">Mikrotik</a></li>
+      <li><a href="https://amf3.github.io/tags/routeros/">Routeros</a></li>
+      <li><a href="https://amf3.github.io/tags/networking/">Networking</a></li>
+      <li><a href="https://amf3.github.io/tags/virtualization/">Virtualization</a></li>
+    </ul>
+
+<ul class="share-buttons">
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://amf3.github.io/">Adam Faris</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

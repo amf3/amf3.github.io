@@ -4,7 +4,7 @@
     <title>Alpine on Adam Faris</title>
     <link>https://amf3.github.io/tags/alpine/</link>
     <description>Recent content in Alpine on Adam Faris</description>
-    <generator>Hugo -- 0.147.9</generator>
+    <generator>Hugo -- 0.152.2</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 14 May 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://amf3.github.io/tags/alpine/index.xml" rel="self" type="application/rss+xml" />
@@ -72,7 +72,8 @@ same macOS host and connected to virtual network interfaces using QEMU&rsquo;s s
 to remove the upload limit, the restriction doesn&rsquo;t prevent me from validating changes before deploying them to physical networks.</p>
 <p>One can download the CHR image from <a href="https://mikrotik.com/download">MikroTik’s download page</a>. I used the stable 7.x version and chose the <strong>Raw disk image</strong> — which is x86 (not ARM).</p>
 <blockquote>
-<p>💡 In hindsight, the ARM image might be more appropriate for Apple Silicon, but the x86 image works fine.</p></blockquote>
+<p>💡 In hindsight, the ARM image might be more appropriate for Apple Silicon, but the x86 image works fine.</p>
+</blockquote>
 <p><img alt="RouterOS download page with &lsquo;Cloud Hosted Router&rsquo; and &lsquo;Raw disk image&rsquo; highlighted" loading="lazy" src="/articles/virtualization/macos_qemu_networks/assets/routerOS-dl-screenshot.png#center"></p>
 <hr>
 <p>First, convert the raw image to <code>qcow2</code> format. This allows snapshotting the VM, making it easy to roll back from bad config changes.</p>
@@ -159,7 +160,8 @@ on the router.</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip firewall nat add action<span style="color:#f92672">=</span>masquerade chain<span style="color:#f92672">=</span>srcnat out-interface<span style="color:#f92672">=</span>ether1
 </span></span></code></pre></div><blockquote>
-<p>⚠️ The example does not set any firewall rules. Use it as a starting point only.</p></blockquote>
+<p>⚠️ The example does not set any firewall rules. Use it as a starting point only.</p>
+</blockquote>
 <p>To gracefully shutdown the router</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /system shutdown
 </span></span></code></pre></div><p>Answer y when prompted. Or, leave the router running. It will be used again shortly.</p>
