@@ -37,7 +37,7 @@ submodule-patch: submodule-reset
 # Pull latest upstream theme updates
 submodule-update:
 	@echo "Updating PaperMod submodule..."
-	git submodule update --remote --rebase
+	git submodule update --init --recursive --remote --rebase
 
 # Reset theme submodule if needed.
 submodule-reset:
