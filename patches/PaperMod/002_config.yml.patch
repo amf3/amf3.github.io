@@ -1,0 +1,11 @@
+diff --git a/.github/ISSUE_TEMPLATE/config.yml b/.github/ISSUE_TEMPLATE/config.yml
+deleted file mode 100644
+index eeb6e55..0000000
+--- a/.github/ISSUE_TEMPLATE/config.yml
++++ /dev/null
+@@ -1,5 +0,0 @@
+-blank_issues_enabled: false
+-contact_links:
+-  - name: PaperMod Discussions
+-    url: https://github.com/adityatelange/hugo-PaperMod/discussions
+-    about: Please ask and answer questions/doubts here, DO NOT open an issue for questions.
