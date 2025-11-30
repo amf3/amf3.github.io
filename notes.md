@@ -42,8 +42,10 @@ To publish content to github
 * [PaperMod Example Site Source](https://github.com/adityatelange/hugo-PaperMod/tree/exampleSite)
 * [YAML TO TOML converter](https://transform.tools/yaml-to-toml)
 
-### Manage Hugo with go modules
+### Manage Hugo Version with go modules
 
+```shell
 go mod init github.com/<myusername>/<myBlogName>
 go get -tool github.com/gohugoio/hugo@v0.152.2
 go tool hugo serve or whatever subcommand is needed
+```
