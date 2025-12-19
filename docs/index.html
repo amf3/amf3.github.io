@@ -163,6 +163,22 @@
 
 <article class="first-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">Decoupling Compute and Storage
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Who Should Not Read This Post This post does not discuss:
+data support for multiple writers having zero downtime cloud-scale best practices Instead I discuss embracing single points of failure (SPOF) in exchange for simplicity within environments that can tolerate downtime.
+Permission to Not Over-Engineer In environments that tolerate downtime, having a SPOF is great because they are simple to deploy and it’s obvious what failed.
+Lets examine the typical home router. In addition to routing packets between the LAN and the Internet, the home router also provides DHCP and DNS services. Then someone learns of PiHole and runs it on a separate device like a Raspberry PI. Now the router queries PiHole for adblock entries during DNS resolution. Ad-free browsing works works great; until HTTP requests stop working. With this scenario, it’s not obvious if it’s an issue on the router or an issue with PiHole.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-12-16 21:51:16 -0800 PST'>December 16, 2025</span>&nbsp;·&nbsp;<span>1316 words</span></footer>
+  <a class="entry-link" aria-label="post link to Decoupling Compute and Storage" href="https://amf3.github.io/articles/arch/2swarm_nodes/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">Uh-oh. Is the router down?
     </h2>
   </header>
@@ -287,20 +303,6 @@ Understanding cloud-init execution stages Before continuing, let’s cover some 
   </div>
   <footer class="entry-footer"><span title='2025-03-21 16:28:54 -0400 -0400'>March 21, 2025</span>&nbsp;·&nbsp;<span>909 words</span></footer>
   <a class="entry-link" aria-label="post link to cloud-init troubleshooting" href="https://amf3.github.io/articles/cloudinit/troubleshooting/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Unattended Ubuntu Installs - Virtual Machines to Bare-Metal
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>In a previous post, I discussed using cloud-init and Multipass as a method of provisioning virtual machines on a local computer with a cloud-like API. Today I am going to dive deeper with Ubuntu and how their autoinstall API can simplify on-premise host provisioning.
-autoinstall is a tool that allows for unattended installations of Ubuntu, ensuring consistency, reporducibility, and providing automation across a fleet of hosts. In this post I’ll walk through an example of using autoinstall to configure networking, local storage, and demonstrate shell command execution during provisioning.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2025-03-03 23:07:23 -0800 PST'>March 3, 2025</span>&nbsp;·&nbsp;<span>2082 words</span></footer>
-  <a class="entry-link" aria-label="post link to Unattended Ubuntu Installs - Virtual Machines to Bare-Metal" href="https://amf3.github.io/articles/cloudinit/autoinstall/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">
