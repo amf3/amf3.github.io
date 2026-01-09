@@ -6,8 +6,169 @@
     <description>Recent content on Adam Faris</description>
     <generator>Hugo -- 0.152.2</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 16 Dec 2025 21:51:16 -0800</lastBuildDate>
+    <lastBuildDate>Mon, 05 Jan 2026 12:25:30 -0800</lastBuildDate>
     <atom:link href="https://amf3.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Docker Socket Myths</title>
+      <link>https://amf3.github.io/articles/virtualization/docker_socket/</link>
+      <pubDate>Mon, 05 Jan 2026 12:25:30 -0800</pubDate>
+      <guid>https://amf3.github.io/articles/virtualization/docker_socket/</guid>
+      <description>Making Read Only Access Safer </description>
+      <content:encoded><![CDATA[<p>There&rsquo;s a popular myth in the Docker community.
+The myth is that it&rsquo;s possible to mount /var/run/docker.sock with read only options.  Even large container projects like
+<a href="https://github.com/traefik/traefik/blob/f7280439e6378221a541910f43a01323d52db048/docs/content/user-guides/docker-compose/basic-example/index.md?plain=1#L122">Traefik</a>
+get this wrong.</p>
+<p>Bind mounting the Docker socket with read only options doesn&rsquo;t work the way one thinks it would.  This post will explain how using the
+<strong>&quot;:ro&quot;</strong> option when mounting the Docker socket is little more than <a href="https://en.wikipedia.org/wiki/Security_theater">security theater</a> and to
+discuss alternatives.</p>
+<p>Please read this post if you&rsquo;re adding <code>/var/run/docker.sock:/var/run/docker.sock:ro</code> to Docker compose files.</p>
+<h2 id="socket-behavior">Socket behavior</h2>
+<h3 id="demo">Demo</h3>
+<p>The issue isn&rsquo;t specific to Docker, instead its normal <a href="https://en.wikipedia.org/wiki/POSIX">POSIX</a> behavior.  This is easily demonstrable
+by creating a Unix socket with python and not using Docker at all.</p>
+<p>This code block will create a Unix socket and wait for clients to connect.  When the client connects, the server prints received
+data to standard out.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python3" data-lang="python3"><span style="display:flex;"><span><span style="color:#75715e">#! /usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Save as server.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>SOCK <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/tmp/control.sock&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    os<span style="color:#f92672">.</span>unlink(SOCK)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">FileNotFoundError</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>srv <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_UNIX, socket<span style="color:#f92672">.</span>SOCK_STREAM)
+</span></span><span style="display:flex;"><span>srv<span style="color:#f92672">.</span>bind(SOCK)
+</span></span><span style="display:flex;"><span>os<span style="color:#f92672">.</span>chmod(SOCK, <span style="color:#ae81ff">0o660</span>)   <span style="color:#75715e"># same write permissions that are used with docker.sock</span>
+</span></span><span style="display:flex;"><span>srv<span style="color:#f92672">.</span>listen(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;listening&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>conn, _ <span style="color:#f92672">=</span> srv<span style="color:#f92672">.</span>accept()
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;client connected&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> conn<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> data:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;received:&#34;</span>, data<span style="color:#f92672">.</span>decode())
+</span></span><span style="display:flex;"><span>    conn<span style="color:#f92672">.</span>sendall(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;ack</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><p>The next block contains the client code.  Notice that the client socket path (/mnt/control.sock) is different from the server (/tmp/control.sock)
+as it&rsquo;s using the read only bind mount created in the next step.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python3" data-lang="python3"><span style="display:flex;"><span><span style="color:#75715e">#! /usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Save as client.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sock <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_UNIX, socket<span style="color:#f92672">.</span>SOCK_STREAM)
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>connect(<span style="color:#e6db74">&#34;/mnt/control.sock&#34;</span>)   <span style="color:#75715e"># connect to read-only mount point</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>sendall(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;This is a write string from the client</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>print(sock<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>))
+</span></span></code></pre></div><p>Start the server code to create <code>/tmp/control.sock</code> and then bind mount the socket
+to a new mount point with read-only access.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo touch /mnt/control.sock                           <span style="color:#75715e"># create the mount point</span>
+</span></span><span style="display:flex;"><span>$ sudo mount --bind /tmp/control.sock /mnt/control.sock  <span style="color:#75715e"># mount the socket to a new mount point</span>
+</span></span><span style="display:flex;"><span>$ sudo mount -o remount,ro,bind /mnt/control.sock        <span style="color:#75715e"># Remount the socket mount point with read only options</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ mount | grep control.sock                              <span style="color:#75715e"># Display the read-only mount</span>
+</span></span><span style="display:flex;"><span>tmpfs on /mnt/control.sock type tmpfs <span style="color:#f92672">(</span>ro,nosuid,nodev,size<span style="color:#f92672">=</span>16037780k,nr_inodes<span style="color:#f92672">=</span>1048576,inode64<span style="color:#f92672">)</span> 
+</span></span></code></pre></div><p>Next run the client.  At this point it <strong>should not</strong> be possible to write to the socket, but this screen shot shows otherwise.</p>
+<p><img alt="Screenshot Demo" loading="lazy" src="/articles/virtualization/docker_socket/assets/socket_demo.jpg"></p>
+<p>If running the demo locally, don&rsquo;t forget to clean up the bind mount.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo umount /mnt/control.sock  <span style="color:#75715e"># unmount the read-only bind mount</span>
+</span></span><span style="display:flex;"><span>sudo rm /mnt/control.sock      <span style="color:#75715e"># remove the mount point</span>
+</span></span><span style="display:flex;"><span>rm /tmp/control.sock           <span style="color:#75715e"># remove the control.sock socket created by the python server code.</span>
+</span></span></code></pre></div><h3 id="how-did-this-work">How did this work?</h3>
+<p>A bind mount creates a second path to the same underlying kernel object. The &ldquo;ro&rdquo; mount option applies filesystem level
+restrictions at the mount point, but does not change the behavior or permissions of the object being mounted.
+When a process opens the object, further access control is determined by the object itself.</p>
+<p>In this case, I&rsquo;m unable to delete the socket or change its metadata, but I can still connect to it.</p>
+<p><img alt="Screenshot Failed Metadata Modification" loading="lazy" src="/articles/virtualization/docker_socket/assets/socket_mod.jpg"></p>
+<p>The read and write behavior for a socket is different from a normal file. Files use the <a href="https://man7.org/linux/man-pages/man2/read.2.html">read()</a>
+and <a href="https://man7.org/linux/man-pages/man2/write.2.html">write()</a> system calls, sockets use
+<a href="https://man7.org/linux/man-pages/man2/send.2.html">send()</a> and <a href="https://man7.org/linux/man-pages/man2/recv.2.html">recv()</a> system calls. The
+read only mount option to the mount point representing the socket allows the client connection.  As send() is a different system call from
+write(), send() is not blocked by the filesystem and data passes through the socket.</p>
+<p>Socket behavior is the big misunderstanding in the Docker community. People conflate filesystem writes with sending
+commands over a socket.</p>
+<h2 id="docker-api">Docker API</h2>
+<p>Docker defaulting to using Unix sockets isn&rsquo;t the problem. The issue is that the Docker API is course grained and was not built with
+multitenancy in mind. While the <a href="https://docs.docker.com/reference/api/engine/version/v1.52/#tag/Container">Docker API</a> is built on HTTP
+verbs, the HTTP endpoints don&rsquo;t map cleanly between safe and unsafe operations.  This makes verb based authorization ineffective
+and explains why granting a container access to the Docker socket implicitly grants elevated capabilities for that container.</p>
+<p>This example only uses HTTP GET requests to demonstrate the missing separation of safe and unsafe operations in the Docker API. The
+example is able to exfiltrate TLS certificates from a running container. No container restart, privilege escalation, or filesystem write is required.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ <span style="color:#75715e"># Get a list of running containers</span>
+</span></span><span style="display:flex;"><span>$ curl -s --unix-socket /var/run/docker.sock -X GET http://localhost/containers/json | jq <span style="color:#e6db74">&#39;.[] | {Names, Id, Image}&#39;</span> 
+</span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;Names&#34;</span>: <span style="color:#f92672">[</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;/cadvisor&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">]</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;Id&#34;</span>: <span style="color:#e6db74">&#34;dfe1461c0a7a1a34bd0b4df6ccc1ecd77d1fc6483be80c248ef916a3e79d8bc9&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;Image&#34;</span>: <span style="color:#e6db74">&#34;gcr.io/cadvisor/cadvisor:v0.52.1&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ <span style="color:#75715e"># Exfiltrate certificates from the running cAdvisor container and save locally to a file named certificates.tar</span>
+</span></span><span style="display:flex;"><span>$ curl -D - -s  --unix-socket /var/run/docker.sock -X GET http://localhost/containers/dfe1461c0a7a1a34bd0b4df6ccc1ecd77d1fc6483be80c248ef916a3e79d8bc9/archive?path<span style="color:#f92672">=</span>/etc/ssl -o certificates.tar 
+</span></span><span style="display:flex;"><span>HTTP/1.1 <span style="color:#ae81ff">200</span> OK
+</span></span><span style="display:flex;"><span>Api-Version: 1.51
+</span></span><span style="display:flex;"><span>Content-Type: application/x-tar
+</span></span><span style="display:flex;"><span>Docker-Experimental: false
+</span></span><span style="display:flex;"><span>Ostype: linux
+</span></span><span style="display:flex;"><span>Server: Docker/28.5.2 <span style="color:#f92672">(</span>linux<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>X-Docker-Container-Path-Stat: eyJuYW1lIjoic3NsIiwic2l6ZSI6MTAsIm1vZGUiOjIxNDc0ODQxNDEsIm10aW1lIjoiMjAyNS0wMi0xM1QyMzoxNzowOFoiLCJsaW5rVGFyZ2V0IjoiIn0<span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>Date: Fri, <span style="color:#ae81ff">09</span> Jan <span style="color:#ae81ff">2026</span> 17:04:45 GMT
+</span></span><span style="display:flex;"><span>Transfer-Encoding: chunked
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ <span style="color:#75715e"># List the contents of the uncompressed downloaded tar archive</span>
+</span></span><span style="display:flex;"><span>$ tar -tf certificates.tar 
+</span></span><span style="display:flex;"><span>ssl/
+</span></span><span style="display:flex;"><span>ssl/cert.pem
+</span></span><span style="display:flex;"><span>ssl/certs/
+</span></span><span style="display:flex;"><span>ssl/certs/ca-certificates.crt
+</span></span><span style="display:flex;"><span>ssl/ct_log_list.cnf
+</span></span><span style="display:flex;"><span>ssl/ct_log_list.cnf.dist
+</span></span></code></pre></div><p>Containers like cAdvisor or Traefik want access to the docker socket.  These are large projects and it&rsquo;s unlikely they would intentionally
+publish harmful code.  But supply chain attacks are common and it&rsquo;s possible for malicious behavior to be introduced into a normally trusted
+container.</p>
+<p>When a container is granted access to the Docker socket, it implicitly inherits the full authority of the Docker API.  Docker does not have a
+mechanism to distinguish between intended and unintended use of the API or a way to scope capabilites. This limitation is why socket proxies
+exist, providing the missing authorization layer in Docker.</p>
+<h2 id="socket-proxies">Socket Proxies</h2>
+<p>A local proxy in front of the Docker socket can filter the endpoints a container can access.  Identity based solutions like
+<a href="https://www.openpolicyagent.org">Open Policy Agent</a> are available and work well for human users with authentication tokens. But
+containers don&rsquo;t use custom headers or use mTLS by default. The application code within the container would need to be modified
+to send authentication with its requests.</p>
+<p>This is why most socket proxy projects use topology for authentication and authorization.  The proxy is deployed
+in a <a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/sidecar">side car</a> pattern with the application container, where
+Docker socket access from the application container passes through the socket proxy container.  In topology based sidecar deployments,
+<strong>where</strong> the request comes from determins what the request can do, not who is making the request.</p>
+<p><img alt="Docker Socket Proxy Network" loading="lazy" src="/articles/virtualization/docker_socket/assets/docker_net.png"></p>
+<p>Popular socket proxy projects are <a href="https://github.com/Tecnativa/docker-socket-proxy">Tecnativa socket-proxy</a> which uses HAProxy with configurable
+endpoint filtering, and <a href="https://github.com/wollomatic/socket-proxy">Wollomatic socket-proxy</a> a Go based alternative. You configure these proxies
+to allow specific endpoints. Like allowing Traefik access <code>containers/json</code> to discover services while blocking request to <code>containers/create</code>.</p>
+<h3 id="tradeoffs">Tradeoffs</h3>
+<p>There&rsquo;s no true identity-based authorization.  The proxy can&rsquo;t distinguish between legitmate requests from Traefik versus another container. The proxy
+only knows requests coming from particular networks get particular permissions.</p>
+<p>Duplicated infrastructure is another concern.  Each application needs its own proxy instance.  Running three containers that need Docker socket
+access, results in configuring and deploying three separate proxies.</p>
+<p>Policy/filter configuration within the proxy is static and set at deployment time.  It&rsquo;s not possible to dynamically adjust permissions based
+on runtime conditions.</p>
+<p>The Docker API design sneaks through proxy endpoints.  It&rsquo;s not possible to grant access to
+<a href="https://docs.docker.com/reference/api/engine/version/v1.52/#tag/Image/operation/ImageInspect">container labels</a> without granting access to environment
+variables, the latter likely contain application secrets.</p>
+<p>Even with these limitations, socket proxies provide a significant security improvement over direct Docker socket mounts.  Socket proxies enforce
+least privilege access at the API level, which is exactly where the authorization needs to happen.</p>
+<h2 id="whats-next">What&rsquo;s Next?</h2>
+<p>If you&rsquo;re currently mounting the Docker socket from your containers with <code>:ro</code> consider switching to a socket proxy solution.  The topology
+based approach isn&rsquo;t perfect but it provides Docker API filtering that read only mounts can&rsquo;t.  Yes a socket proxy requires more setup, but it
+provides a real security boundary rather than the appearance of one.</p>
+<p>If you have thoughts on this content, let me know what you think on <a href="https://bsky.app/profile/af9.us">Bluesky</a>.</p>
+]]></content:encoded>
+    </item>
     <item>
       <title>Decoupling Compute and Storage</title>
       <link>https://amf3.github.io/articles/arch/2swarm_nodes/</link>

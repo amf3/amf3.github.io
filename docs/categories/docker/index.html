@@ -161,6 +161,21 @@
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">Docker Socket Myths
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>There’s a popular myth in the Docker community. The myth is that it’s possible to mount /var/run/docker.sock with read only options. Even large container projects like Traefik get this wrong.
+Bind mounting the Docker socket with read only options doesn’t work the way one thinks it would. This post will explain how using the &#34;:ro&#34; option when mounting the Docker socket is little more than security theater and to discuss alternatives.
+Please read this post if you’re adding /var/run/docker.sock:/var/run/docker.sock:ro to Docker compose files.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-01-05 12:25:30 -0800 PST'>January 5, 2026</span>&nbsp;·&nbsp;<span>1275 words</span></footer>
+  <a class="entry-link" aria-label="post link to Docker Socket Myths" href="https://amf3.github.io/articles/virtualization/docker_socket/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">DIY Docker Volume Drivers: What&#39;s Missing
     </h2>
   </header>
@@ -175,7 +190,7 @@ In this post, I’ll cover how Docker handles volume storage under the hood. I�
     </main>
     
 <footer class="footer">
-        <span>&copy; 2025 <a href="https://amf3.github.io/">Adam Faris</a></span> · 
+        <span>&copy; 2026 <a href="https://amf3.github.io/">Adam Faris</a></span> · 
 
     <span>
         Powered by

@@ -6,8 +6,29 @@
     <description>Recent content in Categories on Adam Faris</description>
     <generator>Hugo -- 0.152.2</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 16 Dec 2025 21:51:16 -0800</lastBuildDate>
+    <lastBuildDate>Mon, 05 Jan 2026 12:25:30 -0800</lastBuildDate>
     <atom:link href="https://amf3.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Cloud</title>
+      <link>https://amf3.github.io/categories/cloud/</link>
+      <pubDate>Mon, 05 Jan 2026 12:25:30 -0800</pubDate>
+      <guid>https://amf3.github.io/categories/cloud/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Docker</title>
+      <link>https://amf3.github.io/categories/docker/</link>
+      <pubDate>Mon, 05 Jan 2026 12:25:30 -0800</pubDate>
+      <guid>https://amf3.github.io/categories/docker/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Virtualization</title>
+      <link>https://amf3.github.io/categories/virtualization/</link>
+      <pubDate>Mon, 05 Jan 2026 12:25:30 -0800</pubDate>
+      <guid>https://amf3.github.io/categories/virtualization/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Architecture</title>
       <link>https://amf3.github.io/categories/architecture/</link>
@@ -51,13 +72,6 @@
       <description></description>
     </item>
     <item>
-      <title>Docker</title>
-      <link>https://amf3.github.io/categories/docker/</link>
-      <pubDate>Thu, 26 Jun 2025 22:37:40 -0700</pubDate>
-      <guid>https://amf3.github.io/categories/docker/</guid>
-      <description></description>
-    </item>
-    <item>
       <title>Storage</title>
       <link>https://amf3.github.io/categories/storage/</link>
       <pubDate>Thu, 26 Jun 2025 22:37:40 -0700</pubDate>
@@ -72,13 +86,6 @@
       <description></description>
     </item>
     <item>
-      <title>Cloud</title>
-      <link>https://amf3.github.io/categories/cloud/</link>
-      <pubDate>Sun, 06 Apr 2025 07:41:29 -0400</pubDate>
-      <guid>https://amf3.github.io/categories/cloud/</guid>
-      <description></description>
-    </item>
-    <item>
       <title>Qemu</title>
       <link>https://amf3.github.io/categories/qemu/</link>
       <pubDate>Sun, 06 Apr 2025 07:41:29 -0400</pubDate>
@@ -90,13 +97,6 @@
       <link>https://amf3.github.io/categories/tips/</link>
       <pubDate>Sun, 06 Apr 2025 07:41:29 -0400</pubDate>
       <guid>https://amf3.github.io/categories/tips/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Virtualization</title>
-      <link>https://amf3.github.io/categories/virtualization/</link>
-      <pubDate>Sun, 06 Apr 2025 07:41:29 -0400</pubDate>
-      <guid>https://amf3.github.io/categories/virtualization/</guid>
       <description></description>
     </item>
     <item>
