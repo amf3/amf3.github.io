@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Docker Socket Myths | Adam Faris</title>
+<meta name="keywords" content="">
+<meta name="description" content="Making Read Only Access Safer ">
+<meta name="author" content="">
+<link rel="canonical" href="https://amf3.github.io/articles/virtualization/docker_socket/">
+<meta name="google-site-verification" content="6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E">
+<meta name="msvalidate.01" content="C1E02AC59FE7ECBDB6D9EFB7D5E02B65">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://amf3.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://amf3.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://amf3.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://amf3.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://amf3.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://amf3.github.io/articles/virtualization/docker_socket/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-MKR06D6KGD"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-MKR06D6KGD');
+        }
+      </script><meta property="og:url" content="https://amf3.github.io/articles/virtualization/docker_socket/">
+  <meta property="og:site_name" content="Adam Faris">
+  <meta property="og:title" content="Docker Socket Myths">
+  <meta property="og:description" content="Making Read Only Access Safer ">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="articles">
+    <meta property="article:published_time" content="2026-01-05T12:25:30-08:00">
+    <meta property="article:modified_time" content="2026-01-05T12:25:30-08:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker Socket Myths">
+<meta name="twitter:description" content="Making Read Only Access Safer ">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "articles",
+      "item": "https://amf3.github.io/articles/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Docker Socket Myths",
+      "item": "https://amf3.github.io/articles/virtualization/docker_socket/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Docker Socket Myths",
+  "name": "Docker Socket Myths",
+  "description": "Making Read Only Access Safer ",
+  "keywords": [
+    
+  ],
+  "articleBody": "There’s a popular myth in the Docker community. The myth is that it’s possible to mount /var/run/docker.sock with read only options. Even large container projects like Traefik get this wrong.\nBind mounting the Docker socket with read only options doesn’t work the way one thinks it would. This post will explain how using the \":ro\" option when mounting the Docker socket is little more than security theater and to discuss alternatives.\nPlease read this post if you’re adding /var/run/docker.sock:/var/run/docker.sock:ro to Docker compose files.\nSocket behavior Demo The issue isn’t specific to Docker, instead its normal POSIX behavior. This is easily demonstrable by creating a Unix socket with python and not using Docker at all.\nThis code block will create a Unix socket and wait for clients to connect. When the client connects, the server prints received data to standard out.\n#! /usr/bin/env python3 # Save as server.py import socket import os SOCK = \"/tmp/control.sock\" try: os.unlink(SOCK) except FileNotFoundError: pass srv = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) srv.bind(SOCK) os.chmod(SOCK, 0o660) # same write permissions that are used with docker.sock srv.listen(1) print(\"listening\") conn, _ = srv.accept() print(\"client connected\") while True: data = conn.recv(1024) if not data: break print(\"received:\", data.decode()) conn.sendall(b\"ack\\n\") The next block contains the client code. Notice that the client socket path (/mnt/control.sock) is different from the server (/tmp/control.sock) as it’s using the read only bind mount created in the next step.\n#! /usr/bin/env python3 # Save as client.py import socket sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) sock.connect(\"/mnt/control.sock\") # connect to read-only mount point sock.sendall(b\"This is a write string from the client\\n\") print(sock.recv(1024)) Start the server code to create /tmp/control.sock and then bind mount the socket to a new mount point with read-only access.\n$ sudo touch /mnt/control.sock # create the mount point $ sudo mount --bind /tmp/control.sock /mnt/control.sock # mount the socket to a new mount point $ sudo mount -o remount,ro,bind /mnt/control.sock # Remount the socket mount point with read only options $ mount | grep control.sock # Display the read-only mount tmpfs on /mnt/control.sock type tmpfs (ro,nosuid,nodev,size=16037780k,nr_inodes=1048576,inode64) Next run the client. At this point it should not be possible to write to the socket, but this screen shot shows otherwise.\nIf running the demo locally, don’t forget to clean up the bind mount.\nsudo umount /mnt/control.sock # unmount the read-only bind mount sudo rm /mnt/control.sock # remove the mount point rm /tmp/control.sock # remove the control.sock socket created by the python server code. How did this work? A bind mount creates a second path to the same underlying kernel object. The “ro” mount option applies filesystem level restrictions at the mount point, but does not change the behavior or permissions of the object being mounted. When a process opens the object, further access control is determined by the object itself.\nIn this case, I’m unable to delete the socket or change its metadata, but I can still connect to it.\nThe read and write behavior for a socket is different from a normal file. Files use the read() and write() system calls, sockets use send() and recv() system calls. The read only mount option to the mount point representing the socket allows the client connection. As send() is a different system call from write(), send() is not blocked by the filesystem and data passes through the socket.\nSocket behavior is the big misunderstanding in the Docker community. People conflate filesystem writes with sending commands over a socket.\nDocker API Docker defaulting to using Unix sockets isn’t the problem. The issue is that the Docker API is course grained and was not built with multitenancy in mind. While the Docker API is built on HTTP verbs, the HTTP endpoints don’t map cleanly between safe and unsafe operations. This makes verb based authorization ineffective and explains why granting a container access to the Docker socket implicitly grants elevated capabilities for that container.\nThis example only uses HTTP GET requests to demonstrate the missing separation of safe and unsafe operations in the Docker API. The example is able to exfiltrate TLS certificates from a running container. No container restart, privilege escalation, or filesystem write is required.\n$ # Get a list of running containers $ curl -s --unix-socket /var/run/docker.sock -X GET http://localhost/containers/json | jq '.[] | {Names, Id, Image}' { \"Names\": [ \"/cadvisor\" ], \"Id\": \"dfe1461c0a7a1a34bd0b4df6ccc1ecd77d1fc6483be80c248ef916a3e79d8bc9\", \"Image\": \"gcr.io/cadvisor/cadvisor:v0.52.1\" } $ # Exfiltrate certificates from the running cAdvisor container and save locally to a file named certificates.tar $ curl -D - -s --unix-socket /var/run/docker.sock -X GET http://localhost/containers/dfe1461c0a7a1a34bd0b4df6ccc1ecd77d1fc6483be80c248ef916a3e79d8bc9/archive?path=/etc/ssl -o certificates.tar HTTP/1.1 200 OK Api-Version: 1.51 Content-Type: application/x-tar Docker-Experimental: false Ostype: linux Server: Docker/28.5.2 (linux) X-Docker-Container-Path-Stat: eyJuYW1lIjoic3NsIiwic2l6ZSI6MTAsIm1vZGUiOjIxNDc0ODQxNDEsIm10aW1lIjoiMjAyNS0wMi0xM1QyMzoxNzowOFoiLCJsaW5rVGFyZ2V0IjoiIn0= Date: Fri, 09 Jan 2026 17:04:45 GMT Transfer-Encoding: chunked $ # List the contents of the uncompressed downloaded tar archive $ tar -tf certificates.tar ssl/ ssl/cert.pem ssl/certs/ ssl/certs/ca-certificates.crt ssl/ct_log_list.cnf ssl/ct_log_list.cnf.dist Containers like cAdvisor or Traefik want access to the docker socket. These are large projects and it’s unlikely they would intentionally publish harmful code. But supply chain attacks are common and it’s possible for malicious behavior to be introduced into a normally trusted container.\nWhen a container is granted access to the Docker socket, it implicitly inherits the full authority of the Docker API. Docker does not have a mechanism to distinguish between intended and unintended use of the API or a way to scope capabilites. This limitation is why socket proxies exist, providing the missing authorization layer in Docker.\nSocket Proxies A local proxy in front of the Docker socket can filter the endpoints a container can access. Identity based solutions like Open Policy Agent are available and work well for human users with authentication tokens. But containers don’t use custom headers or use mTLS by default. The application code within the container would need to be modified to send authentication with its requests.\nThis is why most socket proxy projects use topology for authentication and authorization. The proxy is deployed in a side car pattern with the application container, where Docker socket access from the application container passes through the socket proxy container. In topology based sidecar deployments, where the request comes from determins what the request can do, not who is making the request.\nPopular socket proxy projects are Tecnativa socket-proxy which uses HAProxy with configurable endpoint filtering, and Wollomatic socket-proxy a Go based alternative. You configure these proxies to allow specific endpoints. Like allowing Traefik access containers/json to discover services while blocking request to containers/create.\nTradeoffs There’s no true identity-based authorization. The proxy can’t distinguish between legitmate requests from Traefik versus another container. The proxy only knows requests coming from particular networks get particular permissions.\nDuplicated infrastructure is another concern. Each application needs its own proxy instance. Running three containers that need Docker socket access, results in configuring and deploying three separate proxies.\nPolicy/filter configuration within the proxy is static and set at deployment time. It’s not possible to dynamically adjust permissions based on runtime conditions.\nThe Docker API design sneaks through proxy endpoints. It’s not possible to grant access to container labels without granting access to environment variables, the latter likely contain application secrets.\nEven with these limitations, socket proxies provide a significant security improvement over direct Docker socket mounts. Socket proxies enforce least privilege access at the API level, which is exactly where the authorization needs to happen.\nWhat’s Next? If you’re currently mounting the Docker socket from your containers with :ro consider switching to a socket proxy solution. The topology based approach isn’t perfect but it provides Docker API filtering that read only mounts can’t. Yes a socket proxy requires more setup, but it provides a real security boundary rather than the appearance of one.\nIf you have thoughts on this content, let me know what you think on Bluesky.\n",
+  "wordCount" : "1275",
+  "inLanguage": "en",
+  "datePublished": "2026-01-05T12:25:30-08:00",
+  "dateModified": "2026-01-05T12:25:30-08:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://amf3.github.io/articles/virtualization/docker_socket/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Adam Faris",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://amf3.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://amf3.github.io/" accesskey="h" title="Adam Faris (Alt + H)">Adam Faris</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://amf3.github.io/search/" title="search (Alt &#43; /)" accesskey=/>
+                    <span>search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/articles/" title="articles">
+                    <span>articles</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/about/" title="about">
+                    <span>about</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://amf3.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://amf3.github.io/articles/">articles</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Docker Socket Myths
+    </h1>
+    <div class="post-description">
+      Making Read Only Access Safer 
+    </div>
+    <div class="post-meta"><span title='2026-01-05 12:25:30 -0800 PST'>January 5, 2026</span>&nbsp;·&nbsp;<span>1275 words</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#socket-behavior" aria-label="Socket behavior">Socket behavior</a><ul>
+                        
+                <li>
+                    <a href="#demo" aria-label="Demo">Demo</a></li>
+                <li>
+                    <a href="#how-did-this-work" aria-label="How did this work?">How did this work?</a></li></ul>
+                </li>
+                <li>
+                    <a href="#docker-api" aria-label="Docker API">Docker API</a></li>
+                <li>
+                    <a href="#socket-proxies" aria-label="Socket Proxies">Socket Proxies</a><ul>
+                        
+                <li>
+                    <a href="#tradeoffs" aria-label="Tradeoffs">Tradeoffs</a></li></ul>
+                </li>
+                <li>
+                    <a href="#whats-next" aria-label="What&rsquo;s Next?">What&rsquo;s Next?</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>There&rsquo;s a popular myth in the Docker community.
+The myth is that it&rsquo;s possible to mount /var/run/docker.sock with read only options.  Even large container projects like
+<a href="https://github.com/traefik/traefik/blob/f7280439e6378221a541910f43a01323d52db048/docs/content/user-guides/docker-compose/basic-example/index.md?plain=1#L122">Traefik</a>
+get this wrong.</p>
+<p>Bind mounting the Docker socket with read only options doesn&rsquo;t work the way one thinks it would.  This post will explain how using the
+<strong>&quot;:ro&quot;</strong> option when mounting the Docker socket is little more than <a href="https://en.wikipedia.org/wiki/Security_theater">security theater</a> and to
+discuss alternatives.</p>
+<p>Please read this post if you&rsquo;re adding <code>/var/run/docker.sock:/var/run/docker.sock:ro</code> to Docker compose files.</p>
+<h2 id="socket-behavior">Socket behavior<a hidden class="anchor" aria-hidden="true" href="#socket-behavior">#</a></h2>
+<h3 id="demo">Demo<a hidden class="anchor" aria-hidden="true" href="#demo">#</a></h3>
+<p>The issue isn&rsquo;t specific to Docker, instead its normal <a href="https://en.wikipedia.org/wiki/POSIX">POSIX</a> behavior.  This is easily demonstrable
+by creating a Unix socket with python and not using Docker at all.</p>
+<p>This code block will create a Unix socket and wait for clients to connect.  When the client connects, the server prints received
+data to standard out.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python3" data-lang="python3"><span style="display:flex;"><span><span style="color:#75715e">#! /usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Save as server.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>SOCK <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/tmp/control.sock&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    os<span style="color:#f92672">.</span>unlink(SOCK)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">FileNotFoundError</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>srv <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_UNIX, socket<span style="color:#f92672">.</span>SOCK_STREAM)
+</span></span><span style="display:flex;"><span>srv<span style="color:#f92672">.</span>bind(SOCK)
+</span></span><span style="display:flex;"><span>os<span style="color:#f92672">.</span>chmod(SOCK, <span style="color:#ae81ff">0o660</span>)   <span style="color:#75715e"># same write permissions that are used with docker.sock</span>
+</span></span><span style="display:flex;"><span>srv<span style="color:#f92672">.</span>listen(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;listening&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>conn, _ <span style="color:#f92672">=</span> srv<span style="color:#f92672">.</span>accept()
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;client connected&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> conn<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> data:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;received:&#34;</span>, data<span style="color:#f92672">.</span>decode())
+</span></span><span style="display:flex;"><span>    conn<span style="color:#f92672">.</span>sendall(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;ack</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><p>The next block contains the client code.  Notice that the client socket path (/mnt/control.sock) is different from the server (/tmp/control.sock)
+as it&rsquo;s using the read only bind mount created in the next step.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python3" data-lang="python3"><span style="display:flex;"><span><span style="color:#75715e">#! /usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Save as client.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sock <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_UNIX, socket<span style="color:#f92672">.</span>SOCK_STREAM)
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>connect(<span style="color:#e6db74">&#34;/mnt/control.sock&#34;</span>)   <span style="color:#75715e"># connect to read-only mount point</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>sendall(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;This is a write string from the client</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>print(sock<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>))
+</span></span></code></pre></div><p>Start the server code to create <code>/tmp/control.sock</code> and then bind mount the socket
+to a new mount point with read-only access.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo touch /mnt/control.sock                           <span style="color:#75715e"># create the mount point</span>
+</span></span><span style="display:flex;"><span>$ sudo mount --bind /tmp/control.sock /mnt/control.sock  <span style="color:#75715e"># mount the socket to a new mount point</span>
+</span></span><span style="display:flex;"><span>$ sudo mount -o remount,ro,bind /mnt/control.sock        <span style="color:#75715e"># Remount the socket mount point with read only options</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ mount | grep control.sock                              <span style="color:#75715e"># Display the read-only mount</span>
+</span></span><span style="display:flex;"><span>tmpfs on /mnt/control.sock type tmpfs <span style="color:#f92672">(</span>ro,nosuid,nodev,size<span style="color:#f92672">=</span>16037780k,nr_inodes<span style="color:#f92672">=</span>1048576,inode64<span style="color:#f92672">)</span> 
+</span></span></code></pre></div><p>Next run the client.  At this point it <strong>should not</strong> be possible to write to the socket, but this screen shot shows otherwise.</p>
+<p><img alt="Screenshot Demo" loading="lazy" src="/articles/virtualization/docker_socket/assets/socket_demo.jpg"></p>
+<p>If running the demo locally, don&rsquo;t forget to clean up the bind mount.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo umount /mnt/control.sock  <span style="color:#75715e"># unmount the read-only bind mount</span>
+</span></span><span style="display:flex;"><span>sudo rm /mnt/control.sock      <span style="color:#75715e"># remove the mount point</span>
+</span></span><span style="display:flex;"><span>rm /tmp/control.sock           <span style="color:#75715e"># remove the control.sock socket created by the python server code.</span>
+</span></span></code></pre></div><h3 id="how-did-this-work">How did this work?<a hidden class="anchor" aria-hidden="true" href="#how-did-this-work">#</a></h3>
+<p>A bind mount creates a second path to the same underlying kernel object. The &ldquo;ro&rdquo; mount option applies filesystem level
+restrictions at the mount point, but does not change the behavior or permissions of the object being mounted.
+When a process opens the object, further access control is determined by the object itself.</p>
+<p>In this case, I&rsquo;m unable to delete the socket or change its metadata, but I can still connect to it.</p>
+<p><img alt="Screenshot Failed Metadata Modification" loading="lazy" src="/articles/virtualization/docker_socket/assets/socket_mod.jpg"></p>
+<p>The read and write behavior for a socket is different from a normal file. Files use the <a href="https://man7.org/linux/man-pages/man2/read.2.html">read()</a>
+and <a href="https://man7.org/linux/man-pages/man2/write.2.html">write()</a> system calls, sockets use
+<a href="https://man7.org/linux/man-pages/man2/send.2.html">send()</a> and <a href="https://man7.org/linux/man-pages/man2/recv.2.html">recv()</a> system calls. The
+read only mount option to the mount point representing the socket allows the client connection.  As send() is a different system call from
+write(), send() is not blocked by the filesystem and data passes through the socket.</p>
+<p>Socket behavior is the big misunderstanding in the Docker community. People conflate filesystem writes with sending
+commands over a socket.</p>
+<h2 id="docker-api">Docker API<a hidden class="anchor" aria-hidden="true" href="#docker-api">#</a></h2>
+<p>Docker defaulting to using Unix sockets isn&rsquo;t the problem. The issue is that the Docker API is course grained and was not built with
+multitenancy in mind. While the <a href="https://docs.docker.com/reference/api/engine/version/v1.52/#tag/Container">Docker API</a> is built on HTTP
+verbs, the HTTP endpoints don&rsquo;t map cleanly between safe and unsafe operations.  This makes verb based authorization ineffective
+and explains why granting a container access to the Docker socket implicitly grants elevated capabilities for that container.</p>
+<p>This example only uses HTTP GET requests to demonstrate the missing separation of safe and unsafe operations in the Docker API. The
+example is able to exfiltrate TLS certificates from a running container. No container restart, privilege escalation, or filesystem write is required.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ <span style="color:#75715e"># Get a list of running containers</span>
+</span></span><span style="display:flex;"><span>$ curl -s --unix-socket /var/run/docker.sock -X GET http://localhost/containers/json | jq <span style="color:#e6db74">&#39;.[] | {Names, Id, Image}&#39;</span> 
+</span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;Names&#34;</span>: <span style="color:#f92672">[</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;/cadvisor&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">]</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;Id&#34;</span>: <span style="color:#e6db74">&#34;dfe1461c0a7a1a34bd0b4df6ccc1ecd77d1fc6483be80c248ef916a3e79d8bc9&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;Image&#34;</span>: <span style="color:#e6db74">&#34;gcr.io/cadvisor/cadvisor:v0.52.1&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ <span style="color:#75715e"># Exfiltrate certificates from the running cAdvisor container and save locally to a file named certificates.tar</span>
+</span></span><span style="display:flex;"><span>$ curl -D - -s  --unix-socket /var/run/docker.sock -X GET http://localhost/containers/dfe1461c0a7a1a34bd0b4df6ccc1ecd77d1fc6483be80c248ef916a3e79d8bc9/archive?path<span style="color:#f92672">=</span>/etc/ssl -o certificates.tar 
+</span></span><span style="display:flex;"><span>HTTP/1.1 <span style="color:#ae81ff">200</span> OK
+</span></span><span style="display:flex;"><span>Api-Version: 1.51
+</span></span><span style="display:flex;"><span>Content-Type: application/x-tar
+</span></span><span style="display:flex;"><span>Docker-Experimental: false
+</span></span><span style="display:flex;"><span>Ostype: linux
+</span></span><span style="display:flex;"><span>Server: Docker/28.5.2 <span style="color:#f92672">(</span>linux<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>X-Docker-Container-Path-Stat: eyJuYW1lIjoic3NsIiwic2l6ZSI6MTAsIm1vZGUiOjIxNDc0ODQxNDEsIm10aW1lIjoiMjAyNS0wMi0xM1QyMzoxNzowOFoiLCJsaW5rVGFyZ2V0IjoiIn0<span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>Date: Fri, <span style="color:#ae81ff">09</span> Jan <span style="color:#ae81ff">2026</span> 17:04:45 GMT
+</span></span><span style="display:flex;"><span>Transfer-Encoding: chunked
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ <span style="color:#75715e"># List the contents of the uncompressed downloaded tar archive</span>
+</span></span><span style="display:flex;"><span>$ tar -tf certificates.tar 
+</span></span><span style="display:flex;"><span>ssl/
+</span></span><span style="display:flex;"><span>ssl/cert.pem
+</span></span><span style="display:flex;"><span>ssl/certs/
+</span></span><span style="display:flex;"><span>ssl/certs/ca-certificates.crt
+</span></span><span style="display:flex;"><span>ssl/ct_log_list.cnf
+</span></span><span style="display:flex;"><span>ssl/ct_log_list.cnf.dist
+</span></span></code></pre></div><p>Containers like cAdvisor or Traefik want access to the docker socket.  These are large projects and it&rsquo;s unlikely they would intentionally
+publish harmful code.  But supply chain attacks are common and it&rsquo;s possible for malicious behavior to be introduced into a normally trusted
+container.</p>
+<p>When a container is granted access to the Docker socket, it implicitly inherits the full authority of the Docker API.  Docker does not have a
+mechanism to distinguish between intended and unintended use of the API or a way to scope capabilites. This limitation is why socket proxies
+exist, providing the missing authorization layer in Docker.</p>
+<h2 id="socket-proxies">Socket Proxies<a hidden class="anchor" aria-hidden="true" href="#socket-proxies">#</a></h2>
+<p>A local proxy in front of the Docker socket can filter the endpoints a container can access.  Identity based solutions like
+<a href="https://www.openpolicyagent.org">Open Policy Agent</a> are available and work well for human users with authentication tokens. But
+containers don&rsquo;t use custom headers or use mTLS by default. The application code within the container would need to be modified
+to send authentication with its requests.</p>
+<p>This is why most socket proxy projects use topology for authentication and authorization.  The proxy is deployed
+in a <a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/sidecar">side car</a> pattern with the application container, where
+Docker socket access from the application container passes through the socket proxy container.  In topology based sidecar deployments,
+<strong>where</strong> the request comes from determins what the request can do, not who is making the request.</p>
+<p><img alt="Docker Socket Proxy Network" loading="lazy" src="/articles/virtualization/docker_socket/assets/docker_net.png"></p>
+<p>Popular socket proxy projects are <a href="https://github.com/Tecnativa/docker-socket-proxy">Tecnativa socket-proxy</a> which uses HAProxy with configurable
+endpoint filtering, and <a href="https://github.com/wollomatic/socket-proxy">Wollomatic socket-proxy</a> a Go based alternative. You configure these proxies
+to allow specific endpoints. Like allowing Traefik access <code>containers/json</code> to discover services while blocking request to <code>containers/create</code>.</p>
+<h3 id="tradeoffs">Tradeoffs<a hidden class="anchor" aria-hidden="true" href="#tradeoffs">#</a></h3>
+<p>There&rsquo;s no true identity-based authorization.  The proxy can&rsquo;t distinguish between legitmate requests from Traefik versus another container. The proxy
+only knows requests coming from particular networks get particular permissions.</p>
+<p>Duplicated infrastructure is another concern.  Each application needs its own proxy instance.  Running three containers that need Docker socket
+access, results in configuring and deploying three separate proxies.</p>
+<p>Policy/filter configuration within the proxy is static and set at deployment time.  It&rsquo;s not possible to dynamically adjust permissions based
+on runtime conditions.</p>
+<p>The Docker API design sneaks through proxy endpoints.  It&rsquo;s not possible to grant access to
+<a href="https://docs.docker.com/reference/api/engine/version/v1.52/#tag/Image/operation/ImageInspect">container labels</a> without granting access to environment
+variables, the latter likely contain application secrets.</p>
+<p>Even with these limitations, socket proxies provide a significant security improvement over direct Docker socket mounts.  Socket proxies enforce
+least privilege access at the API level, which is exactly where the authorization needs to happen.</p>
+<h2 id="whats-next">What&rsquo;s Next?<a hidden class="anchor" aria-hidden="true" href="#whats-next">#</a></h2>
+<p>If you&rsquo;re currently mounting the Docker socket from your containers with <code>:ro</code> consider switching to a socket proxy solution.  The topology
+based approach isn&rsquo;t perfect but it provides Docker API filtering that read only mounts can&rsquo;t.  Yes a socket proxy requires more setup, but it
+provides a real security boundary rather than the appearance of one.</p>
+<p>If you have thoughts on this content, let me know what you think on <a href="https://bsky.app/profile/af9.us">Bluesky</a>.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+
+<ul class="share-buttons">
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://amf3.github.io/">Adam Faris</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

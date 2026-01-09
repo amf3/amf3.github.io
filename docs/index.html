@@ -163,6 +163,21 @@
 
 <article class="first-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">Docker Socket Myths
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>There’s a popular myth in the Docker community. The myth is that it’s possible to mount /var/run/docker.sock with read only options. Even large container projects like Traefik get this wrong.
+Bind mounting the Docker socket with read only options doesn’t work the way one thinks it would. This post will explain how using the &#34;:ro&#34; option when mounting the Docker socket is little more than security theater and to discuss alternatives.
+Please read this post if you’re adding /var/run/docker.sock:/var/run/docker.sock:ro to Docker compose files.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-01-05 12:25:30 -0800 PST'>January 5, 2026</span>&nbsp;·&nbsp;<span>1275 words</span></footer>
+  <a class="entry-link" aria-label="post link to Docker Socket Myths" href="https://amf3.github.io/articles/virtualization/docker_socket/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">Decoupling Compute and Storage
     </h2>
   </header>
@@ -290,20 +305,6 @@ The default format is raw and raw offers the fewest features. It’s just plain 
   <footer class="entry-footer"><span title='2025-04-06 07:41:29 -0400 -0400'>April 6, 2025</span>&nbsp;·&nbsp;<span>1358 words</span></footer>
   <a class="entry-link" aria-label="post link to Tips for working with qemu images" href="https://amf3.github.io/articles/virtualization/qemuimage_tips/"></a>
 </article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">cloud-init troubleshooting
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>I previously wrote an introduction to cloud-init. I’d like to now follow up with a discussion on troubleshooting. cloud-init failures on remote hosts can be challenging. Depending on the failure point, cloud-init may or may not provide clear error indicators. These are methods I use during provisioning issues related to cloud-init.
-Understanding cloud-init execution stages Before continuing, let’s cover some background. cloud-init follows five stages during boot which run sequentially. If a stage completes, output will contain a status that can be used to verify that stage was successful.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2025-03-21 16:28:54 -0400 -0400'>March 21, 2025</span>&nbsp;·&nbsp;<span>909 words</span></footer>
-  <a class="entry-link" aria-label="post link to cloud-init troubleshooting" href="https://amf3.github.io/articles/cloudinit/troubleshooting/"></a>
-</article>
 <footer class="page-footer">
   <nav class="pagination">
     <a class="next" href="https://amf3.github.io/page/2/">Next&nbsp;&nbsp;»
@@ -313,7 +314,7 @@ Understanding cloud-init execution stages Before continuing, let’s cover some 
     </main>
     
 <footer class="footer">
-        <span>&copy; 2025 <a href="https://amf3.github.io/">Adam Faris</a></span> · 
+        <span>&copy; 2026 <a href="https://amf3.github.io/">Adam Faris</a></span> · 
 
     <span>
         Powered by
