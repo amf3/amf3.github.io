@@ -28,5 +28,5 @@ With this site, I'd like to carry on that tradition of sharing ideas and finding
 
 ### How
 
-Feel free to follow me on [Bluesky](https://@amf3.bsky.social) or subscribe to the [RSS feed](https://amf3.github.io/index.xml)
+Feel free to follow me on [Bluesky](https://bsky.app/profile/af9.us) or subscribe to the [RSS feed](https://amf3.github.io/index.xml)
 if you want to be notified about updates to this site.
