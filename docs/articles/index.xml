@@ -6,12 +6,12 @@
     <description>Recent content in articles on Adam Faris</description>
     <generator>Hugo -- 0.152.2</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 28 Jan 2026 16:29:59 -0800</lastBuildDate>
+    <lastBuildDate>Mon, 23 Feb 2026 16:29:59 -0800</lastBuildDate>
     <atom:link href="https://amf3.github.io/articles/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Open Container Image Format</title>
       <link>https://amf3.github.io/articles/virtualization/oci_image/</link>
-      <pubDate>Wed, 28 Jan 2026 16:29:59 -0800</pubDate>
+      <pubDate>Mon, 23 Feb 2026 16:29:59 -0800</pubDate>
       <guid>https://amf3.github.io/articles/virtualization/oci_image/</guid>
       <description>From Local TAR file to Open Container Image</description>
       <content:encoded><![CDATA[<p><img alt="Image of shipping containers on the pier" loading="lazy" src="/articles/virtualization/oci_image/assets/containers.jpg"></p>
