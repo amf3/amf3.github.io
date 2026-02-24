@@ -218,7 +218,7 @@ empty root password is much easier to use.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img convert -f qcow2 -O nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2 alpine_cloudinit.raw
 </span></span><span style="display:flex;"><span>% dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>alpine_cloudinit.raw bs<span style="color:#f92672">=</span>1m of<span style="color:#f92672">=</span>/dev/...
 </span></span></code></pre></div><p>With the modified image written to the USB device, you can now boot a physical machine from it. Thanks for sticking with me until
-the end. If you find this content useful, follow me on <a href="https://@amf3.bsky.social">BlueSky social</a> for future announcements.</p>
+the end. If you find this content useful, follow me on <a href="https://bsky.app/profile/af9.us">BlueSky social</a> for future announcements.</p>
 ]]></content:encoded>
     </item>
   </channel>

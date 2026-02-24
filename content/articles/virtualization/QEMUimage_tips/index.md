@@ -302,5 +302,5 @@ Finally, convert our modified cloud image from qcow2 format to raw format, then 
 % dd if=alpine_cloudinit.raw bs=1m of=/dev/...
 ```
 
-With the modified image written to the USB device, you can now boot a physical machine from it. Thanks for sticking with me until 
-the end. If you find this content useful, follow me on [BlueSky social](https://@amf3.bsky.social) for future announcements.
+With the modified image written to the USB device, you can now boot a physical machine from it. Thanks for sticking with me until
+the end. If you find this content useful, follow me on [BlueSky social](https://bsky.app/profile/af9.us) for future announcements.
