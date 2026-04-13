@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Containers on Adam Faris</title>
+    <link>https://amf3.github.io/categories/containers/</link>
+    <description>Recent content in Containers on Adam Faris</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 12 Apr 2026 18:23:15 +0000</lastBuildDate>
+    <atom:link href="https://amf3.github.io/categories/containers/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hidden Systems in Base Images</title>
+      <link>https://amf3.github.io/articles/virtualization/base_image/</link>
+      <pubDate>Sun, 12 Apr 2026 18:23:15 +0000</pubDate>
+      <guid>https://amf3.github.io/articles/virtualization/base_image/</guid>
+      <description>You&amp;#39;re not choosing an image. You&amp;#39;re inheriting a system.</description>
+      <content:encoded><![CDATA[<p><img alt="Image of a near empty cargo ship" loading="lazy" src="/articles/virtualization/base_image/assets/base_ship.jpeg"></p>
+<p>Many container images start with <code>FROM python:3.x</code>. What gets imported is not only Python, its a preassembled filesystem
+of decisions you didn&rsquo;t make.  Understanding what&rsquo;s inherited from the base image is key to building container images.  Instead of implicitly trusting
+what&rsquo;s included with the base image, think of the image as a collection of artifacts that are intentionally assembled.</p>
+<h2 id="large-container-images">Large Container Images</h2>
+<p>The <a href="https://hub.docker.com/_/python">official Python</a> container image hosted on Docker Hub is a great demonstration of inheriting unknown layers.
+For Linux environments, the Python image comes with either a Debian or Alpine base image. Both base images come with additional applications
+not required by Python.</p>
+<p>The Debian based image ships with a Perl interpreter.  Yes, you read that correctly.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span> % docker run --rm -it python:3.14.3-trixie /bin/perl -v 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>This is perl 5, version 40, subversion <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>v5.40.1<span style="color:#f92672">)</span> built <span style="color:#66d9ef">for</span> aarch64-linux-gnu-thread-multi
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>with <span style="color:#ae81ff">48</span> registered patches, see perl -V <span style="color:#66d9ef">for</span> more detail<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Copyright 1987-2025, Larry Wall
+</span></span></code></pre></div><p>Perl isn’t there for Python.  It’s a legacy dependency inherited from Debian Trixie.  To be clear, Perl is not a Python dependency or requirement.</p>
+<p>The Python container image built on Alpine is better focused, but still includes tools like <code>showkey</code>, <code>lsusb</code>, and <code>chvt</code>. These utilities interact with
+physical keyboards, USB buses, and Linux virtual consoles.  Things that don&rsquo;t exist in the typical container environment.</p>
+<p>Both images demonstrate inheritance issues that can be avoided with declarative builds.</p>
+<h2 id="curated-run-times">Curated Run times</h2>
+<p>Container images from either the <a href="https://github.com/GoogleContainerTools/distroless">Distroless</a> or
+<a href="https://github.com/docker-hardened-images">Docker Hardened Image</a> (DHI) projects provide a curated runtime by starting with a complete distribution and
+aggressively remove shells, package managers, development tools, and unnecessary services.</p>
+<p>However while exploring the <a href="https://hub.docker.com/hardened-images/catalog/dhi/python">DHI Python 3.14</a> image, I found remnants of the package manager,
+orphaned binaries, and scripts referencing nonexistent shells.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span> % ls -l rootfs/bin/gawk
+</span></span><span style="display:flex;"><span>-rwxr-xr-x  <span style="color:#ae81ff">1</span> adam  staff  <span style="color:#ae81ff">795024</span> Oct <span style="color:#ae81ff">29</span>  <span style="color:#ae81ff">2024</span> rootfs/bin/gawk
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% file rootfs/sbin/*
+</span></span><span style="display:flex;"><span>rootfs/sbin/dpkg-preconfigure:      Perl script text executable
+</span></span><span style="display:flex;"><span>rootfs/sbin/dpkg-reconfigure:       Perl script text executable
+</span></span><span style="display:flex;"><span>rootfs/sbin/update-ca-certificates: POSIX shell script text executable, ASCII text
+</span></span></code></pre></div><p>The concern isn&rsquo;t that these artifacts are dangerous, it&rsquo;s that they exist in the container without intent.  Smaller images are often seen as better, but
+size is actually a side effect.  The goal is being able to explain every artifact that ships in your container.</p>
+<h2 id="declarative-image-composition">Declarative Image Composition</h2>
+<p>Base images provide a working system but also provide a moving target.  When using <code>FROM python:3.x</code> you&rsquo;re not only choosing Python, you&rsquo;re accepting a
+snapshot of someone else&rsquo;s system at a point in time. The snapshot includes everything needed to make the image function, but the contents are undeclared. An
+image rebuild tomorrow could produce a different result, even if your Dockerfile hasn&rsquo;t changed.</p>
+<p>Declarative composition inverts this process.  Instead of inheriting a filesystem, an image is assembled from known artifacts.  A Python runtime becomes the
+output of a build pipeline that compiles from downloaded source.  This is similar to building packages, but instead each file in the image can be traced
+back to a build step. When something changes inside the container image it&rsquo;s because an input changed.  The result is not a smaller image, but one
+that is explainable as the content is defined.</p>
+<p>At first creating an image in this manner seems simple.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">scratch</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> python-rootfs/ /<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;/usr/bin/python3&#34;</span>]<span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>In practice the Python runtime is not a single artifact.  It needs dynamically linked libraries, a runtime loader, and a full standard library. A Python
+3.14 build can easily produce hundreds of megabytes under <code>/usr/lib</code>.  The base image hides dependency complexities. Declarative builds expose dependencies
+and trade convenience for control over what ships inside the container.  A follow up article will assemble a container runtime from a declarative
+build pipeline using Buildroot.</p>
+<h2 id="the-developer-experience">The Developer Experience</h2>
+<p>Developers want familiar environments that are easy to debug, have working defaults, and are simple to update.  A container built against a full distro is going
+to include a package manager, a shell, and a familiar set of tools. If something breaks, it&rsquo;s simple to docker exec into the container and install a debugging utility
+to inspect the running container.</p>
+<p>Declarative images change this workflow but not in the way minimal or distroless images behave.  Instead of removing tools, the goal is to make their presence
+intentional.  If a shell is required for debugging, it&rsquo;s included as part of the image.  The shell isn&rsquo;t inherited from a base image, but is
+added as a known artifact with defined content and dependencies.  This shifts the developer experience from modifying a running container to defining what
+the container should contain ahead of time.</p>
+<p>Security typically fails at adoption, not in design.  Developers will route around tooling if processes are opaque or the debugging workflow fails.
+A declarative approach only works if the intent behind each component is understood by the people maintaining the image.</p>
+<h2 id="trade-offs-and-reality">Trade offs and Reality</h2>
+<p>Base images optimize for convenience and familiarity, while declarative composition optimizes for control and transparency.  Neither approach is
+universally better.  The choice depends on whether simplicity or control is the primary goal.  Building images from scratch is less
+about minimalism and more about making dependencies explicit.  The challenge is not in removing components, but defining the complete runtime
+in a way that explains why every file exists.</p>
+]]></content:encoded>
+    </item>
+  </channel>
+</rss>

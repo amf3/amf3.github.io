@@ -171,6 +171,21 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">Hidden Systems in Base Images
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>
+Many container images start with FROM python:3.x. What gets imported is not only Python, its a preassembled filesystem of decisions you didn’t make. Understanding what’s inherited from the base image is key to building container images. Instead of implicitly trusting what’s included with the base image, think of the image as a collection of artifacts that are intentionally assembled.
+Large Container Images The official Python container image hosted on Docker Hub is a great demonstration of inheriting unknown layers. For Linux environments, the Python image comes with either a Debian or Alpine base image. Both base images come with additional applications not required by Python.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-04-12 18:23:15 +0000 UTC'>April 12, 2026</span>&nbsp;·&nbsp;<span>860 words</span></footer>
+  <a class="entry-link" aria-label="post link to Hidden Systems in Base Images" href="https://amf3.github.io/articles/virtualization/base_image/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">Open Container Image Format
     </h2>
   </header>
@@ -295,23 +310,6 @@ Haystack Overview There are several components mentioned in the original Haystac
   </div>
   <footer class="entry-footer"><span title='2025-05-30 16:46:07 -0700 PDT'>May 30, 2025</span>&nbsp;·&nbsp;<span>1553 words</span></footer>
   <a class="entry-link" aria-label="post link to Using Tar Files as Object Store Storage" href="https://amf3.github.io/articles/storage/tar_objectstore/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Virtual Router Lab on macOS with QEMU
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>UTM and Multipass are great apps for virtualization on macOS.
-But I wanted a lighter-weight approach by invoking QEMU directly. Which meant I needed to understand how QEMU’s networking options interact with the vmnet virtualization API on macOS.
-This becomes especially important when dealing with VM-to-VM connections, network isolation, and bridging on macOS.
-In this post, I’ll walk through creating a simple QEMU-based networking lab.
-Set up RouterOS and Alpine Linux VMs using QEMU on macOS Connect VMs with Apple’s Hypervisor vmnet networking APIs Use unified logging to troubleshoot QEMU network issues on macOS Lab Setup Overview The network diagram shows the network topology used in this lab. Both VMs run on on the same macOS host and connected to virtual network interfaces using QEMU’s support for Apple’s vmnet virtualization API.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2025-05-14 00:00:00 +0000 UTC'>May 14, 2025</span>&nbsp;·&nbsp;<span>2097 words</span></footer>
-  <a class="entry-link" aria-label="post link to Virtual Router Lab on macOS with QEMU" href="https://amf3.github.io/articles/virtualization/macos_qemu_networks/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">
