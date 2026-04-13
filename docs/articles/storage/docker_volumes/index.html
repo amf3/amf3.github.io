@@ -12,7 +12,7 @@
 <link rel="canonical" href="https://amf3.github.io/articles/storage/docker_volumes/">
 <meta name="google-site-verification" content="6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E">
 <meta name="msvalidate.01" content="C1E02AC59FE7ECBDB6D9EFB7D5E02B65">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.4b72e7725c68fccaac08b7b94b4bf3724ac8531837c6717dbd3e55b5a23b0117.css" integrity="sha256-S3Lnclxo/MqsCLe5S0vzckrIUxg3xnF9vT5VtaI7ARc=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://amf3.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://amf3.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://amf3.github.io/favicon-32x32.png">
@@ -53,12 +53,6 @@
             }
         }
 
-        @media (prefers-color-scheme: light) {
-            .list::-webkit-scrollbar-thumb {
-                border-color: var(--code-bg);
-            }
-        }
-
     </style>
 </noscript>
 <script>
@@ -90,14 +84,15 @@
   <meta property="og:site_name" content="Adam Faris">
   <meta property="og:title" content="DIY Docker Volume Drivers: What&#39;s Missing">
   <meta property="og:description" content="How to write a simple volume plugin. No root, no FUSE, just HTTP and Go">
-  <meta property="og:locale" content="en-us">
+  <meta property="og:locale" content="en_us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="articles">
     <meta property="article:published_time" content="2025-06-26T22:37:40-07:00">
     <meta property="article:modified_time" content="2025-06-26T22:37:40-07:00">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="DIY Docker Volume Drivers: What&#39;s Missing">
-<meta name="twitter:description" content="How to write a simple volume plugin. No root, no FUSE, just HTTP and Go">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="DIY Docker Volume Drivers: What&#39;s Missing">
+  <meta name="twitter:description" content="How to write a simple volume plugin. No root, no FUSE, just HTTP and Go">
 
 
 <script type="application/ld+json">
@@ -152,17 +147,17 @@
 </head>
 <body id="top">
     <header class="header">
-    <nav class="nav">
+    <nav class="header-nav">
         <div class="logo">
             <a href="https://amf3.github.io/" accesskey="h" title="Adam Faris (Alt + H)">Adam Faris</a>
             <div class="logo-switches">
-                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
-                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
-                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
                         <circle cx="12" cy="12" r="5"></circle>
@@ -178,7 +173,7 @@
                 </button>
             </div>
         </div>
-        <ul id="menu">
+        <ul id="menu" class="menu">
             <li>
                 <a href="https://amf3.github.io/search/" title="search (Alt &#43; /)" accesskey=/>
                     <span>search</span>
@@ -201,7 +196,13 @@
 
 <article class="post-single">
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://amf3.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://amf3.github.io/articles/">articles</a></div>
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://amf3.github.io/'>Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://amf3.github.io/articles/">articles</a></nav>
     <h1 class="post-title entry-hint-parent">
       DIY Docker Volume Drivers: What&#39;s Missing
     </h1>
@@ -211,44 +212,42 @@
     <div class="post-meta"><span title='2025-06-26 22:37:40 -0700 PDT'>June 26, 2025</span>&nbsp;·&nbsp;<span>1952 words</span>
 
 </div>
-  </header> <div class="toc">
-    <details >
-        <summary accesskey="c" title="(Alt + C)">
-            <span class="details">Table of Contents</span>
-        </summary>
+  </header> <details class="toc" >
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">Table of Contents</span>
+    </summary>
 
-        <div class="inner"><ul>
-                <li>
-                    <a href="#docker-storage-overview" aria-label="Docker Storage Overview">Docker Storage Overview</a></li>
-                <li>
-                    <a href="#whats-missing" aria-label="What&rsquo;s Missing">What&rsquo;s Missing</a></li>
-                <li>
-                    <a href="#the-diy-approach" aria-label="The DIY Approach">The DIY Approach</a></li>
-                <li>
-                    <a href="#my-interest-in-docker-plugins" aria-label="My Interest in Docker Plugins">My Interest in Docker Plugins</a></li>
-                <li>
-                    <a href="#a-simple-plugin" aria-label="A simple plugin">A simple plugin</a><ul>
-                        
-                <li>
-                    <a href="#what-didnt-go-smoothly" aria-label="What Didn&rsquo;t Go Smoothly">What Didn&rsquo;t Go Smoothly</a></li>
-                <li>
-                    <a href="#build-steps" aria-label="Build Steps">Build Steps</a></li>
-                <li>
-                    <a href="#plugin-sdk-and-api-documentation" aria-label="Plugin SDK and API documentation">Plugin SDK and API documentation</a></li>
-                <li>
-                    <a href="#code-highlights" aria-label="Code Highlights">Code Highlights</a></li>
-                <li>
-                    <a href="#build-walkthrough" aria-label="Build WalkThrough">Build WalkThrough</a></li></ul>
-                </li>
-                <li>
-                    <a href="#closing" aria-label="Closing">Closing</a>
-                </li>
-            </ul>
-        </div>
-    </details>
-</div>
+    <div class="inner"><ul>
+            <li>
+                <a href="#docker-storage-overview" aria-label="Docker Storage Overview">Docker Storage Overview</a></li>
+            <li>
+                <a href="#whats-missing" aria-label="What&rsquo;s Missing">What&rsquo;s Missing</a></li>
+            <li>
+                <a href="#the-diy-approach" aria-label="The DIY Approach">The DIY Approach</a></li>
+            <li>
+                <a href="#my-interest-in-docker-plugins" aria-label="My Interest in Docker Plugins">My Interest in Docker Plugins</a></li>
+            <li>
+                <a href="#a-simple-plugin" aria-label="A simple plugin">A simple plugin</a><ul>
+                    
+            <li>
+                <a href="#what-didnt-go-smoothly" aria-label="What Didn&rsquo;t Go Smoothly">What Didn&rsquo;t Go Smoothly</a></li>
+            <li>
+                <a href="#build-steps" aria-label="Build Steps">Build Steps</a></li>
+            <li>
+                <a href="#plugin-sdk-and-api-documentation" aria-label="Plugin SDK and API documentation">Plugin SDK and API documentation</a></li>
+            <li>
+                <a href="#code-highlights" aria-label="Code Highlights">Code Highlights</a></li>
+            <li>
+                <a href="#build-walkthrough" aria-label="Build WalkThrough">Build WalkThrough</a></li></ul>
+            </li>
+            <li>
+                <a href="#closing" aria-label="Closing">Closing</a>
+            </li>
+        </ul>
+    </div>
+</details>
 
-  <div class="post-content"><p>With Docker, it’s not always obvious what storage options exist beyond the built-in <strong>local</strong> volume driver or a traditional <strong>bind mount</strong>.
+  <div class="post-content md-content"><p>With Docker, it’s not always obvious what storage options exist beyond the built-in <strong>local</strong> volume driver or a traditional <strong>bind mount</strong>.
 Exploring Docker volume drivers often turns up archived GitHub repositories or commercially backed plugins tied to specific cloud storage products. The volume
 ecosystem is especially limited for on-premise storage, and many plugins require more privileges than you&rsquo;d expect.</p>
 <p>In this post, I’ll cover how Docker handles volume storage under the hood. I’ll also walkthrough how to create a volume plugin that interacts with remote
@@ -529,9 +528,11 @@ leave a comment.</p>
         <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
     </span>
 </footer>
-<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
-        <path d="M12 6H0l6-6z" />
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
     </svg>
 </a>
 
@@ -570,14 +571,13 @@ leave a comment.</p>
 
 </script>
 <script>
-    var mybutton = document.getElementById("top-link");
+    var toplink = document.getElementById("top-link");
     window.onscroll = function () {
-        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
-            mybutton.style.visibility = "visible";
-            mybutton.style.opacity = "1";
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
         } else {
-            mybutton.style.visibility = "hidden";
-            mybutton.style.opacity = "0";
+            toplink.classList.add("hidden");
         }
     };
 

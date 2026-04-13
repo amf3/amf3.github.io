@@ -1,9 +1,9 @@
 diff --git a/.github/workflows/gh-pages.yml b/.github/workflows/gh-pages.yml
 deleted file mode 100644
-index 7dc6f1c..0000000
+index 8378a37..0000000
 --- a/.github/workflows/gh-pages.yml
 +++ /dev/null
-@@ -1,77 +0,0 @@
+@@ -1,82 +0,0 @@
 -name: Deploy Hugo PaperMod Demo to Pages
 -
 -on:
@@ -21,7 +21,7 @@ index 7dc6f1c..0000000
 -      hugoVersion:
 -        description: "Hugo Version"
 -        required: false
--        default: "0.146.0"
+-        default: "latest"
 -
 -# Allow one concurrent deployment
 -concurrency:
@@ -33,19 +33,21 @@ index 7dc6f1c..0000000
 -  run:
 -    shell: bash
 -
--# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
--permissions:
--  contents: read
--  pages: write
--  id-token: write
--
 -jobs:
 -  # Build job
 -  build:
+-    permissions:
+-      contents: read
 -    runs-on: ubuntu-latest
 -    env:
--      HUGO_VERSION: ${{ github.event.inputs.hugoVersion || '0.146.0' }}
+-      HUGO_VERSION: ${{ github.event.inputs.hugoVersion || 'latest' }}
 -    steps:
+-      - name: Resolve Hugo version
+-        run: |
+-          if [ "${HUGO_VERSION}" = "latest" ]; then
+-            HUGO_VERSION=$(curl -s https://api.github.com/repos/gohugoio/hugo/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+-            echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
+-          fi
 -      - name: Install Hugo CLI
 -        run: |
 -          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_linux-amd64.deb \
@@ -72,6 +74,9 @@ index 7dc6f1c..0000000
 -          path: ./public
 -  # Deployment job
 -  deploy:
+-    permissions:
+-      pages: write
+-      id-token: write
 -    environment:
 -      name: github-pages
 -      url: ${{ steps.deployment.outputs.page_url }}

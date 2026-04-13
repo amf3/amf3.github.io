@@ -1,6 +1,6 @@
 diff --git a/.github/PULL_REQUEST_TEMPLATE.md b/.github/PULL_REQUEST_TEMPLATE.md
 deleted file mode 100644
-index 673d1c4..0000000
+index dcc52d6..0000000
 --- a/.github/PULL_REQUEST_TEMPLATE.md
 +++ /dev/null
 @@ -1,44 +0,0 @@
@@ -32,7 +32,7 @@ index 673d1c4..0000000
 -**Was the change discussed in an issue or in the Discussions before?**
 -
 -<!--
--Link issues and relevant Discussions posts here.
+-Link issues and relevant Discussions posts here. Please create an issue or start a Discussion before opening a PR if you have not done so already.
 -
 -If this PR resolves an issue on GitHub, use "Closes #1234" so that the issue
 -is closed automatically when this PR is merged.
