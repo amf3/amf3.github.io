@@ -52,5 +52,5 @@ hugo-serve: submodule-check
 # Run Hugo for production
 hugo-publish: submodule-check
 	@echo "Generating HTML for Production"
-	go tool hugo
+	go tool hugo build
 
