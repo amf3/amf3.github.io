@@ -1,11 +1,11 @@
 ---
-title: Hidden dependencies in base images.
-description: You're not choosing a image, you inherit a system
-date: 2026-04-11T00:36:15-08:00
+title: Hidden Systems in Base Images
+description: You're not choosing an image. You're inheriting a system.
+date: 2026-04-12T18:23:15-08:00
 draft: false
 searchHidden: false
 showtoc: true
-categories: [containers, cloud, virtualization]
+categories: [containers, cloud]
 images: ["./assets/base_ship"]
 ---
 
