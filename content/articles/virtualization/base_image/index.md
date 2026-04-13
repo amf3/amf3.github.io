@@ -1,7 +1,7 @@
 ---
 title: Hidden Systems in Base Images
 description: You're not choosing an image. You're inheriting a system.
-date: 2026-04-12T18:23:15-08:00
+date: 2026-04-12T18:23:15
 draft: false
 searchHidden: false
 showtoc: true

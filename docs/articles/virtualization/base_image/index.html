@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Hidden Systems in Base Images | Adam Faris</title>
+<meta name="keywords" content="">
+<meta name="description" content="You&#39;re not choosing an image. You&#39;re inheriting a system.">
+<meta name="author" content="">
+<link rel="canonical" href="https://amf3.github.io/articles/virtualization/base_image/">
+<meta name="google-site-verification" content="6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E">
+<meta name="msvalidate.01" content="C1E02AC59FE7ECBDB6D9EFB7D5E02B65">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.4b72e7725c68fccaac08b7b94b4bf3724ac8531837c6717dbd3e55b5a23b0117.css" integrity="sha256-S3Lnclxo/MqsCLe5S0vzckrIUxg3xnF9vT5VtaI7ARc=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://amf3.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://amf3.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://amf3.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://amf3.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://amf3.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://amf3.github.io/articles/virtualization/base_image/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-MKR06D6KGD"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-MKR06D6KGD');
+        }
+      </script><meta property="og:url" content="https://amf3.github.io/articles/virtualization/base_image/">
+  <meta property="og:site_name" content="Adam Faris">
+  <meta property="og:title" content="Hidden Systems in Base Images">
+  <meta property="og:description" content="You&#39;re not choosing an image. You&#39;re inheriting a system.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="articles">
+    <meta property="article:published_time" content="2026-04-12T18:23:15+00:00">
+    <meta property="article:modified_time" content="2026-04-12T18:23:15+00:00">
+      <meta property="og:image" content="https://amf3.github.io/assets/base_ship">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://amf3.github.io/assets/base_ship">
+  <meta name="twitter:title" content="Hidden Systems in Base Images">
+  <meta name="twitter:description" content="You&#39;re not choosing an image. You&#39;re inheriting a system.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "articles",
+      "item": "https://amf3.github.io/articles/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Hidden Systems in Base Images",
+      "item": "https://amf3.github.io/articles/virtualization/base_image/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Hidden Systems in Base Images",
+  "name": "Hidden Systems in Base Images",
+  "description": "You're not choosing an image. You're inheriting a system.",
+  "keywords": [
+    
+  ],
+  "articleBody": "\nMany container images start with FROM python:3.x. What gets imported is not only Python, its a preassembled filesystem of decisions you didn’t make. Understanding what’s inherited from the base image is key to building container images. Instead of implicitly trusting what’s included with the base image, think of the image as a collection of artifacts that are intentionally assembled.\nLarge Container Images The official Python container image hosted on Docker Hub is a great demonstration of inheriting unknown layers. For Linux environments, the Python image comes with either a Debian or Alpine base image. Both base images come with additional applications not required by Python.\nThe Debian based image ships with a Perl interpreter. Yes, you read that correctly.\n% docker run --rm -it python:3.14.3-trixie /bin/perl -v This is perl 5, version 40, subversion 1 (v5.40.1) built for aarch64-linux-gnu-thread-multi (with 48 registered patches, see perl -V for more detail) Copyright 1987-2025, Larry Wall Perl isn’t there for Python. It’s a legacy dependency inherited from Debian Trixie. To be clear, Perl is not a Python dependency or requirement.\nThe Python container image built on Alpine is better focused, but still includes tools like showkey, lsusb, and chvt. These utilities interact with physical keyboards, USB buses, and Linux virtual consoles. Things that don’t exist in the typical container environment.\nBoth images demonstrate inheritance issues that can be avoided with declarative builds.\nCurated Run times Container images from either the Distroless or Docker Hardened Image (DHI) projects provide a curated runtime by starting with a complete distribution and aggressively remove shells, package managers, development tools, and unnecessary services.\nHowever while exploring the DHI Python 3.14 image, I found remnants of the package manager, orphaned binaries, and scripts referencing nonexistent shells.\n% ls -l rootfs/bin/gawk -rwxr-xr-x 1 adam staff 795024 Oct 29 2024 rootfs/bin/gawk % file rootfs/sbin/* rootfs/sbin/dpkg-preconfigure: Perl script text executable rootfs/sbin/dpkg-reconfigure: Perl script text executable rootfs/sbin/update-ca-certificates: POSIX shell script text executable, ASCII text The concern isn’t that these artifacts are dangerous, it’s that they exist in the container without intent. Smaller images are often seen as better, but size is actually a side effect. The goal is being able to explain every artifact that ships in your container.\nDeclarative Image Composition Base images provide a working system but also provide a moving target. When using FROM python:3.x you’re not only choosing Python, you’re accepting a snapshot of someone else’s system at a point in time. The snapshot includes everything needed to make the image function, but the contents are undeclared. An image rebuild tomorrow could produce a different result, even if your Dockerfile hasn’t changed.\nDeclarative composition inverts this process. Instead of inheriting a filesystem, an image is assembled from known artifacts. A Python runtime becomes the output of a build pipeline that compiles from downloaded source. This is similar to building packages, but instead each file in the image can be traced back to a build step. When something changes inside the container image it’s because an input changed. The result is not a smaller image, but one that is explainable as the content is defined.\nAt first creating an image in this manner seems simple.\nFROM scratch COPY python-rootfs/ / CMD [\"/usr/bin/python3\"] In practice the Python runtime is not a single artifact. It needs dynamically linked libraries, a runtime loader, and a full standard library. A Python 3.14 build can easily produce hundreds of megabytes under /usr/lib. The base image hides dependency complexities. Declarative builds expose dependencies and trade convenience for control over what ships inside the container. A follow up article will assemble a container runtime from a declarative build pipeline using Buildroot.\nThe Developer Experience Developers want familiar environments that are easy to debug, have working defaults, and are simple to update. A container built against a full distro is going to include a package manager, a shell, and a familiar set of tools. If something breaks, it’s simple to docker exec into the container and install a debugging utility to inspect the running container.\nDeclarative images change this workflow but not in the way minimal or distroless images behave. Instead of removing tools, the goal is to make their presence intentional. If a shell is required for debugging, it’s included as part of the image. The shell isn’t inherited from a base image, but is added as a known artifact with defined content and dependencies. This shifts the developer experience from modifying a running container to defining what the container should contain ahead of time.\nSecurity typically fails at adoption, not in design. Developers will route around tooling if processes are opaque or the debugging workflow fails. A declarative approach only works if the intent behind each component is understood by the people maintaining the image.\nTrade offs and Reality Base images optimize for convenience and familiarity, while declarative composition optimizes for control and transparency. Neither approach is universally better. The choice depends on whether simplicity or control is the primary goal. Building images from scratch is less about minimalism and more about making dependencies explicit. The challenge is not in removing components, but defining the complete runtime in a way that explains why every file exists.\n",
+  "wordCount" : "860",
+  "inLanguage": "en",
+  "image": "https://amf3.github.io/assets/base_ship","datePublished": "2026-04-12T18:23:15Z",
+  "dateModified": "2026-04-12T18:23:15Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://amf3.github.io/articles/virtualization/base_image/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Adam Faris",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://amf3.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="https://amf3.github.io/" accesskey="h" title="Adam Faris (Alt + H)">Adam Faris</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="https://amf3.github.io/search/" title="search (Alt &#43; /)" accesskey=/>
+                    <span>search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/articles/" title="articles">
+                    <span>articles</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/about/" title="about">
+                    <span>about</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://amf3.github.io/'>Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://amf3.github.io/articles/">articles</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Hidden Systems in Base Images
+    </h1>
+    <div class="post-description">
+      You&#39;re not choosing an image. You&#39;re inheriting a system.
+    </div>
+    <div class="post-meta"><span title='2026-04-12 18:23:15 +0000 UTC'>April 12, 2026</span>&nbsp;·&nbsp;<span>860 words</span>
+
+</div>
+  </header> <details class="toc" >
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">Table of Contents</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#large-container-images" aria-label="Large Container Images">Large Container Images</a></li>
+            <li>
+                <a href="#curated-run-times" aria-label="Curated Run times">Curated Run times</a></li>
+            <li>
+                <a href="#declarative-image-composition" aria-label="Declarative Image Composition">Declarative Image Composition</a></li>
+            <li>
+                <a href="#the-developer-experience" aria-label="The Developer Experience">The Developer Experience</a></li>
+            <li>
+                <a href="#trade-offs-and-reality" aria-label="Trade offs and Reality">Trade offs and Reality</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+  <div class="post-content md-content"><p><img alt="Image of a near empty cargo ship" loading="lazy" src="/articles/virtualization/base_image/assets/base_ship.jpeg"></p>
+<p>Many container images start with <code>FROM python:3.x</code>. What gets imported is not only Python, its a preassembled filesystem
+of decisions you didn&rsquo;t make.  Understanding what&rsquo;s inherited from the base image is key to building container images.  Instead of implicitly trusting
+what&rsquo;s included with the base image, think of the image as a collection of artifacts that are intentionally assembled.</p>
+<h2 id="large-container-images">Large Container Images<a hidden class="anchor" aria-hidden="true" href="#large-container-images">#</a></h2>
+<p>The <a href="https://hub.docker.com/_/python">official Python</a> container image hosted on Docker Hub is a great demonstration of inheriting unknown layers.
+For Linux environments, the Python image comes with either a Debian or Alpine base image. Both base images come with additional applications
+not required by Python.</p>
+<p>The Debian based image ships with a Perl interpreter.  Yes, you read that correctly.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span> % docker run --rm -it python:3.14.3-trixie /bin/perl -v 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>This is perl 5, version 40, subversion <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>v5.40.1<span style="color:#f92672">)</span> built <span style="color:#66d9ef">for</span> aarch64-linux-gnu-thread-multi
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>with <span style="color:#ae81ff">48</span> registered patches, see perl -V <span style="color:#66d9ef">for</span> more detail<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Copyright 1987-2025, Larry Wall
+</span></span></code></pre></div><p>Perl isn’t there for Python.  It’s a legacy dependency inherited from Debian Trixie.  To be clear, Perl is not a Python dependency or requirement.</p>
+<p>The Python container image built on Alpine is better focused, but still includes tools like <code>showkey</code>, <code>lsusb</code>, and <code>chvt</code>. These utilities interact with
+physical keyboards, USB buses, and Linux virtual consoles.  Things that don&rsquo;t exist in the typical container environment.</p>
+<p>Both images demonstrate inheritance issues that can be avoided with declarative builds.</p>
+<h2 id="curated-run-times">Curated Run times<a hidden class="anchor" aria-hidden="true" href="#curated-run-times">#</a></h2>
+<p>Container images from either the <a href="https://github.com/GoogleContainerTools/distroless">Distroless</a> or
+<a href="https://github.com/docker-hardened-images">Docker Hardened Image</a> (DHI) projects provide a curated runtime by starting with a complete distribution and
+aggressively remove shells, package managers, development tools, and unnecessary services.</p>
+<p>However while exploring the <a href="https://hub.docker.com/hardened-images/catalog/dhi/python">DHI Python 3.14</a> image, I found remnants of the package manager,
+orphaned binaries, and scripts referencing nonexistent shells.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span> % ls -l rootfs/bin/gawk
+</span></span><span style="display:flex;"><span>-rwxr-xr-x  <span style="color:#ae81ff">1</span> adam  staff  <span style="color:#ae81ff">795024</span> Oct <span style="color:#ae81ff">29</span>  <span style="color:#ae81ff">2024</span> rootfs/bin/gawk
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% file rootfs/sbin/*
+</span></span><span style="display:flex;"><span>rootfs/sbin/dpkg-preconfigure:      Perl script text executable
+</span></span><span style="display:flex;"><span>rootfs/sbin/dpkg-reconfigure:       Perl script text executable
+</span></span><span style="display:flex;"><span>rootfs/sbin/update-ca-certificates: POSIX shell script text executable, ASCII text
+</span></span></code></pre></div><p>The concern isn&rsquo;t that these artifacts are dangerous, it&rsquo;s that they exist in the container without intent.  Smaller images are often seen as better, but
+size is actually a side effect.  The goal is being able to explain every artifact that ships in your container.</p>
+<h2 id="declarative-image-composition">Declarative Image Composition<a hidden class="anchor" aria-hidden="true" href="#declarative-image-composition">#</a></h2>
+<p>Base images provide a working system but also provide a moving target.  When using <code>FROM python:3.x</code> you&rsquo;re not only choosing Python, you&rsquo;re accepting a
+snapshot of someone else&rsquo;s system at a point in time. The snapshot includes everything needed to make the image function, but the contents are undeclared. An
+image rebuild tomorrow could produce a different result, even if your Dockerfile hasn&rsquo;t changed.</p>
+<p>Declarative composition inverts this process.  Instead of inheriting a filesystem, an image is assembled from known artifacts.  A Python runtime becomes the
+output of a build pipeline that compiles from downloaded source.  This is similar to building packages, but instead each file in the image can be traced
+back to a build step. When something changes inside the container image it&rsquo;s because an input changed.  The result is not a smaller image, but one
+that is explainable as the content is defined.</p>
+<p>At first creating an image in this manner seems simple.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">scratch</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> python-rootfs/ /<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;/usr/bin/python3&#34;</span>]<span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>In practice the Python runtime is not a single artifact.  It needs dynamically linked libraries, a runtime loader, and a full standard library. A Python
+3.14 build can easily produce hundreds of megabytes under <code>/usr/lib</code>.  The base image hides dependency complexities. Declarative builds expose dependencies
+and trade convenience for control over what ships inside the container.  A follow up article will assemble a container runtime from a declarative
+build pipeline using Buildroot.</p>
+<h2 id="the-developer-experience">The Developer Experience<a hidden class="anchor" aria-hidden="true" href="#the-developer-experience">#</a></h2>
+<p>Developers want familiar environments that are easy to debug, have working defaults, and are simple to update.  A container built against a full distro is going
+to include a package manager, a shell, and a familiar set of tools. If something breaks, it&rsquo;s simple to docker exec into the container and install a debugging utility
+to inspect the running container.</p>
+<p>Declarative images change this workflow but not in the way minimal or distroless images behave.  Instead of removing tools, the goal is to make their presence
+intentional.  If a shell is required for debugging, it&rsquo;s included as part of the image.  The shell isn&rsquo;t inherited from a base image, but is
+added as a known artifact with defined content and dependencies.  This shifts the developer experience from modifying a running container to defining what
+the container should contain ahead of time.</p>
+<p>Security typically fails at adoption, not in design.  Developers will route around tooling if processes are opaque or the debugging workflow fails.
+A declarative approach only works if the intent behind each component is understood by the people maintaining the image.</p>
+<h2 id="trade-offs-and-reality">Trade offs and Reality<a hidden class="anchor" aria-hidden="true" href="#trade-offs-and-reality">#</a></h2>
+<p>Base images optimize for convenience and familiarity, while declarative composition optimizes for control and transparency.  Neither approach is
+universally better.  The choice depends on whether simplicity or control is the primary goal.  Building images from scratch is less
+about minimalism and more about making dependencies explicit.  The challenge is not in removing components, but defining the complete runtime
+in a way that explains why every file exists.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+
+<ul class="share-buttons">
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://amf3.github.io/">Adam Faris</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

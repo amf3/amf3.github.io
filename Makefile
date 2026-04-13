@@ -25,6 +25,10 @@ submodule-check:
 	@echo "OK: No unexpected .github directory."
 
 # Apply patches from patch directory to PaperMod theme
+# To create patch, 
+#      1) cd to themes/PaperMod directory, git rm ./file.yaml.
+#      2) run git diff --cached > ../../patches/PaperMod/00n_patch-name.patch
+# 	   3) run `make submodule-reset` to remove any module changes and repeat for each patch to create
 submodule-patch: submodule-reset
 	@echo "Applying patches to $(THEME_DIR)..."
 	@cd $(THEME_DIR) && \
