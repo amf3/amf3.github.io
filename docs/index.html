@@ -157,6 +157,21 @@
 
 <article class="first-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">Declarative Builds
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>I previously described how I think container base images should be built. This post turns that idea into a working example.
+Usually a container image starts with something like FROM: python:3.x or FROM debian:bookworm-slim. What gets pulled in is more than just a runtime. It’s an entire filesystem assembled by an upstream distribution.
+The filesystem often includes tools and binaries that aren’t required for the application. They’re not necessarily harmful, but they are unexplained. When a container image includes a Perl interpreter, USB utilities, or terminal tooling that the application never uses, it raises a simple question. Why is that there?
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-04-17 23:20:00 +0000 UTC'>April 17, 2026</span>&nbsp;·&nbsp;<span>1123 words</span></footer>
+  <a class="entry-link" aria-label="post link to Declarative Builds" href="https://amf3.github.io/articles/virtualization/declarative_builds/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">Hidden Systems in Base Images
     </h2>
   </header>
@@ -282,20 +297,6 @@ In this post, I’ll cover how Docker handles volume storage under the hood. I�
   </div>
   <footer class="entry-footer"><span title='2025-06-26 22:37:40 -0700 PDT'>June 26, 2025</span>&nbsp;·&nbsp;<span>1952 words</span></footer>
   <a class="entry-link" aria-label="post link to DIY Docker Volume Drivers: What&#39;s Missing" href="https://amf3.github.io/articles/storage/docker_volumes/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Using Tar Files as Object Store Storage
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>I’m looking at how object storage systems manage data on disk. Especially the idea of using append only archives with an index for fast retrieveal. While reading Facebook’s Haystack design, I noticed similarities to the tar file format and the potential to implement something similar at the local scale.
-Haystack Overview There are several components mentioned in the original Haystack paper, but at the core is the Haystack Store, where end user image files are physically kept. Instead of writing files directly to the filesystem, images are appended to a large file called a volume, which acts as an append-only archive. Each volume is typically capped at around 100 GB and is aligned to 8-byte offsets. Image files within this volume are referred to as needles.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2025-05-30 16:46:07 -0700 PDT'>May 30, 2025</span>&nbsp;·&nbsp;<span>1553 words</span></footer>
-  <a class="entry-link" aria-label="post link to Using Tar Files as Object Store Storage" href="https://amf3.github.io/articles/storage/tar_objectstore/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">
