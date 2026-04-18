@@ -161,7 +161,8 @@
     </h2>
   </header>
   <div class="entry-content">
-    <p>I previously described how I think container base images should be built. This post turns that idea into a working example.
+    <p>
+I previously described how I think container base images should be built. This post turns that idea into a working example.
 Usually a container image starts with something like FROM: python:3.x or FROM debian:bookworm-slim. What gets pulled in is more than just a runtime. It’s an entire filesystem assembled by an upstream distribution.
 The filesystem often includes tools and binaries that aren’t required for the application. They’re not necessarily harmful, but they are unexplained. When a container image includes a Perl interpreter, USB utilities, or terminal tooling that the application never uses, it raises a simple question. Why is that there?
 ...</p>

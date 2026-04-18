@@ -14,7 +14,8 @@
       <pubDate>Fri, 17 Apr 2026 23:20:00 +0000</pubDate>
       <guid>https://amf3.github.io/articles/virtualization/declarative_builds/</guid>
       <description>Demonstrating an Opinionated Build Process for Container Images</description>
-      <content:encoded><![CDATA[<p>I previously described how I think <a href="../base_image/">container base images</a> should be built. This post turns that
+      <content:encoded><![CDATA[<p><img alt="Image of a near cargo ship being loaded with containers" loading="lazy" src="/articles/virtualization/declarative_builds/assets/container_loading.jpeg"></p>
+<p>I previously described how I think <a href="../base_image/">container base images</a> should be built. This post turns that
 idea into a working example.</p>
 <p>Usually a container image starts with something like <code>FROM: python:3.x</code> or <code>FROM debian:bookworm-slim</code>.
 What gets pulled in is more than just a runtime. It&rsquo;s an entire filesystem assembled by an upstream

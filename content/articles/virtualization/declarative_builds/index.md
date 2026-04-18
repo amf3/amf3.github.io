@@ -9,6 +9,8 @@ categories: [containers, cloud]
 images: ["./assets/container_loading.jpeg"]
 ---
 
+![Image of a near cargo ship being loaded with containers](./assets/container_loading.jpeg)
+
 I previously described how I think [container base images](../base_image/) should be built. This post turns that 
 idea into a working example.
 
