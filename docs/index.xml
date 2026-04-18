@@ -6,8 +6,169 @@
     <description>Recent content on Adam Faris</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 12 Apr 2026 18:23:15 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 17 Apr 2026 23:20:00 +0000</lastBuildDate>
     <atom:link href="https://amf3.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Declarative Builds</title>
+      <link>https://amf3.github.io/articles/virtualization/declarative_builds/</link>
+      <pubDate>Fri, 17 Apr 2026 23:20:00 +0000</pubDate>
+      <guid>https://amf3.github.io/articles/virtualization/declarative_builds/</guid>
+      <description>Demonstrating an Opinionated Build Process for Container Images</description>
+      <content:encoded><![CDATA[<p>I previously described how I think <a href="../base_image/">container base images</a> should be built. This post turns that
+idea into a working example.</p>
+<p>Usually a container image starts with something like <code>FROM: python:3.x</code> or <code>FROM debian:bookworm-slim</code>.
+What gets pulled in is more than just a runtime. It&rsquo;s an entire filesystem assembled by an upstream
+distribution.</p>
+<p>The filesystem often includes tools and binaries that aren&rsquo;t required for the application.  They&rsquo;re not
+necessarily harmful, but they are unexplained.  When a container image includes a Perl interpreter,
+USB utilities, or terminal tooling that the application never uses, it raises a simple question.  <em>Why is
+that there?</em></p>
+<p>Minimal and hardened images try to address the question by removing as much as possible after the
+fact.  This helps reduce size and surface area but it doesn&rsquo;t fully solve the problem.  Artifacts in
+the image can still remain without clear intent.</p>
+<p>This post takes a different approach.  Instead of starting with a full image and removing what doesn&rsquo;t
+belong, we start with an empty filesystem and add only what is explicitly required.</p>
+<h2 id="build-overview">Build Overview</h2>
+<p>Instead of asking &ldquo;What should I remove from this image?&rdquo;, we begin by asking &ldquo;What do I need to add for my application to work?&rdquo;. That question inverts current container image builds by starting with an
+empty root filesystem.</p>
+<p>Files or build artifacts, are added only when declared in a manifest or as a discovered ELF dependency.  Existing container tools like Docker buildx or Buildah are still used.</p>
+<p>The root filesystem starts as an empty staging directory, a process reads a manifest file and copies artifacts into the staging directory and exits.  Library dependencies are auto discovered for each
+listed binary at runtime and copied into the staging directory. Container tooling like Docker buildx is then used to convert the staging directory into a container image.</p>
+<h2 id="the-manifest">The Manifest</h2>
+<p>Building the root filesystem starts with the manifest YAML file.  The manifest lists locations of artifacts to include, data to copy, directories and symlinks, to create in the empty root filesystem.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">input</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">backend</span>: <span style="color:#ae81ff">buildroot</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">mode</span>: <span style="color:#ae81ff">staging</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/path/to/buildroot/output/staging</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">binaries</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">BUILDROOT/usr/bin/netcat:/usr/bin/netcat</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">BUILDROOT/usr/sbin/nginx:/usr/sbin/nginx</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">data</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">BUILDROOT/etc/passwd:/etc/passwd</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">BUILDROOT/etc/nginx/nginx.conf:/etc/nginx/nginx.conf</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">./local/config/motd:/etc/motd</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">directories</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">/var/log/nginx</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">/var/run</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">/tmp</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">symlinks</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">/usr/bin/netcat:/usr/bin/nc</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">/usr/lib:/lib</span>
+</span></span></code></pre></div><p>Here&rsquo;s an overview of the manifest file.  The format will likely change as this is a work in progress.</p>
+<ul>
+<li><strong>input</strong> - defines the artifact backend. I&rsquo;m using <a href="https://buildroot.org">Buildroot</a> to create build artifacts, but this could be expanded to other backends like fetching artifactory URLs.</li>
+<li><strong>binaries</strong> - These are binaries to include with the empty root filesystem.  ELF dependencies are dynamically found and copied over.  Currently this is done by capturing lddtree output from paix-utils.</li>
+<li><strong>data</strong> - Data is simply copied over from the source.</li>
+<li><strong>directories</strong> - Directories to create in the root filesystem</li>
+<li><strong>symlinks</strong> - Symlinks will be created in the root filesystem</li>
+</ul>
+<h2 id="build-output">Build Output</h2>
+<p>The first step is to assemble the rootfs by reading artifacts from the buildroot staging directory.  assemble.py is a Python script that reads the manifest file. When reading the manifest, assemble.py
+creates specified directories, symbolic links, then the specified data files.  Binaries are handled a bit differently.  In addition to copying the specified binary, assemble.py will run lddtree against each binary and copy each linked library mentioned in lddtree&rsquo;s output.</p>
+<pre tabindex="0"><code>$ ./assemble.py unbound_container.yml my_root_fs
+Rootfs built at: /home/ubuntu/just_enough/project_manifest/tools/my_root_fs
+</code></pre><p>The assembled filesystem which is only 12MB in size.</p>
+<pre tabindex="0"><code>$ tree my_root_fs/
+my_root_fs/
+├── bin -&gt; /usr/bin
+├── etc
+│   ├── group
+│   ├── passwd
+│   └── unbound
+│       └── unbound.conf
+├── lib
+│   ├── ld-linux-aarch64.so.1
+│   ├── libc.so.6
+│   ├── libcrypto.so.3
+│   ├── libevent-2.1.so.7
+│   ├── libsodium.so.23
+│   └── libssl.so.3
+├── lib64 -&gt; /lib
+├── sbin -&gt; /usr/sbin
+├── usr
+│   ├── lib -&gt; /lib
+│   └── sbin
+│       └── unbound
+└── var
+    ├── cache
+    │   └── unbound
+    └── run
+
+14 directories, 10 files
+
+$ du -sh my_root_fs/
+12M     my_root_fs/
+</code></pre><h2 id="demo">Demo</h2>
+<p>I used this Dockerfile with <code>docker build</code> to convert the staging directory into a container image.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">scratch</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> --chown<span style="color:#f92672">=</span>0:0 my_root_fs /<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">EXPOSE</span> <span style="color:#e6db74">53/tcp</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">EXPOSE</span> <span style="color:#e6db74">53/udp</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">ENTRYPOINT</span> [<span style="color:#e6db74">&#34;/usr/sbin/unbound&#34;</span>, <span style="color:#e6db74">&#34;-d&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;/etc/unbound/unbound.conf&#34;</span>] <span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>This is how the image appears.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ docker history unbound-minimal:latest 
+</span></span><span style="display:flex;"><span>IMAGE          CREATED       CREATED BY                                      SIZE      COMMENT
+</span></span><span style="display:flex;"><span>43ac3c4ba387   <span style="color:#ae81ff">3</span> hours ago   ENTRYPOINT <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;/usr/sbin/unbound&#34;</span> <span style="color:#e6db74">&#34;-d&#34;</span> <span style="color:#e6db74">&#34;-c&#34;</span> <span style="color:#e6db74">&#34;/…   0B        buildkit.dockerfile.v0
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;missing&gt;      3 hours ago   EXPOSE [53/udp]                                 0B        buildkit.dockerfile.v0
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;missing&gt;      3 hours ago   EXPOSE [53/tcp]                                 0B        buildkit.dockerfile.v0
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;missing&gt;      3 hours ago   COPY --chown=0:0 my_root_fs/ / # buildkit       11.7MB    buildkit.dockerfile.v0
+</span></span></span></code></pre></div><p>The Docker run command to launch the container.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ docker run -it --rm -p 53:53/udp -p 53:53/tcp  unbound-minimal:latest 
+</span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:43:35 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> notice: init module 0: validator
+</span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:43:35 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> notice: init module 1: iterator
+</span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:43:35 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: start of service <span style="color:#f92672">(</span>unbound 1.21.1<span style="color:#f92672">)</span>.
+</span></span></code></pre></div><p>The dig command is run in a second terminal to validate that the resolver works.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ dig @127.0.0.1 +answer bsky.app 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>; &lt;&lt;&gt;&gt; DiG 9.18.39-0ubuntu0.24.04.3-Ubuntu &lt;&lt;&gt;&gt; @127.0.0.1 +answer bsky.app
+</span></span><span style="display:flex;"><span>; <span style="color:#f92672">(</span><span style="color:#ae81ff">1</span> server found<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>;; global options: +cmd
+</span></span><span style="display:flex;"><span>;; Got answer:
+</span></span><span style="display:flex;"><span>;; -&gt;&gt;HEADER<span style="color:#e6db74">&lt;&lt;- opco</span>de: QUERY, status: NOERROR, id: <span style="color:#ae81ff">60188</span>
+</span></span><span style="display:flex;"><span>;; flags: qr rd ra; QUERY: 1, ANSWER: 8, AUTHORITY: 0, ADDITIONAL: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>;; OPT PSEUDOSECTION:
+</span></span><span style="display:flex;"><span>; EDNS: version: 0, flags:; udp: <span style="color:#ae81ff">1232</span>
+</span></span><span style="display:flex;"><span>;; QUESTION SECTION:
+</span></span><span style="display:flex;"><span>;bsky.app.                      IN      A
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>;; ANSWER SECTION:
+</span></span><span style="display:flex;"><span>bsky.app.               <span style="color:#ae81ff">60</span>      IN      A       3.15.241.112
+</span></span><span style="display:flex;"><span>bsky.app.               <span style="color:#ae81ff">60</span>      IN      A       16.59.153.152
+</span></span><span style="display:flex;"><span>bsky.app.               <span style="color:#ae81ff">60</span>      IN      A       3.134.210.175
+</span></span><span style="display:flex;"><span>bsky.app.               <span style="color:#ae81ff">60</span>      IN      A       18.220.107.168
+</span></span><span style="display:flex;"><span>bsky.app.               <span style="color:#ae81ff">60</span>      IN      A       3.12.186.67
+</span></span><span style="display:flex;"><span>bsky.app.               <span style="color:#ae81ff">60</span>      IN      A       18.225.51.158
+</span></span><span style="display:flex;"><span>bsky.app.               <span style="color:#ae81ff">60</span>      IN      A       3.150.190.10
+</span></span><span style="display:flex;"><span>bsky.app.               <span style="color:#ae81ff">60</span>      IN      A       3.135.42.242
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>;; Query time: <span style="color:#ae81ff">32</span> msec
+</span></span><span style="display:flex;"><span>;; SERVER: 127.0.0.1#53<span style="color:#f92672">(</span>127.0.0.1<span style="color:#f92672">)</span> <span style="color:#f92672">(</span>UDP<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>;; WHEN: Thu Apr <span style="color:#ae81ff">16</span> 23:44:28 PDT <span style="color:#ae81ff">2026</span>
+</span></span><span style="display:flex;"><span>;; MSG SIZE  rcvd: <span style="color:#ae81ff">165</span>
+</span></span></code></pre></div><p>With the unbound log output showing the query was received.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:44:28 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: 172.17.0.1 bsky.app. A IN
+</span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:44:28 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: resolving bsky.app. A IN
+</span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:44:28 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: response <span style="color:#66d9ef">for</span> bsky.app. A IN
+</span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:44:28 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: reply from &lt;.&gt; 1.1.1.1#53
+</span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:44:28 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: query response was ANSWER
+</span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:44:28 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: 172.17.0.1 bsky.app. A IN NOERROR 0.032742 <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">165</span>
+</span></span></code></pre></div><h2 id="wrapping-up">Wrapping Up</h2>
+<p>This demo shows a different way to build container images.  Instead of inheriting an unknown
+filesystem and removing what doesn&rsquo;t belong, the image is assembled from known artifacts with
+explicit intent. Every file is accounted for and nothing exists by accident.</p>
+<p>This process does introduce more upfront work.  A manifest needs to be defined and the build process
+is more deliberate than a typical Dockerfile.  The benefit is gaining complete control over the
+final image and the ability to reproduce it exactly from known inputs.</p>
+<p>The tooling is still evolving, and there are gaps around permissions, ownership and input sources.  But the model works as
+container images can be built declaratively without relying on base image inheritance.</p>
+<p>The question isn’t whether this approach is possible, but whether this level of control is worth it for your use case.</p>
+]]></content:encoded>
+    </item>
     <item>
       <title>Hidden Systems in Base Images</title>
       <link>https://amf3.github.io/articles/virtualization/base_image/</link>
