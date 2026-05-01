@@ -6,8 +6,136 @@
     <description>Recent content in articles on Adam Faris</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 17 Apr 2026 23:20:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 22 Apr 2026 21:27:51 +0000</lastBuildDate>
     <atom:link href="https://amf3.github.io/articles/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Container Image Validation</title>
+      <link>https://amf3.github.io/articles/virtualization/container_validation/</link>
+      <pubDate>Wed, 22 Apr 2026 21:27:51 +0000</pubDate>
+      <guid>https://amf3.github.io/articles/virtualization/container_validation/</guid>
+      <description>Ensuring containers have what they need. Nothing more, nothing less.</description>
+      <content:encoded><![CDATA[<p><img alt="Picture of a forklift loading containers onto a truck" loading="lazy" src="/articles/virtualization/container_validation/assets/forklift.png"></p>
+<p>I hit a runtime error with my <a href="../declarative_builds/">manifest built</a> container image.  It was caused by a missing libz dependency overlooked by lddtree. I thought
+the image had everything it needed, but I was wrong.</p>
+<p>So how does one verify what a container actually needs?</p>
+<h2 id="why-static-analysis-fails">Why static analysis fails</h2>
+<p>Using tools like <code>lddtree</code> to explore ELF dependencies only work to a point.  Binary ELF files list linked dependencies in a section named DT_NEEDED. Tooling will read the DT_NEEDED section to discover linked dependencies.  This works great for direct links, but not implicit dependencies.</p>
+<p>While exploring an <code>unbound DNS</code> binary, lddtree successfully listed a <code>libcrypto</code> dependency.  At runtime, libcrypto lazily loads a compression library named <code>libz</code>.
+Because the library access happens at runtime, libz doesn&rsquo;t appear in the DT_NEEDED section of either unbound or libcrypto and is why it wasn&rsquo;t found by lddtree.</p>
+<p>Another static analysis issue is knowing what files an application attempts to access. I discovered the same unbound DNS binary attempting to access nsswitch.conf, passwd,
+and openssl.cnf within the /etc directory.  I also learned applications will intentionally attempt to open files that may not exist.  These attempts are probes to
+detect the runtime environment or optional configs. Failed probe attempts are considered normal behavior and provide a useful signal by telling us what the
+application expects might exist.</p>
+<p>Static analysis tooling doesn&rsquo;t understand this behavior.</p>
+<h2 id="my-approach-to-tracing-containers">My approach to tracing containers</h2>
+<p>I started looking into Docker APIs but quickly realized they didn&rsquo;t support my needs.  I needed to go deeper and ended up writing a runc wrapper called by Docker.</p>
+<p><img alt="A diagram showing the wrapper sits between Docker and runc, intercepting life cycle hooks." loading="lazy" src="/articles/virtualization/container_validation/assets/docker-runc-wrapper.png"></p>
+<p>The wrapper is a Python script that intercepts the runc <a href="https://github.com/opencontainers/runc/blob/main/libcontainer/configs/config.go#L409-L427">createRuntime and poststop</a> hooks
+to attach a <code>bpftrace</code> process against the container PID for tracing <code>openat</code> system calls in the container.  This program is passed to a Python subprocess call.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>BPFTRACE_PROGRAM <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">tracepoint:syscalls:sys_enter_clone
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">/pid == </span><span style="color:#e6db74">{pid}</span><span style="color:#e6db74">/
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">{{ @children[tid] = 1; }}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">tracepoint:syscalls:sys_enter_clone3
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">/pid == </span><span style="color:#e6db74">{pid}</span><span style="color:#e6db74">/
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">{{ @children[tid] = 1; }}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">tracepoint:syscalls:sys_enter_openat
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">/pid == </span><span style="color:#e6db74">{pid}</span><span style="color:#e6db74"> || @children[pid]/
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">{{ @fname[tid] = args.filename; }}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">tracepoint:syscalls:sys_exit_openat
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">/pid == </span><span style="color:#e6db74">{pid}</span><span style="color:#e6db74"> || @children[pid]/
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">{{
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    printf(&#34;</span><span style="color:#e6db74">%d</span><span style="color:#e6db74"> </span><span style="color:#e6db74">%d</span><span style="color:#e6db74"> </span><span style="color:#e6db74">%s</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">n&#34;, elapsed, args.ret, str(@fname[tid]));
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    delete(@fname[tid]);
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">}}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">END {{ clear(@children); clear(@fname); }}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span></code></pre></div><p>Enabling the wrapper was done with a docker-daemon.json update.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo cat /etc/docker/daemon.json 
+</span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;default-runtime&#34;</span>: <span style="color:#e6db74">&#34;runc-traced&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;runtimes&#34;</span>: <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;runc-traced&#34;</span>: <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;path&#34;</span>: <span style="color:#e6db74">&#34;/usr/local/bin/runc-wrapper&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p>When the wrapper receives a createRuntime request, it calls SIGSTOP to pause the container before its entrypoint runs.  This was discovered
+while tracing <code>docker run --rm alpine cat /etc/os-release</code> and realizing the container exited before the trace could attach.  Without the
+SIGSTOP window, file access attempts during dynamic linker initialization or early startup can be missed.  Once bpftrace is attached, the
+runc wrapper calls SIGCONT on the container.</p>
+<p>Bpftrace output from the running container is captured in a log file on the host.</p>
+<h2 id="what-the-trace-shows">What the trace shows</h2>
+<p>This is partial logged output from bpftrace.  The -2 means the read attempt failed.  Notice that libz is listed as a missing file in the output, showing the limits of static analysis.</p>
+<pre tabindex="0"><code class="language-log" data-lang="log">98098465 -2 /lib64/libz.so
+98154798 -2 /usr/lib64/libz.so
+98383507 -2 /usr/lib/engines-3/gost.so
+98397715 -2 /usr/lib/engines-3/gost.so
+98480216 -2 /etc/ssl/openssl.cnf
+</code></pre><p>The bpftrace trace output is then fed into a Python report generator.  By combining the manifest with bpftrace output, we can determine which files
+should exist and which are missing.  The report does filtering of application probe attempts for files in /proc and /sys.  Other missing files are not always
+required by the application as lookups and probes can happen outside of /proc.  An example is the gost SSL engine in the output below.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ ./generate-report.py --show-ignored 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">================================================================</span>
+</span></span><span style="display:flex;"><span>  Container Dependency Report
+</span></span><span style="display:flex;"><span><span style="color:#f92672">================================================================</span>
+</span></span><span style="display:flex;"><span>  Container : a07acffbfd31c222...
+</span></span><span style="display:flex;"><span>  Present   : <span style="color:#ae81ff">13</span> files
+</span></span><span style="display:flex;"><span>  Missing   : <span style="color:#ae81ff">3</span> files
+</span></span><span style="display:flex;"><span>  Ignored   : <span style="color:#ae81ff">16</span> files <span style="color:#f92672">(</span>kernel probes / noise<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">================================================================</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  FILES PRESENT / SUCCESSFULLY OPENED <span style="color:#f92672">(</span>13<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>  --------------------------------------------------------------
+</span></span><span style="display:flex;"><span>  OK   /
+</span></span><span style="display:flex;"><span>  OK   /dev/null
+</span></span><span style="display:flex;"><span>  OK   /etc/nsswitch.conf
+</span></span><span style="display:flex;"><span>  OK   /etc/passwd
+</span></span><span style="display:flex;"><span>  OK   /etc/ssl/openssl.cnf
+</span></span><span style="display:flex;"><span>  OK   /etc/unbound/unbound.conf
+</span></span><span style="display:flex;"><span>  OK   /lib64/libc.so.6
+</span></span><span style="display:flex;"><span>  OK   /lib64/libcrypto.so.3
+</span></span><span style="display:flex;"><span>  OK   /lib64/libevent-2.1.so.7
+</span></span><span style="display:flex;"><span>  OK   /lib64/libsodium.so.23
+</span></span><span style="display:flex;"><span>  OK   /lib64/libssl.so.3
+</span></span><span style="display:flex;"><span>  OK   /lib64/libz.so
+</span></span><span style="display:flex;"><span>  OK   /var/run/unbound.pid
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  FILES REQUESTED BUT NOT FOUND / ENOENT  <span style="color:#f92672">(</span>3<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>  --------------------------------------------------------------
+</span></span><span style="display:flex;"><span>  --   /etc/group
+</span></span><span style="display:flex;"><span>  --   /etc/localtime
+</span></span><span style="display:flex;"><span>  --   /usr/lib/engines-3/gost.so
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  IGNORED <span style="color:#f92672">(</span>kernel probes / noise<span style="color:#f92672">)</span>  <span style="color:#f92672">(</span>16<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>  --------------------------------------------------------------
+</span></span><span style="display:flex;"><span>  --   /etc/ld.so.cache  Linker cache — optional optimisation
+</span></span><span style="display:flex;"><span>  ok   /proc/acpi  ACPI power management probe
+</span></span><span style="display:flex;"><span>  --   /proc/asound  ALSA audio subsystem probe
+</span></span><span style="display:flex;"><span>  ok   /proc/interrupts  Hardware interrupt table
+</span></span><span style="display:flex;"><span>  ok   /proc/kcore  Kernel memory ELF core
+</span></span><span style="display:flex;"><span>  ok   /proc/keys  Kernel keyring
+</span></span><span style="display:flex;"><span>  ok   /proc/latency_stats  Scheduling latency debug
+</span></span><span style="display:flex;"><span>  --   /proc/sched_debug  Scheduler internals debug
+</span></span><span style="display:flex;"><span>  ok   /proc/scsi  SCSI device list
+</span></span><span style="display:flex;"><span>  ok   /proc/sys/kernel/cap_last_cap  Capability number probe, has fallback
+</span></span><span style="display:flex;"><span>  --   /proc/sys/kernel/ngroups_max  Max groups probe, has fallback
+</span></span><span style="display:flex;"><span>  ok   /proc/timer_list  Kernel timer state
+</span></span><span style="display:flex;"><span>  --   /proc/timer_stats  Removed in Linux 4.11
+</span></span><span style="display:flex;"><span>  --   /sys/devices/virtual/powercap  CPU power capping <span style="color:#f92672">(</span>Intel RAPL<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>  ok   /sys/firmware  BIOS/EFI info
+</span></span><span style="display:flex;"><span>  ok   /var/lib/docker/rootfs/overlayfs/a07acffbfd31c222486540fae8145d..  Docker overlay layer path <span style="color:#f92672">(</span>host artifact<span style="color:#f92672">)</span>
+</span></span></code></pre></div><h2 id="why-is-this-important">Why is this important?</h2>
+<p>Using manifests in image builds define what should be in the container.  The validator verifies the definition against runtime behavior.
+Together, the manifest and validator form a build, run, verify, refine, loop that makes the manifest approach trustworthy.</p>
+<p>Instead of guessing at what an image needs, it can be observed and corrected, resulting in an intentionally minimal image.</p>
+]]></content:encoded>
+    </item>
     <item>
       <title>Declarative Builds</title>
       <link>https://amf3.github.io/articles/virtualization/declarative_builds/</link>
