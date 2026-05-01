@@ -161,6 +161,22 @@
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">Container Image Validation
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>
+I hit a runtime error with my manifest built container image. It was caused by a missing libz dependency overlooked by lddtree. I thought the image had everything it needed, but I was wrong.
+So how does one verify what a container actually needs?
+Why static analysis fails Using tools like lddtree to explore ELF dependencies only work to a point. Binary ELF files list linked dependencies in a section named DT_NEEDED. Tooling will read the DT_NEEDED section to discover linked dependencies. This works great for direct links, but not implicit dependencies.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-04-22 21:27:51 +0000 UTC'>April 22, 2026</span>&nbsp;·&nbsp;<span>824 words</span></footer>
+  <a class="entry-link" aria-label="post link to Container Image Validation" href="https://amf3.github.io/articles/virtualization/container_validation/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">Declarative Builds
     </h2>
   </header>
