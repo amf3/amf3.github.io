@@ -1,5 +1,5 @@
 ---
-title: Hidden Systems in Base Images
+title: Hidden Systems in Base Container Images
 description: You're not choosing an image. You're inheriting a system.
 date: 2026-04-12T18:23:15
 draft: false
