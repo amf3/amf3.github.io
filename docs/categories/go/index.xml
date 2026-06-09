@@ -27,11 +27,11 @@ which are flags.  Some programs like <code>git</code> take this further by treat
 flag parsing consistent between executables gets messy.</p>
 <p>Fortunately several libraries are available to make subcommands and flags easier to manage.  The one that I finally chose is <a href="https://cli.urfave.org">urfave/cli</a> which offers a builder style API.  The examples below use
 version 3 of the library which can be imported as:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;github.com/urfave/cli/v3&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;github.com/urfave/cli/v3&#34;</span>
 </span></span></code></pre></div><h2 id="urfavecli-with-flags">urfave/cli with flags</h2>
 <p>This is how simple the urfave/cli library is to use. I configure a <a href="https://pkg.go.dev/github.com/urfave/cli#Command">cli.Command</a>
 struct, then call <a href="https://pkg.go.dev/github.com/urfave/cli#App.Run">Run()</a> to execute it.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>{
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">...</span> <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">goes</span> <span style="color:#a6e22e">here</span> <span style="color:#f92672">...</span>
 </span></span><span style="display:flex;"><span>    }
@@ -43,7 +43,7 @@ struct, then call <a href="https://pkg.go.dev/github.com/urfave/cli#App.Run">Run
 allowing us to freely mix different flag types like
 <a href="https://pkg.go.dev/github.com/urfave/cli#StringFlag">StringFlag</a>, <a href="https://pkg.go.dev/github.com/urfave/cli#BoolFlag">BoolFlag</a>,
 or <a href="https://pkg.go.dev/github.com/urfave/cli#IntFlag">IntFlag</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>    <span style="color:#a6e22e">Flags</span>: []<span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Flag</span>{
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>    <span style="color:#a6e22e">Flags</span>: []<span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Flag</span>{
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">IntFlag</span>{
 </span></span><span style="display:flex;"><span>            <span style="color:#f92672">...</span>
 </span></span><span style="display:flex;"><span>        },
@@ -53,14 +53,14 @@ or <a href="https://pkg.go.dev/github.com/urfave/cli#IntFlag">IntFlag</a>.</p>
 </span></span><span style="display:flex;"><span>    },
 </span></span></code></pre></div><p>The other struct field is <a href="https://pkg.go.dev/github.com/urfave/cli/v3#ActionFunc">Action</a> which runs a function after parsing the flags.
 The function can either be inline or passed as a reference. Here is an inline example.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>    <span style="color:#a6e22e">Action</span>: <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>    <span style="color:#a6e22e">Action</span>: <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">Bool</span>(<span style="color:#e6db74">&#34;hello&#34;</span>) {
 </span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">String</span>(<span style="color:#e6db74">&#34;name&#34;</span>), <span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">Int</span>(<span style="color:#e6db74">&#34;count&#34;</span>))
 </span></span><span style="display:flex;"><span>        }
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>
 </span></span><span style="display:flex;"><span>    },
 </span></span></code></pre></div><p>This is what my populated main() looks like.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>{
 </span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Flags</span>: []<span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Flag</span>{
 </span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">BoolFlag</span>{
@@ -100,7 +100,7 @@ The function can either be inline or passed as a reference. Here is an inline ex
 </span></span></code></pre></div><p>A complete working example using flags can be <a href="./assets/flag_example.go">downloaded</a>.</p>
 <h3 id="flags-demo">Flags Demo</h3>
 <p>When invoked without the &ndash;name flag which is marked required, urfave/cli will throw an error and print the help statement.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run flag_example.go --count <span style="color:#ae81ff">2</span> --hello 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run flag_example.go --count <span style="color:#ae81ff">2</span> --hello 
 </span></span><span style="display:flex;"><span>NAME:
 </span></span><span style="display:flex;"><span>   flag_example - A new cli application
 </span></span><span style="display:flex;"><span>
@@ -116,14 +116,14 @@ The function can either be inline or passed as a reference. Here is an inline ex
 </span></span><span style="display:flex;"><span>2025/10/02 08:36:19 Required flag <span style="color:#e6db74">&#34;name&#34;</span> not set
 </span></span><span style="display:flex;"><span>exit status <span style="color:#ae81ff">1</span>
 </span></span></code></pre></div><p>Adding the &ndash;name flag results in it working as expected.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run flag_example.go --count <span style="color:#ae81ff">2</span> --hello --name Adam
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run flag_example.go --count <span style="color:#ae81ff">2</span> --hello --name Adam
 </span></span><span style="display:flex;"><span>Hello Adam
 </span></span><span style="display:flex;"><span>Hello Adam
 </span></span></code></pre></div><h2 id="urfavecli-with-subcommands">urfave/cli with subcommands</h2>
 <p>Subcommands are added in a similar way, except instead of using a slice of Flag, we are using a slice of
 Command which I described above.  Instead of using &ndash;hello or &ndash;goodbye as a flag, this example creates the
 hello and goodbye subcommands.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Hello&#34;</span>)
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>
 </span></span><span style="display:flex;"><span>}
@@ -155,7 +155,7 @@ hello and goodbye subcommands.</p>
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><h3 id="commands-demo">Commands Demo</h3>
 <p>The autogenerated help statement when a subcommand isn&rsquo;t used.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run command_example.go
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run command_example.go
 </span></span><span style="display:flex;"><span>NAME:
 </span></span><span style="display:flex;"><span>   command_example - A new cli application
 </span></span><span style="display:flex;"><span>
@@ -170,14 +170,14 @@ hello and goodbye subcommands.</p>
 </span></span><span style="display:flex;"><span>GLOBAL OPTIONS:
 </span></span><span style="display:flex;"><span>   --help, -h  show help
 </span></span></code></pre></div><p>Invoking the goodbye subcommand</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run command_example.go goodbye
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run command_example.go goodbye
 </span></span><span style="display:flex;"><span>Goodbye
 </span></span></code></pre></div><h2 id="combining-flags-and-subcommands">Combining flags and subcommands</h2>
 <p>Now that we know how flags and subcommands work, lets combine them to get that openssl like experience.
 But this is the great part, because subcommands are a slice of Command, and we know that Command accepts
 a slice of Flag, we already know how this works.  Simply define a Flag for each subcommand.</p>
 <p>Here&rsquo;s an example where the hello subcommand supports a name flag and the goodbye subcommand supports a count flag.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>{
 </span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Commands</span>: []<span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>{
 </span></span><span style="display:flex;"><span>            {
@@ -211,7 +211,7 @@ a slice of Flag, we already know how this works.  Simply define a Flag for each 
 </span></span></code></pre></div><p>A complete example that combines flags and subcommands is available for <a href="./assets/combo_example.go">download</a>.</p>
 <h3 id="combination-demo">Combination Demo</h3>
 <p>Running the demo without any options</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run combo_example.go 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run combo_example.go 
 </span></span><span style="display:flex;"><span>NAME:
 </span></span><span style="display:flex;"><span>   combo_example - A new cli application
 </span></span><span style="display:flex;"><span>
@@ -226,7 +226,7 @@ a slice of Flag, we already know how this works.  Simply define a Flag for each 
 </span></span><span style="display:flex;"><span>GLOBAL OPTIONS:
 </span></span><span style="display:flex;"><span>   --help, -h  show help
 </span></span></code></pre></div><p>Running the demo with a subcommand missing a required flag</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run combo_example.go hello                                                 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run combo_example.go hello                                                 
 </span></span><span style="display:flex;"><span>NAME:
 </span></span><span style="display:flex;"><span>   combo_example hello - Greets a person with <span style="color:#e6db74">&#39;Hello&#39;</span>
 </span></span><span style="display:flex;"><span>
@@ -239,7 +239,7 @@ a slice of Flag, we already know how this works.  Simply define a Flag for each 
 </span></span><span style="display:flex;"><span>2025/10/05 09:33:19 Required flag <span style="color:#e6db74">&#34;name&#34;</span> not set
 </span></span><span style="display:flex;"><span>exit status <span style="color:#ae81ff">1</span>
 </span></span></code></pre></div><p>Running the demo successfully</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% go run combo_example.go hello --name Adam
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% go run combo_example.go hello --name Adam
 </span></span><span style="display:flex;"><span>Hello Adam
 </span></span></code></pre></div><h2 id="accessing-set-values">Accessing Set Values</h2>
 <p>The urfave API offers several functions to access the set values, which are found in
@@ -253,7 +253,7 @@ online <a href="https://pkg.go.dev/github.com/urfave/cli/v3#pkg-index">documenta
 </ul>
 <p>Let&rsquo;s go back to the earlier <em>combo</em> example using these CLI options <code>go run combo_example.go hello --name Adam</code>.
 This is the code block used in the example.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">runIt</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">runIt</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">switch</span> <span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">Name</span> {
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;hello&#34;</span>:
 </span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">String</span>(<span style="color:#e6db74">&#34;name&#34;</span>))
@@ -383,13 +383,13 @@ OpenAPI <a href="https://spec.openapis.org/oas/v3.0.3.html">schema documentation
 <p>To get started one needs to create a specification.  A very minimal specification meeting the 3.0.x requirements is listed below.
 It&rsquo;s not a very interesting example as endpoints in the application server aren&rsquo;t defined, but it shows how minimal a
 specification can be that meets schema requirements.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">openapi</span>: <span style="color:#e6db74">&#34;3.0.3&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">openapi</span>: <span style="color:#e6db74">&#34;3.0.3&#34;</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">info</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">version</span>: <span style="color:#ae81ff">1.0.0</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">title</span>: <span style="color:#ae81ff">My Contrived Server</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">paths</span>:
 </span></span></code></pre></div><p>Let&rsquo;s get started by extending the simple example defining a path named /status. It will return a 200 response code with a JSON resonse.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">paths</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">paths</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">/status</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">get</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">responses</span>:
@@ -401,7 +401,7 @@ specification can be that meets schema requirements.</p>
 </span></span><span style="display:flex;"><span>                <span style="color:#f92672">$ref</span>: <span style="color:#e6db74">&#39;#/components/schemas/status&#39;</span>
 </span></span></code></pre></div><p>The JSON response is documented in a separate YAML block named components. It defines the response containing a JSON
 map containing the keys &ldquo;state&rdquo; and &ldquo;message&rdquo;, both of which have a string value.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>: 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>: 
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">schemas</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">status</span>:
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">type</span>: <span style="color:#ae81ff">object</span>
@@ -413,7 +413,7 @@ map containing the keys &ldquo;state&rdquo; and &ldquo;message&rdquo;, both of w
 </span></span><span style="display:flex;"><span>            <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
 </span></span><span style="display:flex;"><span>            <span style="color:#f92672">example</span>: <span style="color:#e6db74">&#34;App running within parameters&#34;</span>
 </span></span></code></pre></div><p>OpenAPI supports tags, which let you group related endpoints. This example creates a data grouping and puts create_bucket in the group.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">tags</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">tags</span>:
 </span></span><span style="display:flex;"><span>  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">data</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">description</span>:  <span style="color:#ae81ff">data manipulation endpoints</span>
 </span></span><span style="display:flex;"><span>
@@ -432,7 +432,7 @@ map containing the keys &ldquo;state&rdquo; and &ldquo;message&rdquo;, both of w
 </span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#39;200&#39;</span>:
 </span></span><span style="display:flex;"><span>            <span style="color:#f92672">description</span>: <span style="color:#ae81ff">Create a storage object</span>
 </span></span></code></pre></div><p>The OpenAPI specification also provides a definition for authentication to the web application.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">securitySchemes</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">basicAuth</span>:
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">type</span>: <span style="color:#ae81ff">http</span>
@@ -464,21 +464,21 @@ has been downloaded and extracted into a temp/work directory.</p>
 <p>Feel free to inspect the api/http.gen.go file before proceeding. You&rsquo;ll see it contains an interface named ServerInterface,
 which has the GetStatus or PostStatus endpoints from the OpenAPI specification.  http.gen.go also contains a struct named Status
 that was defined from components -&gt; schema -&gt; status.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Status</span> <span style="color:#66d9ef">struct</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Status</span> <span style="color:#66d9ef">struct</span> {
 </span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Message</span> <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;message&#34;`</span>
 </span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">State</span>   <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;state&#34;`</span>
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>To see the working application server, run <code>make server-run</code>.</p>
 <p>The server has Basic Auth enabled with hardcoded credentials. The user is &ldquo;alice&rdquo; and the password &ldquo;mySecretPW&rdquo;.  Curl can be
 used to see the response.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% curl --basic -u alice:mySecretPW  http://localhost:8080/status
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% curl --basic -u alice:mySecretPW  http://localhost:8080/status
 </span></span><span style="display:flex;"><span><span style="color:#f92672">{</span><span style="color:#e6db74">&#34;message&#34;</span>:<span style="color:#e6db74">&#34;Initializing&#34;</span>,<span style="color:#e6db74">&#34;state&#34;</span>:<span style="color:#e6db74">&#34;Unknown&#34;</span><span style="color:#f92672">}</span>
 </span></span></code></pre></div><h2 id="generate-client-interfaces-python">Generate Client Interfaces (Python)</h2>
 <p>This is where OpenAPI really shines.  I was able to use a generator to create Python libraries
 to be used by the client implementation code.  The walkthrough presumes a recent version of Python3 and pip are installed.</p>
 <p>First, create a virtual environment and install the openapi-python-client dependencies.  This shell snippet
 presumes the current working directory is already hello_openapi.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% python3 -mvenv $PWD/.venv
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% python3 -mvenv $PWD/.venv
 </span></span><span style="display:flex;"><span>% source $PWD/.venv/bin/activate
 </span></span><span style="display:flex;"><span>% pip install -r requirements.txt
 </span></span></code></pre></div><p>Then run <code>make client-codegen</code> to build the Python client libraries located in cmd/client/my_contrived_server.</p>
@@ -495,13 +495,13 @@ only took a few lines of python code to implement what the openapi-python-client
 <h2 id="gotchas--lessons-learned">Gotchas &amp; Lessons Learned</h2>
 <p>One issue I have with OpenAPI is the illusion of simplicty. When I first started working with OpenAPI, I noticed the Status struct
 had keys referencing a pointer of strings which wasn&rsquo;t ideal.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Status</span> <span style="color:#66d9ef">struct</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Status</span> <span style="color:#66d9ef">struct</span> {
 </span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Message</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;message&#34;`</span>
 </span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">State</span>   <span style="color:#f92672">*</span><span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;state&#34;`</span>
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>It took some fiddling with the OpenAPI specification to make the generator use strings instead of pointers to strings.
 Adding &lsquo;required&rsquo; to the schema made the generator do what I wanted.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">status</span>:
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">type</span>: <span style="color:#ae81ff">object</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">properties</span>:

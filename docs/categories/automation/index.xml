@@ -34,7 +34,7 @@ should become available.</p>
 <p>The <strong>status</strong> submenu from the cloud-init command provides a method of checking each stage for errors.  In this
 example I intentionally mistyped a schema key name that should be <code>passwd</code> as <code>password</code>.  Output shows the failure
 occurred during the init stage &amp; provides a suggestion on how to resolve it.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ cloud-init status --format json
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ cloud-init status --format json
 </span></span><span style="display:flex;"><span>...
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;extended_status&#34;</span>: <span style="color:#e6db74">&#34;degraded done&#34;</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;init&#34;</span>: <span style="color:#f92672">{</span>
@@ -55,11 +55,11 @@ occurred during the init stage &amp; provides a suggestion on how to resolve it.
 <li>/run/cloud-init/result.json  (summary of execution status)</li>
 </ul>
 <p>Example log output from cloud-init.log indicating a schema validation failure.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>2025-03-18 11:46:41,379 - schema.py<span style="color:#f92672">[</span>WARNING<span style="color:#f92672">]</span>: cloud-config failed schema validation! You may run <span style="color:#e6db74">&#39;sudo cloud-init schema --system&#39;</span> to check the details.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>2025-03-18 11:46:41,379 - schema.py<span style="color:#f92672">[</span>WARNING<span style="color:#f92672">]</span>: cloud-config failed schema validation! You may run <span style="color:#e6db74">&#39;sudo cloud-init schema --system&#39;</span> to check the details.
 </span></span></code></pre></div><h1 id="debugging-user-data-issues">Debugging User-Data Issues</h1>
 <p>cloud-init has a defined schema and it’s possible to validate user-data content with the <strong>schema</strong> submenu.
 To troubleshoot a possible schema issue on a remote host where a YAML key named <code>passwd</code> was mistyped as <code>password</code>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo cloud-init schema --system
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo cloud-init schema --system
 </span></span><span style="display:flex;"><span>Found cloud-config data types: user-data, vendor-data, network-config
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>1. user-data at /var/lib/cloud/instances/docker-demo/cloud-config.txt:
@@ -78,7 +78,7 @@ and contain the package.  The <strong>cloud-init-output.log</strong> file can sh
 try accessing the instance over the instance&rsquo;s serial console.</p>
 <p>Check for missing or incorrectly set permissions on scripts.</p>
 <p>Use <code>cloud-init analyze show</code> to help in identifying long-running stages.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ cloud-init analyze show
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ cloud-init analyze show
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>-- Boot Record <span style="color:#ae81ff">01</span> --
 </span></span><span style="display:flex;"><span>The total time elapsed since completing an event is printed after the <span style="color:#e6db74">&#34;@&#34;</span> character.
@@ -102,7 +102,7 @@ cached to disk.  If the cache exists on reboot, cloud-init will not run again.  
 run <code>cloud-init clean --logs</code> and reboot the instance.</p>
 <p>Issues with a specific module can be exposed by using <code>cloud-init single</code>.  This could be useful when
 troubleshooting user or vendor scripts.  Module names can be found with <code>grep &quot;Running module&quot; /var/log/cloud-init.log</code>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo cloud-init single --name set_passwords
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo cloud-init single --name set_passwords
 </span></span><span style="display:flex;"><span>Cloud-init v. 24.4.1-0ubuntu0~24.04.1 running <span style="color:#e6db74">&#39;single&#39;</span> at Fri, <span style="color:#ae81ff">21</span> Mar <span style="color:#ae81ff">2025</span> 20:45:47 +0000. Up 16145.16 seconds.
 </span></span></code></pre></div><p>When using the <strong>single</strong> submenu, it won&rsquo;t necessarily fix dependencies unless those are also explicitly re-triggered.  It&rsquo;s best
 to reprovision the instance after troubleshooting any failed modules.</p>
@@ -210,7 +210,7 @@ hostname of my-qemu-vm, creates an admin account named ubuntu, and assigns the u
 It&rsquo;s possible to generate a different secure password hash with openssl, as shown in
 this example: <code>echo abc123 |  openssl passwd -6 -stdin</code>.  Restart the QEMU VM so it boots from the
 virtual CD-ROM and modify the GRUB menu so it loads the new config when the VM boots.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">version</span>: <span style="color:#ae81ff">1</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">identity</span>:
@@ -229,7 +229,7 @@ possible to view the specified values from the user-data YAML file that have bee
 the install.  Other options like locale or the keyboard setup can be found in the autoinstall-user-data file and added ot the example below.  Restarting
 the QEMU VM and modifying the GRUB menu to reinstall the host OS is needed to apply the new changes to the YAML file.  Reinstalling
 the OS also demonstrates the ease of initializing a system to a known state with autoinstall &amp; cloud-init configs.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">version</span>: <span style="color:#ae81ff">1</span>
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">identity</span>:
@@ -257,7 +257,7 @@ This value will change based on which slot a PCI card is plugged into.  Luckily
 lets us wildcard the device names.</p>
 <p>This network example will work with either OpenRC or Systemd device names.  It&rsquo;s similar to what&rsquo;s used by
 <a href="https://git.launchpad.net/livecd-rootfs/tree/live-build/ubuntu-server/includes.chroot.ubuntu-server-minimal.ubuntu-server.installer/etc/cloud/cloud.cfg#n23">Ubuntu&rsquo;s LiveCD</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">network</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">network</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">version</span>: <span style="color:#ae81ff">2</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">ethernets</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">my-en-devices</span>:
@@ -286,7 +286,7 @@ can be complex when configuring per partition byte offsets. Luckily we can provi
 handle the details.  I&rsquo;ll show a basic lvm example but the other supported layouts are direct, and zfs.</p>
 <p>Here we specify a LVM configuration with a sizing policy to use the entire disk for the logical volume.  If sizing-policy
 were set to <code>scaled</code>, free space would be left on the storage device for things like snapshots or further expansion.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">storage</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">storage</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">layout</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">name</span>: <span style="color:#ae81ff">lvm</span>
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">sizing-policy</span>: <span style="color:#ae81ff">all</span>
@@ -315,7 +315,7 @@ Local Time is:    Tue Mar  4 05:45:56 2025 UTC
 SMART support is: Available - device has SMART capability.
 SMART support is: Enabled
 </code></pre><p>If we wanted to match this disk by wild-carding the model name, we would use the following.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">storage</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">layout</span>:
@@ -325,7 +325,7 @@ SMART support is: Enabled
 </span></span><span style="display:flex;"><span>            <span style="color:#f92672">model</span>: <span style="color:#ae81ff">QEMU*</span>
 </span></span></code></pre></div><p>Alternatively if our on-premise hardware instance had a 1GB SSD for the OS and a second 12GB spinning disk for data storage, we could
 use a match with size <code>size: smallest</code> to install the OS on the 1GB disk.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">storage</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">layout</span>:
@@ -337,19 +337,19 @@ use a match with size <code>size: smallest</code> to install the OS on the 1GB d
 <p>Running arbitrary commands is possible when autoinstall runs.  Commands are specified as a list and run under &ldquo;sh -c&rdquo;.
 Its  possible to specify if commands should run early in the autoinstall process, late, or when an error occurs.</p>
 <p>For example we want to hit a web endpoint when the installer has completed.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">late-commands</span>:
 </span></span><span style="display:flex;"><span>      - <span style="color:#f92672">curl -H &#39;Content-Type</span>: <span style="color:#ae81ff">application/json&#39; --data &#39;{&#34;host&#34;: &#34;&#39;$HOSTNAME&#39;&#34;}&#39; http://myapi.example.com/success</span>
 </span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">echo &#34;Install Success&#34;  &gt; /var/log/my.log</span>
 </span></span></code></pre></div><p>To run a command before the autoinstall process runs, like downloading internal x509 certificates:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">early-commands</span>:
 </span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">mkdir /etc/ssl/mycerts</span>
 </span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">wget -O /etc/ssl/mycerts/internal.pem &#34;http://x509api.example.com/certs/$HOSTNAME&#34;</span>
 </span></span></code></pre></div><p>Or reporting an error when autoinstall fails</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">error-commands</span>:
 </span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">echo &#34;Install failed&#34; &gt; /var/log/my.log</span>
@@ -360,7 +360,7 @@ the cloud-init entries under a user-data key.  Here&rsquo;s a cloud-init example
 <p>cloud-init and
 autoinstall sometimes perform similar tasks. When configuring a storage device with cloud-init, I found it was
 better to use autoinstall as the cloud-init changes were overwritten.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">user-data</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">package_update</span>: <span style="color:#66d9ef">true</span>    <span style="color:#75715e"># update the list of available packages</span>
@@ -371,7 +371,7 @@ better to use autoinstall as the cloud-init changes were overwritten.</p>
 </span></span></code></pre></div><h3 id="other">Other</h3>
 <p>It&rsquo;s possible to configure a local proxy for downloading software packages.  Running apt-cacher-ng as a package
 proxy inside a docker container on my laptop helps when I&rsquo;m on a high latency Internet connection.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">proxy</span>: <span style="color:#ae81ff">http://10.0.2.2:3142</span>
 </span></span></code></pre></div><h2 id="provision-a-physical-host">Provision a physical host</h2>
@@ -424,7 +424,7 @@ will need to be <a href="https://cloudinit.readthedocs.io/en/latest/tutorial/qem
 the VM with cloud-init to provide additional software packages and define a list of software packages to be installed on the VM.</p>
 <h4 id="add-external-ppa">Add External PPA</h4>
 <p>Add the 3rd-party <a href="https://cloudinit.readthedocs.io/en/latest/reference/modules.html#apt-configure">PPA</a> provided by Docker, Inc.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># Add Docker&#39;s PPA for Ubuntu</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># Add Docker&#39;s PPA for Ubuntu</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">apt</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">sources</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">docker.list</span>:
@@ -434,14 +434,14 @@ the VM with cloud-init to provide additional software packages and define a list
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">keyid</span>: <span style="color:#ae81ff">9DC858229FC7DD38854AE2D88D81803C0EBFCD88 </span>
 </span></span></code></pre></div><p>Should the GPG key ID for the Docker PPA change, I have left a comment above on how to find that value.<br>
 This is how the GPG output appears in 2025.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ gpg --show-keys &lt;<span style="color:#f92672">(</span>curl -s https://download.docker.com/linux/ubuntu/gpg<span style="color:#f92672">)</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ gpg --show-keys &lt;<span style="color:#f92672">(</span>curl -s https://download.docker.com/linux/ubuntu/gpg<span style="color:#f92672">)</span>
 </span></span><span style="display:flex;"><span>pub   rsa4096 2017-02-22 <span style="color:#f92672">[</span>SCEA<span style="color:#f92672">]</span>
 </span></span><span style="display:flex;"><span>      9DC858229FC7DD38854AE2D88D81803C0EBFCD88
 </span></span><span style="display:flex;"><span>uid                      Docker Release <span style="color:#f92672">(</span>CE deb<span style="color:#f92672">)</span> &lt;docker@docker.com&gt;
 </span></span><span style="display:flex;"><span>sub   rsa4096 2017-02-22 <span style="color:#f92672">[</span>S<span style="color:#f92672">]</span>
 </span></span></code></pre></div><h4 id="define-package-list">Define Package List</h4>
 <p>Specify a list of <a href="https://cloudinit.readthedocs.io/en/latest/reference/modules.html#package-update-upgrade-install">packages</a> to install.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># Update the list of packages available online</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># Update the list of packages available online</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">package_update</span>: <span style="color:#66d9ef">true</span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e"># Upgrade all installed packages</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">package_upgrade</span>: <span style="color:#66d9ef">true</span>
@@ -465,10 +465,10 @@ password hash is needed for cloud-init input.</p>
 <h4 id="secrets-generating-a-password-hash">Secrets: Generating a Password Hash</h4>
 <p>To create a password hash, use the <code>mkpasswd</code> command from Ubuntu&rsquo;s whois package.  This example will
 hash the weak password of &ldquo;abc123&rdquo; with the sha512 algorithm.  A password better than &ldquo;abc123&rdquo; should be used if following these examples.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ mkpasswd -m sha-512 <span style="color:#e6db74">&#34;abc123&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ mkpasswd -m sha-512 <span style="color:#e6db74">&#34;abc123&#34;</span>
 </span></span><span style="display:flex;"><span>$6$EkwQ38oDCPnJDuui$QKw3IISzY3emHXgJ/QHeEH8xyzGOKB3N6.bU/wAkwf4KDRsreB2iApa/EHULbunx6v9o9Q8foq4K.d8WtHukU/
 </span></span></code></pre></div><p>As mkpasswd is specific to Linux and doesn&rsquo;t work with MacOS, one can alternatively use <code>openssl</code> to create a password hash.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ echo abc123 |  openssl passwd -6 -stdin  
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ echo abc123 |  openssl passwd -6 -stdin  
 </span></span><span style="display:flex;"><span>$6$tdPON3RwkVViXg41$4O9euMZeGFJQXgJ3bvP3YtVcCw9BwIMHLLkix1s/R7woSuAAFvWWtrqqQ.33ESzgcUi9/HdEwelqB9jJUIrpU0
 </span></span></code></pre></div><h4 id="secrets-generating-a-ssh-public-private-key-pair">Secrets: Generating a SSH public private key pair</h4>
 <p>To create a SSH key pair, use ssh-keygen: <code>ssh-keygen -t ed25519 -f ./docker_vm_key -C &quot;app@docker_vm&quot; -P abc123</code>.  This will create a public &amp; private
@@ -476,7 +476,7 @@ ssh key in the current directory, with the easily guessable passphrase of <code>
 <h4 id="defining-the-user-account">Defining the User Account</h4>
 <p>This defines an application account named &ldquo;app&rdquo;.  The <code>ssh_authorized_keys</code> value comes from the contents of docker_vm_key.pub.<br>
 As a convenience, the <a href="./assets/docker_vm_key.pub">public</a> and <a href="./assets/docker_vm_key">private</a> ssh keys from this example are provided.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># create the docker group</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># create the docker group</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">groups</span>:
 </span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">docker</span>
 </span></span><span style="display:flex;"><span>
@@ -494,9 +494,9 @@ As a convenience, the <a href="./assets/docker_vm_key.pub">public</a> and <a hre
 Run the following to see cloud-init in action. This will create a virtual machine with 2 virtual CPU cores, 2 GB of ram,
 with a 4GB virtual disk using the LTS release of Ubuntu.  Depending on your Internet speed, this may take a few minutes as
 you&rsquo;ll be downloading packages from the Internet.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ multipass launch -n docker-demo --cloud-init docker-install.yaml -c <span style="color:#ae81ff">2</span> -m 2G -d 4G lts
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ multipass launch -n docker-demo --cloud-init docker-install.yaml -c <span style="color:#ae81ff">2</span> -m 2G -d 4G lts
 </span></span></code></pre></div><p>To find the new VM and access it over SSH with the private key so a docker command can be ran from a remote shell.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% mp list                                                                                                                             
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% mp list                                                                                                                             
 </span></span><span style="display:flex;"><span>Name                    State             IPv4             Image
 </span></span><span style="display:flex;"><span>docker-demo             Running           192.168.64.32    Ubuntu 24.04 LTS        
 </span></span><span style="display:flex;"><span>                                          172.17.0.1     

@@ -32,7 +32,7 @@ application expects might exist.</p>
 <p><img alt="A diagram showing the wrapper sits between Docker and runc, intercepting life cycle hooks." loading="lazy" src="/articles/virtualization/container_validation/assets/docker-runc-wrapper.png"></p>
 <p>The wrapper is a Python script that intercepts the runc <a href="https://github.com/opencontainers/runc/blob/main/libcontainer/configs/config.go#L409-L427">createRuntime and poststop</a> hooks
 to attach a <code>bpftrace</code> process against the container PID for tracing <code>openat</code> system calls in the container.  This program is passed to a Python subprocess call.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>BPFTRACE_PROGRAM <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;&#34;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>BPFTRACE_PROGRAM <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;&#34;
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">tracepoint:syscalls:sys_enter_clone
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">/pid == </span><span style="color:#e6db74">{pid}</span><span style="color:#e6db74">/
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">{{ @children[tid] = 1; }}
@@ -55,7 +55,7 @@ to attach a <code>bpftrace</code> process against the container PID for tracing 
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">END {{ clear(@children); clear(@fname); }}
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
 </span></span></code></pre></div><p>Enabling the wrapper was done with a docker-daemon.json update.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo cat /etc/docker/daemon.json 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo cat /etc/docker/daemon.json 
 </span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;default-runtime&#34;</span>: <span style="color:#e6db74">&#34;runc-traced&#34;</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;runtimes&#34;</span>: <span style="color:#f92672">{</span>
@@ -79,7 +79,7 @@ runc wrapper calls SIGCONT on the container.</p>
 </code></pre><p>The bpftrace trace output is then fed into a Python report generator.  By combining the manifest with bpftrace output, we can determine which files
 should exist and which are missing.  The report does filtering of application probe attempts for files in /proc and /sys.  Other missing files are not always
 required by the application as lookups and probes can happen outside of /proc.  An example is the gost SSL engine in the output below.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ ./generate-report.py --show-ignored 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ ./generate-report.py --show-ignored 
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">================================================================</span>
 </span></span><span style="display:flex;"><span>  Container Dependency Report
@@ -137,7 +137,7 @@ Together, the manifest and validator form a build, run, verify, refine, loop tha
 ]]></content:encoded>
     </item>
     <item>
-      <title>Declarative Builds</title>
+      <title>Declarative Container Builds</title>
       <link>https://amf3.github.io/articles/virtualization/declarative_builds/</link>
       <pubDate>Fri, 17 Apr 2026 23:20:00 +0000</pubDate>
       <guid>https://amf3.github.io/articles/virtualization/declarative_builds/</guid>
@@ -165,7 +165,7 @@ empty root filesystem.</p>
 listed binary at runtime and copied into the staging directory. Container tooling like Docker buildx is then used to convert the staging directory into a container image.</p>
 <h2 id="the-manifest">The Manifest</h2>
 <p>Building the root filesystem starts with the manifest YAML file.  The manifest lists locations of artifacts to include, data to copy, directories and symlinks, to create in the empty root filesystem.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">input</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">input</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">backend</span>: <span style="color:#ae81ff">buildroot</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">mode</span>: <span style="color:#ae81ff">staging</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/path/to/buildroot/output/staging</span>
@@ -233,25 +233,25 @@ $ du -sh my_root_fs/
 12M     my_root_fs/
 </code></pre><h2 id="demo">Demo</h2>
 <p>I used this Dockerfile with <code>docker build</code> to convert the staging directory into a container image.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">scratch</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> --chown<span style="color:#f92672">=</span>0:0 my_root_fs /<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">EXPOSE</span> <span style="color:#e6db74">53/tcp</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">EXPOSE</span> <span style="color:#e6db74">53/udp</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">ENTRYPOINT</span> [<span style="color:#e6db74">&#34;/usr/sbin/unbound&#34;</span>, <span style="color:#e6db74">&#34;-d&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;/etc/unbound/unbound.conf&#34;</span>] <span style="color:#960050;background-color:#1e0010">
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">scratch</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">COPY</span> --chown<span style="color:#f92672">=</span>0:0 my_root_fs /<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">EXPOSE</span> <span style="color:#e6db74">53/tcp</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">EXPOSE</span> <span style="color:#e6db74">53/udp</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">ENTRYPOINT</span> [<span style="color:#e6db74">&#34;/usr/sbin/unbound&#34;</span>, <span style="color:#e6db74">&#34;-d&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;/etc/unbound/unbound.conf&#34;</span>] <span style="color:#960050;background-color:#1e0010">
 </span></span></span></code></pre></div><p>This is how the image appears.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ docker history unbound-minimal:latest 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ docker history unbound-minimal:latest 
 </span></span><span style="display:flex;"><span>IMAGE          CREATED       CREATED BY                                      SIZE      COMMENT
 </span></span><span style="display:flex;"><span>43ac3c4ba387   <span style="color:#ae81ff">3</span> hours ago   ENTRYPOINT <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;/usr/sbin/unbound&#34;</span> <span style="color:#e6db74">&#34;-d&#34;</span> <span style="color:#e6db74">&#34;-c&#34;</span> <span style="color:#e6db74">&#34;/…   0B        buildkit.dockerfile.v0
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;missing&gt;      3 hours ago   EXPOSE [53/udp]                                 0B        buildkit.dockerfile.v0
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;missing&gt;      3 hours ago   EXPOSE [53/tcp]                                 0B        buildkit.dockerfile.v0
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;missing&gt;      3 hours ago   COPY --chown=0:0 my_root_fs/ / # buildkit       11.7MB    buildkit.dockerfile.v0
 </span></span></span></code></pre></div><p>The Docker run command to launch the container.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ docker run -it --rm -p 53:53/udp -p 53:53/tcp  unbound-minimal:latest 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ docker run -it --rm -p 53:53/udp -p 53:53/tcp  unbound-minimal:latest 
 </span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:43:35 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> notice: init module 0: validator
 </span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:43:35 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> notice: init module 1: iterator
 </span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:43:35 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: start of service <span style="color:#f92672">(</span>unbound 1.21.1<span style="color:#f92672">)</span>.
 </span></span></code></pre></div><p>The dig command is run in a second terminal to validate that the resolver works.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ dig @127.0.0.1 +answer bsky.app 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ dig @127.0.0.1 +answer bsky.app 
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>; &lt;&lt;&gt;&gt; DiG 9.18.39-0ubuntu0.24.04.3-Ubuntu &lt;&lt;&gt;&gt; @127.0.0.1 +answer bsky.app
 </span></span><span style="display:flex;"><span>; <span style="color:#f92672">(</span><span style="color:#ae81ff">1</span> server found<span style="color:#f92672">)</span>
@@ -280,7 +280,7 @@ $ du -sh my_root_fs/
 </span></span><span style="display:flex;"><span>;; WHEN: Thu Apr <span style="color:#ae81ff">16</span> 23:44:28 PDT <span style="color:#ae81ff">2026</span>
 </span></span><span style="display:flex;"><span>;; MSG SIZE  rcvd: <span style="color:#ae81ff">165</span>
 </span></span></code></pre></div><p>With the unbound log output showing the query was received.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:44:28 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: 172.17.0.1 bsky.app. A IN
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:44:28 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: 172.17.0.1 bsky.app. A IN
 </span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:44:28 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: resolving bsky.app. A IN
 </span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:44:28 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: response <span style="color:#66d9ef">for</span> bsky.app. A IN
 </span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:44:28 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: reply from &lt;.&gt; 1.1.1.1#53
@@ -299,7 +299,7 @@ container images can be built declaratively without relying on base image inheri
 ]]></content:encoded>
     </item>
     <item>
-      <title>Hidden Systems in Base Images</title>
+      <title>Hidden Systems in Base Container Images</title>
       <link>https://amf3.github.io/articles/virtualization/base_image/</link>
       <pubDate>Sun, 12 Apr 2026 18:23:15 +0000</pubDate>
       <guid>https://amf3.github.io/articles/virtualization/base_image/</guid>
@@ -313,7 +313,7 @@ what&rsquo;s included with the base image, think of the image as a collection of
 For Linux environments, the Python image comes with either a Debian or Alpine base image. Both base images come with additional applications
 not required by Python.</p>
 <p>The Debian based image ships with a Perl interpreter.  Yes, you read that correctly.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span> % docker run --rm -it python:3.14.3-trixie /bin/perl -v 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span> % docker run --rm -it python:3.14.3-trixie /bin/perl -v 
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>This is perl 5, version 40, subversion <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>v5.40.1<span style="color:#f92672">)</span> built <span style="color:#66d9ef">for</span> aarch64-linux-gnu-thread-multi
 </span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>with <span style="color:#ae81ff">48</span> registered patches, see perl -V <span style="color:#66d9ef">for</span> more detail<span style="color:#f92672">)</span>
@@ -329,7 +329,7 @@ physical keyboards, USB buses, and Linux virtual consoles.  Things that don&rsqu
 aggressively remove shells, package managers, development tools, and unnecessary services.</p>
 <p>However while exploring the <a href="https://hub.docker.com/hardened-images/catalog/dhi/python">DHI Python 3.14</a> image, I found remnants of the package manager,
 orphaned binaries, and scripts referencing nonexistent shells.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span> % ls -l rootfs/bin/gawk
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span> % ls -l rootfs/bin/gawk
 </span></span><span style="display:flex;"><span>-rwxr-xr-x  <span style="color:#ae81ff">1</span> adam  staff  <span style="color:#ae81ff">795024</span> Oct <span style="color:#ae81ff">29</span>  <span style="color:#ae81ff">2024</span> rootfs/bin/gawk
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>% file rootfs/sbin/*
@@ -347,9 +347,9 @@ output of a build pipeline that compiles from downloaded source.  This is simila
 back to a build step. When something changes inside the container image it&rsquo;s because an input changed.  The result is not a smaller image, but one
 that is explainable as the content is defined.</p>
 <p>At first creating an image in this manner seems simple.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">scratch</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> python-rootfs/ /<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;/usr/bin/python3&#34;</span>]<span style="color:#960050;background-color:#1e0010">
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">scratch</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">COPY</span> python-rootfs/ /<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;/usr/bin/python3&#34;</span>]<span style="color:#960050;background-color:#1e0010">
 </span></span></span></code></pre></div><p>In practice the Python runtime is not a single artifact.  It needs dynamically linked libraries, a runtime loader, and a full standard library. A Python
 3.14 build can easily produce hundreds of megabytes under <code>/usr/lib</code>.  The base image hides dependency complexities. Declarative builds expose dependencies
 and trade convenience for control over what ships inside the container.  A follow up article will assemble a container runtime from a declarative

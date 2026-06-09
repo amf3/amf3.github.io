@@ -12,7 +12,7 @@
 <link rel="canonical" href="https://amf3.github.io/articles/">
 <meta name="google-site-verification" content="6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E">
 <meta name="msvalidate.01" content="C1E02AC59FE7ECBDB6D9EFB7D5E02B65">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.4b72e7725c68fccaac08b7b94b4bf3724ac8531837c6717dbd3e55b5a23b0117.css" integrity="sha256-S3Lnclxo/MqsCLe5S0vzckrIUxg3xnF9vT5VtaI7ARc=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://amf3.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://amf3.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://amf3.github.io/favicon-32x32.png">
@@ -71,7 +71,7 @@
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-MKR06D6KGD"></script>
       <script>
         var doNotTrack = false;
-        if ( false ) {
+        if ( true ) {
           var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
           var doNotTrack = (dnt == "1" || dnt == "yes");
         }
@@ -113,12 +113,12 @@
             <a href="https://amf3.github.io/" accesskey="h" title="Adam Faris (Alt + H)">Adam Faris</a>
             <div class="logo-switches">
                 <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
-                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
-                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
                         <circle cx="12" cy="12" r="5"></circle>
@@ -150,12 +150,22 @@
                     <span>about</span>
                 </a>
             </li>
+            <li>
+                <a href="https://amf3.github.io/archives/" title="archives">
+                    <span>archives</span>
+                </a>
+            </li>
         </ul>
     </nav>
 </header>
 <main class="main"> 
 <header class="page-header"><nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
-    <a href='https://amf3.github.io/'>Home</a></nav>
+            <a href="/">Home</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
   <h1>
     articles
     <a href="/articles/index.xml" title="RSS" aria-label="RSS">
@@ -181,13 +191,15 @@ So how does one verify what a container actually needs?
 Why static analysis fails Using tools like lddtree to explore ELF dependencies only work to a point. Binary ELF files list linked dependencies in a section named DT_NEEDED. Tooling will read the DT_NEEDED section to discover linked dependencies. This works great for direct links, but not implicit dependencies.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-04-22 21:27:51 +0000 UTC'>April 22, 2026</span>&nbsp;·&nbsp;<span>824 words</span></footer>
+  <footer class="entry-footer">
+
+<span title='2026-04-22 21:27:51 +0000 UTC'>April 22, 2026</span>&nbsp;·&nbsp;<span>824 words</span></footer>
   <a class="entry-link" aria-label="post link to Container Image Validation" href="https://amf3.github.io/articles/virtualization/container_validation/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Declarative Builds
+    <h2 class="entry-hint-parent">Declarative Container Builds
     </h2>
   </header>
   <div class="entry-content">
@@ -197,13 +209,15 @@ Usually a container image starts with something like FROM: python:3.x or FROM de
 The filesystem often includes tools and binaries that aren’t required for the application. They’re not necessarily harmful, but they are unexplained. When a container image includes a Perl interpreter, USB utilities, or terminal tooling that the application never uses, it raises a simple question. Why is that there?
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-04-17 23:20:00 +0000 UTC'>April 17, 2026</span>&nbsp;·&nbsp;<span>1123 words</span></footer>
-  <a class="entry-link" aria-label="post link to Declarative Builds" href="https://amf3.github.io/articles/virtualization/declarative_builds/"></a>
+  <footer class="entry-footer">
+
+<span title='2026-04-17 23:20:00 +0000 UTC'>April 17, 2026</span>&nbsp;·&nbsp;<span>1123 words</span></footer>
+  <a class="entry-link" aria-label="post link to Declarative Container Builds" href="https://amf3.github.io/articles/virtualization/declarative_builds/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Hidden Systems in Base Images
+    <h2 class="entry-hint-parent">Hidden Systems in Base Container Images
     </h2>
   </header>
   <div class="entry-content">
@@ -212,8 +226,10 @@ Many container images start with FROM python:3.x. What gets imported is not only
 Large Container Images The official Python container image hosted on Docker Hub is a great demonstration of inheriting unknown layers. For Linux environments, the Python image comes with either a Debian or Alpine base image. Both base images come with additional applications not required by Python.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-04-12 18:23:15 +0000 UTC'>April 12, 2026</span>&nbsp;·&nbsp;<span>860 words</span></footer>
-  <a class="entry-link" aria-label="post link to Hidden Systems in Base Images" href="https://amf3.github.io/articles/virtualization/base_image/"></a>
+  <footer class="entry-footer">
+
+<span title='2026-04-12 18:23:15 +0000 UTC'>April 12, 2026</span>&nbsp;·&nbsp;<span>860 words</span></footer>
+  <a class="entry-link" aria-label="post link to Hidden Systems in Base Container Images" href="https://amf3.github.io/articles/virtualization/base_image/"></a>
 </article>
 
 <article class="post-entry"> 
@@ -226,7 +242,9 @@ Large Container Images The official Python container image hosted on Docker Hub 
 Forget about needing Docker’s buildx or Redhat’s buildah for this OCI container image deep dive. I will explain the OCI container image model and demonstrate building a new container image with a little JSON and a few SHA256 hash sums. You will understand that container images aren’t a file you download, but instead a graph of nodes and how the nodes are addressed after reading this article.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-02-23 16:29:59 -0800 PST'>February 23, 2026</span>&nbsp;·&nbsp;<span>1362 words</span></footer>
+  <footer class="entry-footer">
+
+<span title='2026-02-23 16:29:59 -0800 PST'>February 23, 2026</span>&nbsp;·&nbsp;<span>1362 words</span></footer>
   <a class="entry-link" aria-label="post link to Open Container Image Format" href="https://amf3.github.io/articles/virtualization/oci_image/"></a>
 </article>
 
@@ -241,7 +259,9 @@ Bind mounting the Docker socket with read only options doesn’t work the way on
 Please read this post if you’re adding /var/run/docker.sock:/var/run/docker.sock:ro to Docker compose files.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-01-05 12:25:30 -0800 PST'>January 5, 2026</span>&nbsp;·&nbsp;<span>1275 words</span></footer>
+  <footer class="entry-footer">
+
+<span title='2026-01-05 12:25:30 -0800 PST'>January 5, 2026</span>&nbsp;·&nbsp;<span>1275 words</span></footer>
   <a class="entry-link" aria-label="post link to Docker Socket Myths" href="https://amf3.github.io/articles/virtualization/docker_socket/"></a>
 </article>
 
@@ -257,7 +277,9 @@ Permission to Not Over-Engineer In environments that tolerate downtime, having a
 Lets examine the typical home router. In addition to routing packets between the LAN and the Internet, the home router also provides DHCP and DNS services. Then someone learns of PiHole and runs it on a separate device like a Raspberry PI. Now the router queries PiHole for adblock entries during DNS resolution. Ad-free browsing works works great; until HTTP requests stop working. With this scenario, it’s not obvious if it’s an issue on the router or an issue with PiHole.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-12-16 21:51:16 -0800 PST'>December 16, 2025</span>&nbsp;·&nbsp;<span>1316 words</span></footer>
+  <footer class="entry-footer">
+
+<span title='2025-12-16 21:51:16 -0800 PST'>December 16, 2025</span>&nbsp;·&nbsp;<span>1316 words</span></footer>
   <a class="entry-link" aria-label="post link to Decoupling Compute and Storage" href="https://amf3.github.io/articles/arch/2swarm_nodes/"></a>
 </article>
 
@@ -271,7 +293,9 @@ Lets examine the typical home router. In addition to routing packets between the
 Like any software project, this project is source controlled and rebuildable from scratch. If the router dies, I simply deploy a new router instance. This is the reproducibility you’d expect in a datacenter, not a home office.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-11-19 00:06:09 -0800 PST'>November 19, 2025</span>&nbsp;·&nbsp;<span>2794 words</span></footer>
+  <footer class="entry-footer">
+
+<span title='2025-11-19 00:06:09 -0800 PST'>November 19, 2025</span>&nbsp;·&nbsp;<span>2794 words</span></footer>
   <a class="entry-link" aria-label="post link to Uh-oh. Is the router down?" href="https://amf3.github.io/articles/virtualization/virtual_router/"></a>
 </article>
 
@@ -284,7 +308,9 @@ Like any software project, this project is source controlled and rebuildable fro
     <p>Adding Subcommands to Go CLIs Command Line Interfaces (CLIs) use subcommands and flags to enable different program features. A subcommand is a grouping of related features, and flags are options for controlling those features. The openssl command provides a great example of subcommands and flags. openssl rand -base64 8 will generate 8 random bytes of data with hexadecimal output. The subcommand is “rand” and “-base64” is the flag. Other openssl subcommands like “s_client” or “x509”, provide different features and each has their own options.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-09-29 17:17:10 -0400 -0400'>September 29, 2025</span>&nbsp;·&nbsp;<span>1265 words</span></footer>
+  <footer class="entry-footer">
+
+<span title='2025-09-29 17:17:10 -0400 -0400'>September 29, 2025</span>&nbsp;·&nbsp;<span>1265 words</span></footer>
   <a class="entry-link" aria-label="post link to Go CLIs: Creating Subcommands and Flags" href="https://amf3.github.io/articles/code/go/cli_args/"></a>
 </article>
 
@@ -299,7 +325,9 @@ I’m working on a project and using openAPI to generate API contracts. One of t
 const ( Gzip PostPailsCompression = &#34;gzip&#34; None PostPailsCompression = &#34;none&#34; ) type PostPails struct { Compression *PostPailsCompression `json:&#34;compression,omitempty&#34;` // MaxArchiveSize Max size (bytes) before rotating to a new archive. MaxArchiveSize *int `json:&#34;max_archive_size,omitempty&#34;` // Name Name of the new pail Name string `json:&#34;name&#34;` } I need to populate the struct with values when writing unit tests. But dealing with pointers in Go test code usually results in using temporary variables. It’s not bad, but there’s some visual noise.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-07-11 21:11:43 -0700 PDT'>July 11, 2025</span>&nbsp;·&nbsp;<span>325 words</span></footer>
+  <footer class="entry-footer">
+
+<span title='2025-07-11 21:11:43 -0700 PDT'>July 11, 2025</span>&nbsp;·&nbsp;<span>325 words</span></footer>
   <a class="entry-link" aria-label="post link to Go Generics: A Real World Use Case" href="https://amf3.github.io/articles/code/go/real_world_generics/"></a>
 </article>
 
@@ -312,7 +340,9 @@ const ( Gzip PostPailsCompression = &#34;gzip&#34; None PostPailsCompression = &
     <p>OpenAPI is a specification for documenting HTTP APIs for both humans and machines to consume. As OpenAPI is a specification, it is language agnostic. OpenAPI relies on generators for translating the specification. There’s more than just documentation that’s generated. Generators also create language-specific interfaces, tooling, and contracts. In some ways the OpenAPI pattern reminds me of either protobuf with gRPC or ORM schema-first design. As a result, a declarative API is created by the tooling.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-07-04 22:43:09 -0700 PDT'>July 4, 2025</span>&nbsp;·&nbsp;<span>1149 words</span></footer>
+  <footer class="entry-footer">
+
+<span title='2025-07-04 22:43:09 -0700 PDT'>July 4, 2025</span>&nbsp;·&nbsp;<span>1149 words</span></footer>
   <a class="entry-link" aria-label="post link to OpenAPI in Practice: Go Server &#43; Python Client from Spec" href="https://amf3.github.io/articles/api/hello_openapi/"></a>
 </article>
 <footer class="page-footer">
@@ -326,9 +356,11 @@ const ( Gzip PostPailsCompression = &#34;gzip&#34; None PostPailsCompression = &
 <footer class="footer">
         <span>&copy; 2026 <a href="https://amf3.github.io/">Adam Faris</a></span> · 
 
+    
+    
     <span>
         Powered by
-        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
         <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
     </span>
 </footer>
