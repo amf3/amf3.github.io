@@ -32,7 +32,7 @@ application expects might exist.</p>
 <p><img alt="A diagram showing the wrapper sits between Docker and runc, intercepting life cycle hooks." loading="lazy" src="/articles/virtualization/container_validation/assets/docker-runc-wrapper.png"></p>
 <p>The wrapper is a Python script that intercepts the runc <a href="https://github.com/opencontainers/runc/blob/main/libcontainer/configs/config.go#L409-L427">createRuntime and poststop</a> hooks
 to attach a <code>bpftrace</code> process against the container PID for tracing <code>openat</code> system calls in the container.  This program is passed to a Python subprocess call.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>BPFTRACE_PROGRAM <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;&#34;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>BPFTRACE_PROGRAM <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;&#34;
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">tracepoint:syscalls:sys_enter_clone
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">/pid == </span><span style="color:#e6db74">{pid}</span><span style="color:#e6db74">/
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">{{ @children[tid] = 1; }}
@@ -55,7 +55,7 @@ to attach a <code>bpftrace</code> process against the container PID for tracing 
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">END {{ clear(@children); clear(@fname); }}
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
 </span></span></code></pre></div><p>Enabling the wrapper was done with a docker-daemon.json update.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo cat /etc/docker/daemon.json 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo cat /etc/docker/daemon.json 
 </span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;default-runtime&#34;</span>: <span style="color:#e6db74">&#34;runc-traced&#34;</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;runtimes&#34;</span>: <span style="color:#f92672">{</span>
@@ -79,7 +79,7 @@ runc wrapper calls SIGCONT on the container.</p>
 </code></pre><p>The bpftrace trace output is then fed into a Python report generator.  By combining the manifest with bpftrace output, we can determine which files
 should exist and which are missing.  The report does filtering of application probe attempts for files in /proc and /sys.  Other missing files are not always
 required by the application as lookups and probes can happen outside of /proc.  An example is the gost SSL engine in the output below.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ ./generate-report.py --show-ignored 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ ./generate-report.py --show-ignored 
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">================================================================</span>
 </span></span><span style="display:flex;"><span>  Container Dependency Report
@@ -137,7 +137,7 @@ Together, the manifest and validator form a build, run, verify, refine, loop tha
 ]]></content:encoded>
     </item>
     <item>
-      <title>Declarative Builds</title>
+      <title>Declarative Container Builds</title>
       <link>https://amf3.github.io/articles/virtualization/declarative_builds/</link>
       <pubDate>Fri, 17 Apr 2026 23:20:00 +0000</pubDate>
       <guid>https://amf3.github.io/articles/virtualization/declarative_builds/</guid>
@@ -165,7 +165,7 @@ empty root filesystem.</p>
 listed binary at runtime and copied into the staging directory. Container tooling like Docker buildx is then used to convert the staging directory into a container image.</p>
 <h2 id="the-manifest">The Manifest</h2>
 <p>Building the root filesystem starts with the manifest YAML file.  The manifest lists locations of artifacts to include, data to copy, directories and symlinks, to create in the empty root filesystem.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">input</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">input</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">backend</span>: <span style="color:#ae81ff">buildroot</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">mode</span>: <span style="color:#ae81ff">staging</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/path/to/buildroot/output/staging</span>
@@ -233,25 +233,25 @@ $ du -sh my_root_fs/
 12M     my_root_fs/
 </code></pre><h2 id="demo">Demo</h2>
 <p>I used this Dockerfile with <code>docker build</code> to convert the staging directory into a container image.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">scratch</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> --chown<span style="color:#f92672">=</span>0:0 my_root_fs /<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">EXPOSE</span> <span style="color:#e6db74">53/tcp</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">EXPOSE</span> <span style="color:#e6db74">53/udp</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">ENTRYPOINT</span> [<span style="color:#e6db74">&#34;/usr/sbin/unbound&#34;</span>, <span style="color:#e6db74">&#34;-d&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;/etc/unbound/unbound.conf&#34;</span>] <span style="color:#960050;background-color:#1e0010">
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">scratch</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">COPY</span> --chown<span style="color:#f92672">=</span>0:0 my_root_fs /<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">EXPOSE</span> <span style="color:#e6db74">53/tcp</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">EXPOSE</span> <span style="color:#e6db74">53/udp</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">ENTRYPOINT</span> [<span style="color:#e6db74">&#34;/usr/sbin/unbound&#34;</span>, <span style="color:#e6db74">&#34;-d&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;/etc/unbound/unbound.conf&#34;</span>] <span style="color:#960050;background-color:#1e0010">
 </span></span></span></code></pre></div><p>This is how the image appears.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ docker history unbound-minimal:latest 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ docker history unbound-minimal:latest 
 </span></span><span style="display:flex;"><span>IMAGE          CREATED       CREATED BY                                      SIZE      COMMENT
 </span></span><span style="display:flex;"><span>43ac3c4ba387   <span style="color:#ae81ff">3</span> hours ago   ENTRYPOINT <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;/usr/sbin/unbound&#34;</span> <span style="color:#e6db74">&#34;-d&#34;</span> <span style="color:#e6db74">&#34;-c&#34;</span> <span style="color:#e6db74">&#34;/…   0B        buildkit.dockerfile.v0
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;missing&gt;      3 hours ago   EXPOSE [53/udp]                                 0B        buildkit.dockerfile.v0
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;missing&gt;      3 hours ago   EXPOSE [53/tcp]                                 0B        buildkit.dockerfile.v0
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;missing&gt;      3 hours ago   COPY --chown=0:0 my_root_fs/ / # buildkit       11.7MB    buildkit.dockerfile.v0
 </span></span></span></code></pre></div><p>The Docker run command to launch the container.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ docker run -it --rm -p 53:53/udp -p 53:53/tcp  unbound-minimal:latest 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ docker run -it --rm -p 53:53/udp -p 53:53/tcp  unbound-minimal:latest 
 </span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:43:35 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> notice: init module 0: validator
 </span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:43:35 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> notice: init module 1: iterator
 </span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:43:35 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: start of service <span style="color:#f92672">(</span>unbound 1.21.1<span style="color:#f92672">)</span>.
 </span></span></code></pre></div><p>The dig command is run in a second terminal to validate that the resolver works.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ dig @127.0.0.1 +answer bsky.app 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ dig @127.0.0.1 +answer bsky.app 
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>; &lt;&lt;&gt;&gt; DiG 9.18.39-0ubuntu0.24.04.3-Ubuntu &lt;&lt;&gt;&gt; @127.0.0.1 +answer bsky.app
 </span></span><span style="display:flex;"><span>; <span style="color:#f92672">(</span><span style="color:#ae81ff">1</span> server found<span style="color:#f92672">)</span>
@@ -280,7 +280,7 @@ $ du -sh my_root_fs/
 </span></span><span style="display:flex;"><span>;; WHEN: Thu Apr <span style="color:#ae81ff">16</span> 23:44:28 PDT <span style="color:#ae81ff">2026</span>
 </span></span><span style="display:flex;"><span>;; MSG SIZE  rcvd: <span style="color:#ae81ff">165</span>
 </span></span></code></pre></div><p>With the unbound log output showing the query was received.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:44:28 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: 172.17.0.1 bsky.app. A IN
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:44:28 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: 172.17.0.1 bsky.app. A IN
 </span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:44:28 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: resolving bsky.app. A IN
 </span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:44:28 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: response <span style="color:#66d9ef">for</span> bsky.app. A IN
 </span></span><span style="display:flex;"><span>Apr <span style="color:#ae81ff">17</span> 06:44:28 unbound<span style="color:#f92672">[</span>1:0<span style="color:#f92672">]</span> info: reply from &lt;.&gt; 1.1.1.1#53
@@ -299,7 +299,7 @@ container images can be built declaratively without relying on base image inheri
 ]]></content:encoded>
     </item>
     <item>
-      <title>Hidden Systems in Base Images</title>
+      <title>Hidden Systems in Base Container Images</title>
       <link>https://amf3.github.io/articles/virtualization/base_image/</link>
       <pubDate>Sun, 12 Apr 2026 18:23:15 +0000</pubDate>
       <guid>https://amf3.github.io/articles/virtualization/base_image/</guid>
@@ -313,7 +313,7 @@ what&rsquo;s included with the base image, think of the image as a collection of
 For Linux environments, the Python image comes with either a Debian or Alpine base image. Both base images come with additional applications
 not required by Python.</p>
 <p>The Debian based image ships with a Perl interpreter.  Yes, you read that correctly.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span> % docker run --rm -it python:3.14.3-trixie /bin/perl -v 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span> % docker run --rm -it python:3.14.3-trixie /bin/perl -v 
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>This is perl 5, version 40, subversion <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>v5.40.1<span style="color:#f92672">)</span> built <span style="color:#66d9ef">for</span> aarch64-linux-gnu-thread-multi
 </span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>with <span style="color:#ae81ff">48</span> registered patches, see perl -V <span style="color:#66d9ef">for</span> more detail<span style="color:#f92672">)</span>
@@ -329,7 +329,7 @@ physical keyboards, USB buses, and Linux virtual consoles.  Things that don&rsqu
 aggressively remove shells, package managers, development tools, and unnecessary services.</p>
 <p>However while exploring the <a href="https://hub.docker.com/hardened-images/catalog/dhi/python">DHI Python 3.14</a> image, I found remnants of the package manager,
 orphaned binaries, and scripts referencing nonexistent shells.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span> % ls -l rootfs/bin/gawk
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span> % ls -l rootfs/bin/gawk
 </span></span><span style="display:flex;"><span>-rwxr-xr-x  <span style="color:#ae81ff">1</span> adam  staff  <span style="color:#ae81ff">795024</span> Oct <span style="color:#ae81ff">29</span>  <span style="color:#ae81ff">2024</span> rootfs/bin/gawk
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>% file rootfs/sbin/*
@@ -347,9 +347,9 @@ output of a build pipeline that compiles from downloaded source.  This is simila
 back to a build step. When something changes inside the container image it&rsquo;s because an input changed.  The result is not a smaller image, but one
 that is explainable as the content is defined.</p>
 <p>At first creating an image in this manner seems simple.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">scratch</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> python-rootfs/ /<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;/usr/bin/python3&#34;</span>]<span style="color:#960050;background-color:#1e0010">
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">scratch</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">COPY</span> python-rootfs/ /<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;/usr/bin/python3&#34;</span>]<span style="color:#960050;background-color:#1e0010">
 </span></span></span></code></pre></div><p>In practice the Python runtime is not a single artifact.  It needs dynamically linked libraries, a runtime loader, and a full standard library. A Python
 3.14 build can easily produce hundreds of megabytes under <code>/usr/lib</code>.  The base image hides dependency complexities. Declarative builds expose dependencies
 and trade convenience for control over what ships inside the container.  A follow up article will assemble a container runtime from a declarative
@@ -469,7 +469,7 @@ level objects reference lower level objects by digest, construction begins with 
 to an object would change the layer digest, which would in turn invalidate the config and manifest digests above it.</p>
 <p>Begin with creating a staging directory for building our conatiner image and the compiled application.  The application is statically
 compiled and named <strong>hello</strong>. It prints a greeting defined by the <a href="./assets/hello.go">GREETING</a> environment variable, else it prints &ldquo;Hello World&rdquo;.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ mkdir -p myapp/blobs/sha256
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ mkdir -p myapp/blobs/sha256
 </span></span><span style="display:flex;"><span>$ tree myapp
 </span></span><span style="display:flex;"><span>myapp
 </span></span><span style="display:flex;"><span>└── blobs
@@ -481,7 +481,7 @@ compiled and named <strong>hello</strong>. It prints a greeting defined by the <
 </span></span><span style="display:flex;"><span>HELLO ADAM
 </span></span></code></pre></div><p>Next turn the &ldquo;hello&rdquo; application into a root filesystem blob.  Currently the build artifact is in the &ldquo;./build&rdquo; directory which
 gets archived with tar.  Compute the SHA256 digest on the tar archive and the archive is copied to the staging directory.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ tree build/
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ tree build/
 </span></span><span style="display:flex;"><span>build/
 </span></span><span style="display:flex;"><span>└── hello
 </span></span><span style="display:flex;"><span>
@@ -498,7 +498,7 @@ gets archived with tar.  Compute the SHA256 digest on the tar archive and the ar
 </span></span><span style="display:flex;"><span>        └── 0f11da71a27abfb549ba01cc400d393388116da84abb5f092572c5f2146398cb
 </span></span></code></pre></div><p>Create a config object which tells the container runtime how to execute the filesystem. For simplicity this example uses an uncompressed tar
 archive. The diff_ids value matches the layer digest.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ cat config.json 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ cat config.json 
 </span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;architecture&#34;</span>: <span style="color:#e6db74">&#34;amd64&#34;</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;os&#34;</span>: <span style="color:#e6db74">&#34;linux&#34;</span>,
@@ -520,7 +520,7 @@ archive. The diff_ids value matches the layer digest.</p>
 </span></span><span style="display:flex;"><span>$ cp config.json myapp/blobs/sha256/f86f75f0d7a7dd4c951a158aca51894ab59f46b0348558a341a589bfcc0d253c
 </span></span></code></pre></div><p>The manifest binds the configuration and layer digests into a single image descriptor. The manifest
 file also gets hashed and stored in the staging directory.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ cat manifest 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ cat manifest 
 </span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;schemaVersion&#34;</span>: 2,
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;mediaType&#34;</span>: <span style="color:#e6db74">&#34;application/vnd.oci.image.manifest.v1+json&#34;</span>,
@@ -543,7 +543,7 @@ file also gets hashed and stored in the staging directory.</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>$ cp manifest myapp/blobs/sha256/d6fceb45932ad49b50f9a1e24b21691b60f861bf46ed9e4a47bd74b8401a2ecd
 </span></span></code></pre></div><p>Finally create the container entry point and declare the myapp directory is the top level directory of a OCI compliant image.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ cat myapp/index.json
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ cat myapp/index.json
 </span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;schemaVersion&#34;</span>: 2,
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;manifests&#34;</span>: <span style="color:#f92672">[</span>
@@ -606,7 +606,7 @@ discuss alternatives.</p>
 by creating a Unix socket with python and not using Docker at all.</p>
 <p>This code block will create a Unix socket and wait for clients to connect.  When the client connects, the server prints received
 data to standard out.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python3" data-lang="python3"><span style="display:flex;"><span><span style="color:#75715e">#! /usr/bin/env python3</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python3" data-lang="python3"><span style="display:flex;"><span><span style="color:#75715e">#! /usr/bin/env python3</span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e"># Save as server.py</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
@@ -636,7 +636,7 @@ data to standard out.</p>
 </span></span><span style="display:flex;"><span>    conn<span style="color:#f92672">.</span>sendall(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;ack</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
 </span></span></code></pre></div><p>The next block contains the client code.  Notice that the client socket path (/mnt/control.sock) is different from the server (/tmp/control.sock)
 as it&rsquo;s using the read only bind mount created in the next step.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python3" data-lang="python3"><span style="display:flex;"><span><span style="color:#75715e">#! /usr/bin/env python3</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python3" data-lang="python3"><span style="display:flex;"><span><span style="color:#75715e">#! /usr/bin/env python3</span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e"># Save as client.py</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
 </span></span><span style="display:flex;"><span>
@@ -647,7 +647,7 @@ as it&rsquo;s using the read only bind mount created in the next step.</p>
 </span></span><span style="display:flex;"><span>print(sock<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>))
 </span></span></code></pre></div><p>Start the server code to create <code>/tmp/control.sock</code> and then bind mount the socket
 to a new mount point with read-only access.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo touch /mnt/control.sock                           <span style="color:#75715e"># create the mount point</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo touch /mnt/control.sock                           <span style="color:#75715e"># create the mount point</span>
 </span></span><span style="display:flex;"><span>$ sudo mount --bind /tmp/control.sock /mnt/control.sock  <span style="color:#75715e"># mount the socket to a new mount point</span>
 </span></span><span style="display:flex;"><span>$ sudo mount -o remount,ro,bind /mnt/control.sock        <span style="color:#75715e"># Remount the socket mount point with read only options</span>
 </span></span><span style="display:flex;"><span>
@@ -656,7 +656,7 @@ to a new mount point with read-only access.</p>
 </span></span></code></pre></div><p>Next run the client.  At this point it <strong>should not</strong> be possible to write to the socket, but this screen shot shows otherwise.</p>
 <p><img alt="Screenshot Demo" loading="lazy" src="/articles/virtualization/docker_socket/assets/socket_demo.jpg"></p>
 <p>If running the demo locally, don&rsquo;t forget to clean up the bind mount.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo umount /mnt/control.sock  <span style="color:#75715e"># unmount the read-only bind mount</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo umount /mnt/control.sock  <span style="color:#75715e"># unmount the read-only bind mount</span>
 </span></span><span style="display:flex;"><span>sudo rm /mnt/control.sock      <span style="color:#75715e"># remove the mount point</span>
 </span></span><span style="display:flex;"><span>rm /tmp/control.sock           <span style="color:#75715e"># remove the control.sock socket created by the python server code.</span>
 </span></span></code></pre></div><h3 id="how-did-this-work">How did this work?</h3>
@@ -679,7 +679,7 @@ verbs, the HTTP endpoints don&rsquo;t map cleanly between safe and unsafe operat
 and explains why granting a container access to the Docker socket implicitly grants elevated capabilities for that container.</p>
 <p>This example only uses HTTP GET requests to demonstrate the missing separation of safe and unsafe operations in the Docker API. The
 example is able to exfiltrate TLS certificates from a running container. No container restart, privilege escalation, or filesystem write is required.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ <span style="color:#75715e"># Get a list of running containers</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ <span style="color:#75715e"># Get a list of running containers</span>
 </span></span><span style="display:flex;"><span>$ curl -s --unix-socket /var/run/docker.sock -X GET http://localhost/containers/json | jq <span style="color:#e6db74">&#39;.[] | {Names, Id, Image}&#39;</span> 
 </span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;Names&#34;</span>: <span style="color:#f92672">[</span>
@@ -891,12 +891,12 @@ wrap QEMU, but it felt unnecessary for this simple use case.  Invoking QEMU dire
 sure the qemu-utils and qemu-system-x86 packages are installed.  I wanted a service account to run the virtual router process.  I
 created a user named <strong>qemu</strong> and gave it access to the <strong>kvm</strong> group.</p>
 <p>If doing this by hand:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo useradd -r -s /usr/sbin/nologin qemu
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo useradd -r -s /usr/sbin/nologin qemu
 </span></span><span style="display:flex;"><span>sudo usermod -aG kvm qemu
 </span></span></code></pre></div><h3 id="isolating-network-cards">Isolating Network Cards</h3>
 <p>This step is generic to isolating PCI cards for any type of virtual machine.   The first step is to get the PCI ID tuple that&rsquo;s
 burned into the card&rsquo;s firmware.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ lspci -nn | grep Ethernet
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ lspci -nn | grep Ethernet
 </span></span><span style="display:flex;"><span>01:00.0 Ethernet controller <span style="color:#f92672">[</span>0200<span style="color:#f92672">]</span>: Intel Corporation I350 Gigabit Network Connection <span style="color:#f92672">[</span>8086:1521<span style="color:#f92672">]</span> <span style="color:#f92672">(</span>rev 01<span style="color:#f92672">)</span>
 </span></span><span style="display:flex;"><span>01:00.1 Ethernet controller <span style="color:#f92672">[</span>0200<span style="color:#f92672">]</span>: Intel Corporation I350 Gigabit Network Connection <span style="color:#f92672">[</span>8086:1521<span style="color:#f92672">]</span> <span style="color:#f92672">(</span>rev 01<span style="color:#f92672">)</span>
 </span></span><span style="display:flex;"><span>06:00.0 Ethernet controller <span style="color:#f92672">[</span>0200<span style="color:#f92672">]</span>: Realtek Semiconductor Co., Ltd. RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller <span style="color:#f92672">[</span>10ec:8168<span style="color:#f92672">]</span> <span style="color:#f92672">(</span>rev 0c<span style="color:#f92672">)</span>
@@ -906,10 +906,10 @@ are the &ldquo;8086:1521&rdquo; tuple.  The first value (8086) in the tuple is r
 family of network controllers.</p>
 <p>Because I want to assign the Intel network card to the router VM, I first need to denylist the IGB driver to prevent the host OS
 from using it.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;blacklist igb&#34;</span> | sudo tee /etc/modprobe.d/blacklist-igb.conf
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;blacklist igb&#34;</span> | sudo tee /etc/modprobe.d/blacklist-igb.conf
 </span></span><span style="display:flex;"><span>sudo update-initramfs -u
 </span></span></code></pre></div><p>Next I need to load the vfio-pci module at boot time so the network card can be assigned to the VM.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#39;GRUB_CMDLINE_LINUX_DEFAULT=&#34;$GRUB_CMDLINE_LINUX intel_iommu=on vfio-pci.ids=8086:1521&#34;&#39;</span> | sudo tee /etc/default/grub.d/virtualRouterNic.cfg
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#39;GRUB_CMDLINE_LINUX_DEFAULT=&#34;$GRUB_CMDLINE_LINUX intel_iommu=on vfio-pci.ids=8086:1521&#34;&#39;</span> | sudo tee /etc/default/grub.d/virtualRouterNic.cfg
 </span></span><span style="display:flex;"><span>sudo update-grub
 </span></span><span style="display:flex;"><span>sudo reboot
 </span></span></code></pre></div><p>Now the steps I listed aren&rsquo;t ideal for everyone but they work for me. Deny listing the IGB kernel module impacts all Intel
@@ -923,15 +923,15 @@ IGB kernel module and use that for the host OS.  It&rsquo;s something to plan fo
 can modify behavior during hardware detection.  The qemu user, a member of the kvm group, is running the router VM process and
 normally doesn&rsquo;t have write access to the Intel network card being assigned to the router VM.  The updated udev rules will grant
 the kvm group members write permissions to the vfio device.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo vi /etc/udev/rules.d/99-qemu-vfio.rules 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo vi /etc/udev/rules.d/99-qemu-vfio.rules 
 </span></span><span style="display:flex;"><span>KERNEL<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;vfio&#34;</span>, GROUP<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;kvm&#34;</span>, MODE<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;0660&#34;</span>
 </span></span><span style="display:flex;"><span>KERNEL<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;[0-9]*&#34;</span>, SUBSYSTEM<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;vfio&#34;</span>, GROUP<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;kvm&#34;</span>, MODE<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;0660&#34;</span>
 </span></span><span style="display:flex;"><span>KERNEL<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;kvm&#34;</span>, GROUP<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;kvm&#34;</span>, MODE<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;0660&#34;</span>
 </span></span></code></pre></div><p>Reload the udev rules with:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo udevadm control --reload-rules
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo udevadm control --reload-rules
 </span></span><span style="display:flex;"><span>sudo udevadm trigger --action<span style="color:#f92672">=</span>add /dev/vfio/1
 </span></span></code></pre></div><p>Then validate that members of the kvm group can write to the vfio device.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ id qemu
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ id qemu
 </span></span><span style="display:flex;"><span>uid<span style="color:#f92672">=</span>999<span style="color:#f92672">(</span>qemu<span style="color:#f92672">)</span> gid<span style="color:#f92672">=</span>987<span style="color:#f92672">(</span>qemu<span style="color:#f92672">)</span> groups<span style="color:#f92672">=</span>987<span style="color:#f92672">(</span>qemu<span style="color:#f92672">)</span>,993<span style="color:#f92672">(</span>kvm<span style="color:#f92672">)</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>$ ls -l /dev/vfio/
@@ -956,7 +956,7 @@ the <a href="https://mikrotik.com/download">raw image</a> which
 I later <a href="https://amf3.github.io/articles/virtualization/qemuimage_tips/#tip-four---transfer-a-qemu-image-to-bare-metal">converted into a qcow2 image</a>
 that allows taking snapshots.  Network card drivers included with CHR are the default drivers from the Linux kernel and a few others.
 Here&rsquo;s a partial module list from one of <a href="https://mikrotik.com/download/changelogs">Mikrotik&rsquo;s change log</a> entries (v7.12).</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>x86 - added support for Mellanox ConnectX-6 Dx NIC;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>x86 - added support for Mellanox ConnectX-6 Dx NIC;
 </span></span><span style="display:flex;"><span> *) x86 - i40e updated driver to 2.23.17 version;
 </span></span><span style="display:flex;"><span> *) x86 - igb updated driver to 5.14.16 version;
 </span></span><span style="display:flex;"><span> *) x86 - igbvf updated driver from in-tree Linux kernel;
@@ -977,7 +977,7 @@ reference in the template file is missing from the vault, the CLI will fail to g
 This prevents generating router configs with incomplete or missing commands.</p>
 <p>Here&rsquo;s an example where I declare a secret reference in a file called router_config.tmpl. I then use the op command to generate
 a new file containing plain-text secrets named router_config.rsc.  router_config.rsc is what&rsquo;s uploaded to the router.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ cat router_config.templ
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ cat router_config.templ
 </span></span><span style="display:flex;"><span>/user set <span style="color:#f92672">[</span>find name<span style="color:#f92672">=</span>admin<span style="color:#f92672">]</span> password<span style="color:#f92672">={{</span> op://API_Vault/Test_Login/password <span style="color:#f92672">}}</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>$ op inject -i router_config.templ -o router_config.rsc   
@@ -995,21 +995,21 @@ These are the qemu options I use when starting the router VM.</p>
 <li><strong>-device</strong> entries specify the Intel PCI card bus ID.  If the card were moved to a different motherboard slot, those values would need to be updated.</li>
 <li><strong>-serial</strong> and <strong>-monitor</strong> options create sockets to the VM&rsquo;s and QEMU&rsquo;s console that I can access with socat.</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ /usr/bin/qemu-system-x86_64 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -machine q35,accel<span style="color:#f92672">=</span>kvm <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -cpu host -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -m 512M -boot c <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -nic none <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -drive file<span style="color:#f92672">=</span>/srv/virtual_machines/routeros/chr-7.19.3.qcow2,if<span style="color:#f92672">=</span>virtio,format<span style="color:#f92672">=</span>qcow2 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -serial unix:/srv/virtual_machines/routeros/console.sock,server,nowait <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -monitor unix:/srv/virtual_machines/routeros/monitor.sock,server,nowait <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -display none -vga none <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device vfio-pci,host<span style="color:#f92672">=</span>01:00.0 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device vfio-pci,host<span style="color:#f92672">=</span>01:00.1
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ /usr/bin/qemu-system-x86_64 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -machine q35,accel<span style="color:#f92672">=</span>kvm <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -cpu host -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -m 512M -boot c <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -nic none <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -drive file<span style="color:#f92672">=</span>/srv/virtual_machines/routeros/chr-7.19.3.qcow2,if<span style="color:#f92672">=</span>virtio,format<span style="color:#f92672">=</span>qcow2 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -serial unix:/srv/virtual_machines/routeros/console.sock,server,nowait <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -monitor unix:/srv/virtual_machines/routeros/monitor.sock,server,nowait <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -display none -vga none <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -device vfio-pci,host<span style="color:#f92672">=</span>01:00.0 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -device vfio-pci,host<span style="color:#f92672">=</span>01:00.1
 </span></span></code></pre></div><p>And the socat command to access the VM console or QEMU monitor.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo -u qemu socat STDIO,cfmakeraw,isig<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> UNIX:/srv/virtual_machines/routeros/console.sock
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo -u qemu socat STDIO,cfmakeraw,isig<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> UNIX:/srv/virtual_machines/routeros/console.sock
 </span></span></code></pre></div><p>To ensure the router is automatically started on reboots, I wrapped the qemu command inside a systemd service unit named routeros.service.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#66d9ef">[Unit]</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#66d9ef">[Unit]</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">Description</span><span style="color:#f92672">=</span><span style="color:#e6db74">RouterOS VM (QEMU)</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">After</span><span style="color:#f92672">=</span><span style="color:#e6db74">network-online.target</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">Wants</span><span style="color:#f92672">=</span><span style="color:#e6db74">network-online.target</span>
@@ -1066,7 +1066,7 @@ These are the qemu options I use when starting the router VM.</p>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">[Install]</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">WantedBy</span><span style="color:#f92672">=</span><span style="color:#e6db74">multi-user.target</span>
 </span></span></code></pre></div><p>Don&rsquo;t forget to refresh systemd to pick up the changes before issuing enable or restart commands for the new service.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo systemctl daemon-reload
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo systemctl daemon-reload
 </span></span></code></pre></div><h2 id="maintenance-and-recovery">Maintenance and Recovery</h2>
 <h3 id="monitoringalerting">Monitoring/Alerting</h3>
 <p>I keep alerting for the router uncomplicated.  If the Internet stops working, I know there&rsquo;s a problem.</p>
@@ -1082,11 +1082,11 @@ virtual machine using QEMU.  The router only cares about interfaces being availa
 config file allows me to track changes in a git repo.  Mikrotik uses a script-like text file format where CLI commands
 are applied as the file is processed.  This example shows how the external interface receives a DHCP address from my Internet provider
 while defining a RFC 1918 address for internal use on a second interface.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>/ip dhcp-client add comment<span style="color:#f92672">=</span>admin_interface disabled<span style="color:#f92672">=</span>no interface<span style="color:#f92672">=</span>ether1  use-peer-dns<span style="color:#f92672">=</span>yes 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>/ip dhcp-client add comment<span style="color:#f92672">=</span>admin_interface disabled<span style="color:#f92672">=</span>no interface<span style="color:#f92672">=</span>ether1  use-peer-dns<span style="color:#f92672">=</span>yes 
 </span></span><span style="display:flex;"><span>/ip address add address<span style="color:#f92672">=</span>192.168.10.1/24 interface<span style="color:#f92672">=</span>ether2 network<span style="color:#f92672">=</span>192.168.10.0
 </span></span></code></pre></div><p>The file is transferred to the router&rsquo;s local filesystem by either using the web interface to upload the file or scp.  Once
 stored on the router, I issue a router reset command that wipes all settings and reapplies the configuration.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>/system/reset-configuration keep-users<span style="color:#f92672">=</span>no no-defaults<span style="color:#f92672">=</span>yes skip-backup<span style="color:#f92672">=</span>yes run-after-reset<span style="color:#f92672">=</span>router_config.rsc
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>/system/reset-configuration keep-users<span style="color:#f92672">=</span>no no-defaults<span style="color:#f92672">=</span>yes skip-backup<span style="color:#f92672">=</span>yes run-after-reset<span style="color:#f92672">=</span>router_config.rsc
 </span></span></code></pre></div><p>Other routing projects offer similar features.  OpenWRT supports text based configs with it&rsquo;s Unified Configuration Interface API
 and Opnsense can be configured with it&rsquo;s config.xml file.  Meaning this approach isn&rsquo;t limited to Mikrotik software.</p>
 <h3 id="router-recovery">Router Recovery</h3>
@@ -1147,11 +1147,11 @@ which are flags.  Some programs like <code>git</code> take this further by treat
 flag parsing consistent between executables gets messy.</p>
 <p>Fortunately several libraries are available to make subcommands and flags easier to manage.  The one that I finally chose is <a href="https://cli.urfave.org">urfave/cli</a> which offers a builder style API.  The examples below use
 version 3 of the library which can be imported as:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;github.com/urfave/cli/v3&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;github.com/urfave/cli/v3&#34;</span>
 </span></span></code></pre></div><h2 id="urfavecli-with-flags">urfave/cli with flags</h2>
 <p>This is how simple the urfave/cli library is to use. I configure a <a href="https://pkg.go.dev/github.com/urfave/cli#Command">cli.Command</a>
 struct, then call <a href="https://pkg.go.dev/github.com/urfave/cli#App.Run">Run()</a> to execute it.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>{
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">...</span> <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">goes</span> <span style="color:#a6e22e">here</span> <span style="color:#f92672">...</span>
 </span></span><span style="display:flex;"><span>    }
@@ -1163,7 +1163,7 @@ struct, then call <a href="https://pkg.go.dev/github.com/urfave/cli#App.Run">Run
 allowing us to freely mix different flag types like
 <a href="https://pkg.go.dev/github.com/urfave/cli#StringFlag">StringFlag</a>, <a href="https://pkg.go.dev/github.com/urfave/cli#BoolFlag">BoolFlag</a>,
 or <a href="https://pkg.go.dev/github.com/urfave/cli#IntFlag">IntFlag</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>    <span style="color:#a6e22e">Flags</span>: []<span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Flag</span>{
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>    <span style="color:#a6e22e">Flags</span>: []<span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Flag</span>{
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">IntFlag</span>{
 </span></span><span style="display:flex;"><span>            <span style="color:#f92672">...</span>
 </span></span><span style="display:flex;"><span>        },
@@ -1173,14 +1173,14 @@ or <a href="https://pkg.go.dev/github.com/urfave/cli#IntFlag">IntFlag</a>.</p>
 </span></span><span style="display:flex;"><span>    },
 </span></span></code></pre></div><p>The other struct field is <a href="https://pkg.go.dev/github.com/urfave/cli/v3#ActionFunc">Action</a> which runs a function after parsing the flags.
 The function can either be inline or passed as a reference. Here is an inline example.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>    <span style="color:#a6e22e">Action</span>: <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>    <span style="color:#a6e22e">Action</span>: <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">Bool</span>(<span style="color:#e6db74">&#34;hello&#34;</span>) {
 </span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">String</span>(<span style="color:#e6db74">&#34;name&#34;</span>), <span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">Int</span>(<span style="color:#e6db74">&#34;count&#34;</span>))
 </span></span><span style="display:flex;"><span>        }
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>
 </span></span><span style="display:flex;"><span>    },
 </span></span></code></pre></div><p>This is what my populated main() looks like.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>{
 </span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Flags</span>: []<span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Flag</span>{
 </span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">BoolFlag</span>{
@@ -1220,7 +1220,7 @@ The function can either be inline or passed as a reference. Here is an inline ex
 </span></span></code></pre></div><p>A complete working example using flags can be <a href="./assets/flag_example.go">downloaded</a>.</p>
 <h3 id="flags-demo">Flags Demo</h3>
 <p>When invoked without the &ndash;name flag which is marked required, urfave/cli will throw an error and print the help statement.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run flag_example.go --count <span style="color:#ae81ff">2</span> --hello 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run flag_example.go --count <span style="color:#ae81ff">2</span> --hello 
 </span></span><span style="display:flex;"><span>NAME:
 </span></span><span style="display:flex;"><span>   flag_example - A new cli application
 </span></span><span style="display:flex;"><span>
@@ -1236,14 +1236,14 @@ The function can either be inline or passed as a reference. Here is an inline ex
 </span></span><span style="display:flex;"><span>2025/10/02 08:36:19 Required flag <span style="color:#e6db74">&#34;name&#34;</span> not set
 </span></span><span style="display:flex;"><span>exit status <span style="color:#ae81ff">1</span>
 </span></span></code></pre></div><p>Adding the &ndash;name flag results in it working as expected.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run flag_example.go --count <span style="color:#ae81ff">2</span> --hello --name Adam
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run flag_example.go --count <span style="color:#ae81ff">2</span> --hello --name Adam
 </span></span><span style="display:flex;"><span>Hello Adam
 </span></span><span style="display:flex;"><span>Hello Adam
 </span></span></code></pre></div><h2 id="urfavecli-with-subcommands">urfave/cli with subcommands</h2>
 <p>Subcommands are added in a similar way, except instead of using a slice of Flag, we are using a slice of
 Command which I described above.  Instead of using &ndash;hello or &ndash;goodbye as a flag, this example creates the
 hello and goodbye subcommands.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Hello&#34;</span>)
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>
 </span></span><span style="display:flex;"><span>}
@@ -1275,7 +1275,7 @@ hello and goodbye subcommands.</p>
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><h3 id="commands-demo">Commands Demo</h3>
 <p>The autogenerated help statement when a subcommand isn&rsquo;t used.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run command_example.go
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run command_example.go
 </span></span><span style="display:flex;"><span>NAME:
 </span></span><span style="display:flex;"><span>   command_example - A new cli application
 </span></span><span style="display:flex;"><span>
@@ -1290,14 +1290,14 @@ hello and goodbye subcommands.</p>
 </span></span><span style="display:flex;"><span>GLOBAL OPTIONS:
 </span></span><span style="display:flex;"><span>   --help, -h  show help
 </span></span></code></pre></div><p>Invoking the goodbye subcommand</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run command_example.go goodbye
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run command_example.go goodbye
 </span></span><span style="display:flex;"><span>Goodbye
 </span></span></code></pre></div><h2 id="combining-flags-and-subcommands">Combining flags and subcommands</h2>
 <p>Now that we know how flags and subcommands work, lets combine them to get that openssl like experience.
 But this is the great part, because subcommands are a slice of Command, and we know that Command accepts
 a slice of Flag, we already know how this works.  Simply define a Flag for each subcommand.</p>
 <p>Here&rsquo;s an example where the hello subcommand supports a name flag and the goodbye subcommand supports a count flag.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>{
 </span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Commands</span>: []<span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>{
 </span></span><span style="display:flex;"><span>            {
@@ -1331,7 +1331,7 @@ a slice of Flag, we already know how this works.  Simply define a Flag for each 
 </span></span></code></pre></div><p>A complete example that combines flags and subcommands is available for <a href="./assets/combo_example.go">download</a>.</p>
 <h3 id="combination-demo">Combination Demo</h3>
 <p>Running the demo without any options</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run combo_example.go 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run combo_example.go 
 </span></span><span style="display:flex;"><span>NAME:
 </span></span><span style="display:flex;"><span>   combo_example - A new cli application
 </span></span><span style="display:flex;"><span>
@@ -1346,7 +1346,7 @@ a slice of Flag, we already know how this works.  Simply define a Flag for each 
 </span></span><span style="display:flex;"><span>GLOBAL OPTIONS:
 </span></span><span style="display:flex;"><span>   --help, -h  show help
 </span></span></code></pre></div><p>Running the demo with a subcommand missing a required flag</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run combo_example.go hello                                                 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go run combo_example.go hello                                                 
 </span></span><span style="display:flex;"><span>NAME:
 </span></span><span style="display:flex;"><span>   combo_example hello - Greets a person with <span style="color:#e6db74">&#39;Hello&#39;</span>
 </span></span><span style="display:flex;"><span>
@@ -1359,7 +1359,7 @@ a slice of Flag, we already know how this works.  Simply define a Flag for each 
 </span></span><span style="display:flex;"><span>2025/10/05 09:33:19 Required flag <span style="color:#e6db74">&#34;name&#34;</span> not set
 </span></span><span style="display:flex;"><span>exit status <span style="color:#ae81ff">1</span>
 </span></span></code></pre></div><p>Running the demo successfully</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% go run combo_example.go hello --name Adam
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% go run combo_example.go hello --name Adam
 </span></span><span style="display:flex;"><span>Hello Adam
 </span></span></code></pre></div><h2 id="accessing-set-values">Accessing Set Values</h2>
 <p>The urfave API offers several functions to access the set values, which are found in
@@ -1373,7 +1373,7 @@ online <a href="https://pkg.go.dev/github.com/urfave/cli/v3#pkg-index">documenta
 </ul>
 <p>Let&rsquo;s go back to the earlier <em>combo</em> example using these CLI options <code>go run combo_example.go hello --name Adam</code>.
 This is the code block used in the example.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">runIt</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">runIt</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">cmd</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">cli</span>.<span style="color:#a6e22e">Command</span>) <span style="color:#66d9ef">error</span> {
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">switch</span> <span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">Name</span> {
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;hello&#34;</span>:
 </span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">String</span>(<span style="color:#e6db74">&#34;name&#34;</span>))
@@ -1503,13 +1503,13 @@ OpenAPI <a href="https://spec.openapis.org/oas/v3.0.3.html">schema documentation
 <p>To get started one needs to create a specification.  A very minimal specification meeting the 3.0.x requirements is listed below.
 It&rsquo;s not a very interesting example as endpoints in the application server aren&rsquo;t defined, but it shows how minimal a
 specification can be that meets schema requirements.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">openapi</span>: <span style="color:#e6db74">&#34;3.0.3&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">openapi</span>: <span style="color:#e6db74">&#34;3.0.3&#34;</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">info</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">version</span>: <span style="color:#ae81ff">1.0.0</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">title</span>: <span style="color:#ae81ff">My Contrived Server</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">paths</span>:
 </span></span></code></pre></div><p>Let&rsquo;s get started by extending the simple example defining a path named /status. It will return a 200 response code with a JSON resonse.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">paths</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">paths</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">/status</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">get</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">responses</span>:
@@ -1521,7 +1521,7 @@ specification can be that meets schema requirements.</p>
 </span></span><span style="display:flex;"><span>                <span style="color:#f92672">$ref</span>: <span style="color:#e6db74">&#39;#/components/schemas/status&#39;</span>
 </span></span></code></pre></div><p>The JSON response is documented in a separate YAML block named components. It defines the response containing a JSON
 map containing the keys &ldquo;state&rdquo; and &ldquo;message&rdquo;, both of which have a string value.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>: 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>: 
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">schemas</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">status</span>:
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">type</span>: <span style="color:#ae81ff">object</span>
@@ -1533,7 +1533,7 @@ map containing the keys &ldquo;state&rdquo; and &ldquo;message&rdquo;, both of w
 </span></span><span style="display:flex;"><span>            <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
 </span></span><span style="display:flex;"><span>            <span style="color:#f92672">example</span>: <span style="color:#e6db74">&#34;App running within parameters&#34;</span>
 </span></span></code></pre></div><p>OpenAPI supports tags, which let you group related endpoints. This example creates a data grouping and puts create_bucket in the group.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">tags</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">tags</span>:
 </span></span><span style="display:flex;"><span>  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">data</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">description</span>:  <span style="color:#ae81ff">data manipulation endpoints</span>
 </span></span><span style="display:flex;"><span>
@@ -1552,7 +1552,7 @@ map containing the keys &ldquo;state&rdquo; and &ldquo;message&rdquo;, both of w
 </span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#39;200&#39;</span>:
 </span></span><span style="display:flex;"><span>            <span style="color:#f92672">description</span>: <span style="color:#ae81ff">Create a storage object</span>
 </span></span></code></pre></div><p>The OpenAPI specification also provides a definition for authentication to the web application.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">securitySchemes</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">basicAuth</span>:
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">type</span>: <span style="color:#ae81ff">http</span>
@@ -1584,21 +1584,21 @@ has been downloaded and extracted into a temp/work directory.</p>
 <p>Feel free to inspect the api/http.gen.go file before proceeding. You&rsquo;ll see it contains an interface named ServerInterface,
 which has the GetStatus or PostStatus endpoints from the OpenAPI specification.  http.gen.go also contains a struct named Status
 that was defined from components -&gt; schema -&gt; status.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Status</span> <span style="color:#66d9ef">struct</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Status</span> <span style="color:#66d9ef">struct</span> {
 </span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Message</span> <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;message&#34;`</span>
 </span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">State</span>   <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;state&#34;`</span>
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>To see the working application server, run <code>make server-run</code>.</p>
 <p>The server has Basic Auth enabled with hardcoded credentials. The user is &ldquo;alice&rdquo; and the password &ldquo;mySecretPW&rdquo;.  Curl can be
 used to see the response.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% curl --basic -u alice:mySecretPW  http://localhost:8080/status
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% curl --basic -u alice:mySecretPW  http://localhost:8080/status
 </span></span><span style="display:flex;"><span><span style="color:#f92672">{</span><span style="color:#e6db74">&#34;message&#34;</span>:<span style="color:#e6db74">&#34;Initializing&#34;</span>,<span style="color:#e6db74">&#34;state&#34;</span>:<span style="color:#e6db74">&#34;Unknown&#34;</span><span style="color:#f92672">}</span>
 </span></span></code></pre></div><h2 id="generate-client-interfaces-python">Generate Client Interfaces (Python)</h2>
 <p>This is where OpenAPI really shines.  I was able to use a generator to create Python libraries
 to be used by the client implementation code.  The walkthrough presumes a recent version of Python3 and pip are installed.</p>
 <p>First, create a virtual environment and install the openapi-python-client dependencies.  This shell snippet
 presumes the current working directory is already hello_openapi.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% python3 -mvenv $PWD/.venv
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% python3 -mvenv $PWD/.venv
 </span></span><span style="display:flex;"><span>% source $PWD/.venv/bin/activate
 </span></span><span style="display:flex;"><span>% pip install -r requirements.txt
 </span></span></code></pre></div><p>Then run <code>make client-codegen</code> to build the Python client libraries located in cmd/client/my_contrived_server.</p>
@@ -1615,13 +1615,13 @@ only took a few lines of python code to implement what the openapi-python-client
 <h2 id="gotchas--lessons-learned">Gotchas &amp; Lessons Learned</h2>
 <p>One issue I have with OpenAPI is the illusion of simplicty. When I first started working with OpenAPI, I noticed the Status struct
 had keys referencing a pointer of strings which wasn&rsquo;t ideal.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Status</span> <span style="color:#66d9ef">struct</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Status</span> <span style="color:#66d9ef">struct</span> {
 </span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Message</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;message&#34;`</span>
 </span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">State</span>   <span style="color:#f92672">*</span><span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;state&#34;`</span>
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>It took some fiddling with the OpenAPI specification to make the generator use strings instead of pointers to strings.
 Adding &lsquo;required&rsquo; to the schema made the generator do what I wanted.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">components</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">status</span>:
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">type</span>: <span style="color:#ae81ff">object</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">properties</span>:
@@ -1664,7 +1664,7 @@ storage without needing CAP_SYS_ADMIN privileges.</p>
 <p>Plugins for Volume Drivers are usually installed as special containers using the <strong>docker plugin</strong> command. Plugin containers run
 in their own namespaces and don&rsquo;t behave like normal containers. However, if the plugin includes a shell, it&rsquo;s possible to enter the
 namespace using <a href="https://docs.docker.com/engine/extend/#debugging-plugins">runc</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>ubuntu@docker-dev:~/work$ sudo runc --root /run/docker/runtime-runc/plugins.moby list 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>ubuntu@docker-dev:~/work$ sudo runc --root /run/docker/runtime-runc/plugins.moby list 
 </span></span><span style="display:flex;"><span>ID                                                                 PID         STATUS      BUNDLE                                                                                                                        CREATED                          OWNER
 </span></span><span style="display:flex;"><span>bae595da4deac656921a48f4b3d854992c692777f46db891934310ae863746c1   <span style="color:#ae81ff">24503</span>       running     /run/containerd/io.containerd.runtime.v2.task/plugins.moby/bae595da4deac656921a48f4b3d854992c692777f46db891934310ae863746c1   2025-06-27T03:55:42.927740463Z   root
 </span></span><span style="display:flex;"><span>
@@ -1729,7 +1729,7 @@ with minimal privileges and lightweight tooling. I have to admit that the proces
 <p><img alt="Docker Documentation Screenshot of Building a Plugin" loading="lazy" src="/articles/storage/docker_volumes/assets/doc.jpg"></p>
 <p>Fortunately, someone wrapped these steps in a <a href="https://github.com/vieux/docker-volume-sshfs/blob/1e0cd2fcb72d6af0a2ad4689faed8c312124517c/Makefile">Makefile</a>
 which can be used as a starting point.  Here&rsquo;s a snippet from the docker-volume-sshfs repo.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-make" data-lang="make"><span style="display:flex;"><span><span style="color:#a6e22e">rootfs</span><span style="color:#f92672">:</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-make" data-lang="make"><span style="display:flex;"><span><span style="color:#a6e22e">rootfs</span><span style="color:#f92672">:</span>
 </span></span><span style="display:flex;"><span>	@echo <span style="color:#e6db74">&#34;### docker build: rootfs image with docker-volume-sshfs&#34;</span>
 </span></span><span style="display:flex;"><span>	@docker build -q -t <span style="color:#e6db74">${</span>PLUGIN_NAME<span style="color:#e6db74">}</span>:rootfs .
 </span></span><span style="display:flex;"><span>	@echo <span style="color:#e6db74">&#34;### create rootfs directory in ./plugin/rootfs&#34;</span>
@@ -1761,7 +1761,7 @@ using it is optional.  I came across several projects like rclone and SeaweedFS 
 <h3 id="code-highlights">Code Highlights</h3>
 <p>The plugin I built is intentionaly minimal.  When a container calls <strong>mount</strong> on the volume, the function creates a hello.txt file in the volume directory.<br>
 It simulates downloading data from remote storage while keeping things simple:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Go" data-lang="Go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">d</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">myDriver</span>) <span style="color:#a6e22e">Mount</span>(<span style="color:#a6e22e">req</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">volume</span>.<span style="color:#a6e22e">MountRequest</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">volume</span>.<span style="color:#a6e22e">MountResponse</span>, <span style="color:#66d9ef">error</span>) {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-Go" data-lang="Go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">d</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">myDriver</span>) <span style="color:#a6e22e">Mount</span>(<span style="color:#a6e22e">req</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">volume</span>.<span style="color:#a6e22e">MountRequest</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">volume</span>.<span style="color:#a6e22e">MountResponse</span>, <span style="color:#66d9ef">error</span>) {
 </span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">volPath</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">filepath</span>.<span style="color:#a6e22e">Join</span>(<span style="color:#a6e22e">pluginRoot</span>, <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">Name</span>)
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>	<span style="color:#75715e">// Write a hello.txt file</span>
@@ -1800,7 +1800,7 @@ permissions. This step could be used to sync local changes back to remote storag
 <ol>
 <li>Build the Go code and create a plugin image</li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ docker build -t rootfsimage .
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ docker build -t rootfsimage .
 </span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>+<span style="color:#f92672">]</span> Building 6.1s <span style="color:#f92672">(</span>13/13<span style="color:#f92672">)</span> FINISHED                                                                                                   docker:default
 </span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>internal<span style="color:#f92672">]</span> load build definition from Dockerfile                                                                                 0.0s
 </span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; transferring dockerfile: 461B                                                                                                 0.0s
@@ -1970,7 +1970,7 @@ from <a href="./assets/test.tar">here</a>.</p>
 in <a href="(https://cgit.git.savannah.gnu.org/cgit/tar.git/tree/src/tar.h#n24)">GNU&rsquo;s tar header definition</a>.</p>
 <p><img alt="Screenshot of the struct" loading="lazy" src="/articles/storage/tar_objectstore/assets/header_struct.png"></p>
 <p>Here’s an example of the batteries-included approach using the <strong>tarfile</strong> module. I’ll scan the archive, read each file’s size and data offset, and store that in a dictionary:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env python3</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env python3</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> math
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> tarfile
 </span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> collections <span style="color:#f92672">import</span> defaultdict
@@ -2009,7 +2009,7 @@ in <a href="(https://cgit.git.savannah.gnu.org/cgit/tar.git/tree/src/tar.h#n24)"
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> attribute <span style="color:#f92672">in</span> attributes:
 </span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;filename: </span><span style="color:#e6db74">{</span>file_name<span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;10</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> attributes: file_size: </span><span style="color:#e6db74">{</span>attribute[<span style="color:#ae81ff">0</span>]<span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;6</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> data_offset: </span><span style="color:#e6db74">{</span>attribute[<span style="color:#ae81ff">1</span>]<span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;6</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
 </span></span></code></pre></div><p>Example output.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% python offsets.py
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% python offsets.py
 </span></span><span style="display:flex;"><span>filename: a.txt      attributes: file_size: <span style="color:#ae81ff">4</span>      data_offset: <span style="color:#ae81ff">512</span>   
 </span></span><span style="display:flex;"><span>filename: a.txt      attributes: file_size: <span style="color:#ae81ff">13</span>     data_offset: <span style="color:#ae81ff">2560</span>  
 </span></span><span style="display:flex;"><span>filename: b.txt      attributes: file_size: <span style="color:#ae81ff">4</span>      data_offset: <span style="color:#ae81ff">1536</span>  
@@ -2018,7 +2018,7 @@ When a file is re-added, it becomes the newer version.</p>
 <p>In our example archive file, <strong>a.txt</strong> was modified and appended, producing two versions in the archive. Traditional tar extraction reads from the beginning and
 overwrites earlier entries as it encounters newer ones. But by having an index of offsets, I can seek directly to either version and extract it manually.</p>
 <p>Here’s a helper function to extract a specific version of a file:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">extract_file</span>(archive: str, file_name: str, offset: int, read_bytes: int):
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">extract_file</span>(archive: str, file_name: str, offset: int, read_bytes: int):
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> open(archive, <span style="color:#e6db74">&#39;rb&#39;</span>) <span style="color:#66d9ef">as</span> f:
 </span></span><span style="display:flex;"><span>            f<span style="color:#f92672">.</span>seek(offset)
@@ -2028,10 +2028,10 @@ overwrites earlier entries as it encounters newer ones. But by having an index o
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
 </span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Error extracting </span><span style="color:#e6db74">{</span>file_name<span style="color:#e6db74">}</span><span style="color:#e6db74"> at offset: </span><span style="color:#e6db74">{</span>offset<span style="color:#e6db74">:</span><span style="color:#e6db74">08x</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
 </span></span></code></pre></div><p>Add the following lines in main to extract both versions of <strong>a.txt</strong>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>extract_file(ARCHIVE_FILE, <span style="color:#e6db74">&#34;a.txt&#34;</span>, <span style="color:#ae81ff">512</span>, <span style="color:#ae81ff">4</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>extract_file(ARCHIVE_FILE, <span style="color:#e6db74">&#34;a.txt&#34;</span>, <span style="color:#ae81ff">512</span>, <span style="color:#ae81ff">4</span>)
 </span></span><span style="display:flex;"><span>extract_file(ARCHIVE_FILE, <span style="color:#e6db74">&#34;a.txt&#34;</span>, <span style="color:#ae81ff">2560</span>, <span style="color:#ae81ff">13</span>)
 </span></span></code></pre></div><p>And the result:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% ls -latr a.txt@*
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% ls -latr a.txt@*
 </span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> adam  staff   <span style="color:#ae81ff">4</span> Jun  <span style="color:#ae81ff">6</span> 22:07 a.txt@00000200
 </span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> adam  staff  <span style="color:#ae81ff">13</span> Jun  <span style="color:#ae81ff">6</span> 22:07 a.txt@00000a00
 </span></span><span style="display:flex;"><span>
@@ -2112,7 +2112,7 @@ same macOS host and connected to virtual network interfaces using QEMU&rsquo;s s
 </ol>
 <h3 id="other-qemu-network-backends">Other QEMU Network Backends</h3>
 <p>To see a complete list of network backends supported by QEMU:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cmd" data-lang="cmd"><span style="display:flex;"><span>%  qemu-system-x86_64 -netdev help  
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-cmd" data-lang="cmd"><span style="display:flex;"><span>%  qemu-system-x86_64 -netdev help  
 </span></span><span style="display:flex;"><span>Available netdev backend types:
 </span></span><span style="display:flex;"><span>socket
 </span></span><span style="display:flex;"><span>stream
@@ -2140,7 +2140,7 @@ to remove the upload limit, the restriction doesn&rsquo;t prevent me from valida
 <p><img alt="RouterOS download page with &lsquo;Cloud Hosted Router&rsquo; and &lsquo;Raw disk image&rsquo; highlighted" loading="lazy" src="/articles/virtualization/macos_qemu_networks/assets/routerOS-dl-screenshot.png#center"></p>
 <hr>
 <p>First, convert the raw image to <code>qcow2</code> format. This allows snapshotting the VM, making it easy to roll back from bad config changes.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span> % qemu-img convert -f raw -O qcow2 chr-7.18.2.img chr-7.18.2.qcow2
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span> % qemu-img convert -f raw -O qcow2 chr-7.18.2.img chr-7.18.2.qcow2
 </span></span><span style="display:flex;"><span> % qemu-img snapshot -c original_image chr-7.18.2.qcow2
 </span></span><span style="display:flex;"><span> % qemu-img info chr-7.18.2.qcow2 
 </span></span><span style="display:flex;"><span>image: chr-7.18.2.qcow2
@@ -2164,14 +2164,14 @@ to remove the upload limit, the restriction doesn&rsquo;t prevent me from valida
 </span></span><span style="display:flex;"><span>    file length: 44.2 MiB <span style="color:#f92672">(</span><span style="color:#ae81ff">46333952</span> bytes<span style="color:#f92672">)</span>
 </span></span><span style="display:flex;"><span>    disk size: 44.2 MiB
 </span></span></code></pre></div><p>Now, start the RouterOS VM and create the two virtual networks with QEMU.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>sudo qemu-system-x86_64  -m <span style="color:#ae81ff">2048</span> -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial mon:stdio  <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device virtio-scsi-pci,id<span style="color:#f92672">=</span>scsi0 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -drive file<span style="color:#f92672">=</span>./chr-7.18.2.qcow2,if<span style="color:#f92672">=</span>none,format<span style="color:#f92672">=</span>qcow2,discard<span style="color:#f92672">=</span>unmap,id<span style="color:#f92672">=</span>hda <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device scsi-hd,drive<span style="color:#f92672">=</span>hda,bus<span style="color:#f92672">=</span>scsi0.0 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device virtio-net-pci,netdev<span style="color:#f92672">=</span>net1 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -netdev vmnet-shared,id<span style="color:#f92672">=</span>net1,start-address<span style="color:#f92672">=</span>172.16.0.1,end-address<span style="color:#f92672">=</span>172.31.255.254,subnet-mask<span style="color:#f92672">=</span>255.240.0.0 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device virtio-net-pci,netdev<span style="color:#f92672">=</span>net2 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -netdev vmnet-host,id<span style="color:#f92672">=</span>net2,start-address<span style="color:#f92672">=</span>192.168.2.1,end-address<span style="color:#f92672">=</span>192.168.2.254,subnet-mask<span style="color:#f92672">=</span>255.255.255.0,net-uuid<span style="color:#f92672">=</span>154780B0-F499-4968-9B20-E58C02FDF5FB
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>sudo qemu-system-x86_64  -m <span style="color:#ae81ff">2048</span> -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial mon:stdio  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -device virtio-scsi-pci,id<span style="color:#f92672">=</span>scsi0 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -drive file<span style="color:#f92672">=</span>./chr-7.18.2.qcow2,if<span style="color:#f92672">=</span>none,format<span style="color:#f92672">=</span>qcow2,discard<span style="color:#f92672">=</span>unmap,id<span style="color:#f92672">=</span>hda <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -device scsi-hd,drive<span style="color:#f92672">=</span>hda,bus<span style="color:#f92672">=</span>scsi0.0 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -device virtio-net-pci,netdev<span style="color:#f92672">=</span>net1 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -netdev vmnet-shared,id<span style="color:#f92672">=</span>net1,start-address<span style="color:#f92672">=</span>172.16.0.1,end-address<span style="color:#f92672">=</span>172.31.255.254,subnet-mask<span style="color:#f92672">=</span>255.240.0.0 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -device virtio-net-pci,netdev<span style="color:#f92672">=</span>net2 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -netdev vmnet-host,id<span style="color:#f92672">=</span>net2,start-address<span style="color:#f92672">=</span>192.168.2.1,end-address<span style="color:#f92672">=</span>192.168.2.254,subnet-mask<span style="color:#f92672">=</span>255.255.255.0,net-uuid<span style="color:#f92672">=</span>154780B0-F499-4968-9B20-E58C02FDF5FB
 </span></span></code></pre></div><ul>
 <li>Uses sudo to create vmnet interfaces (required on macOS).</li>
 <li>Allocates 2 GB of RAM and 4 vCPUs.</li>
@@ -2192,7 +2192,7 @@ to remove the upload limit, the restriction doesn&rsquo;t prevent me from valida
 </ul>
 <p>Once RouterOS boots, log in with username <strong>admin</strong> and press <strong>Enter</strong> for a blank password. You’ll be prompted to set a new one.</p>
 <p>To list interfaces:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /interface print 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /interface print 
 </span></span><span style="display:flex;"><span>Flags: R - RUNNING
 </span></span><span style="display:flex;"><span>Columns: NAME, TYPE, ACTUAL-MTU, MAC-ADDRESS
 </span></span><span style="display:flex;"><span><span style="color:#75715e">#   NAME    TYPE      ACTUAL-MTU  MAC-ADDRESS      </span>
@@ -2200,7 +2200,7 @@ to remove the upload limit, the restriction doesn&rsquo;t prevent me from valida
 </span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span> R ether2  ether           <span style="color:#ae81ff">1500</span>  52:54:00:12:34:57
 </span></span><span style="display:flex;"><span><span style="color:#ae81ff">2</span> R lo      loopback       <span style="color:#ae81ff">65536</span>  00:00:00:00:00:00
 </span></span></code></pre></div><p>To check assigned IPs:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip/address print
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip/address print
 </span></span><span style="display:flex;"><span>Flags: D - DYNAMIC
 </span></span><span style="display:flex;"><span>Columns: ADDRESS, NETWORK, INTERFACE
 </span></span><span style="display:flex;"><span><span style="color:#75715e">#   ADDRESS        NETWORK     INTERFACE</span>
@@ -2215,7 +2215,7 @@ on the router.</p>
 <li>create a dhcpd server</li>
 <li>enable NAT</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip address add address<span style="color:#f92672">=</span>192.168.2.1/24 interface<span style="color:#f92672">=</span>ether2 network<span style="color:#f92672">=</span>192.168.2.0
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip address add address<span style="color:#f92672">=</span>192.168.2.1/24 interface<span style="color:#f92672">=</span>ether2 network<span style="color:#f92672">=</span>192.168.2.0
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip pool add name<span style="color:#f92672">=</span>dhcp ranges<span style="color:#f92672">=</span>192.168.2.50-192.168.2.100
 </span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip dhcp-server add address-pool<span style="color:#f92672">=</span>dhcp interface<span style="color:#f92672">=</span>ether2 lease-time<span style="color:#f92672">=</span>1h name<span style="color:#f92672">=</span>defconf
@@ -2226,20 +2226,20 @@ on the router.</p>
 <p>⚠️ The example does not set any firewall rules. Use it as a starting point only.</p>
 </blockquote>
 <p>To gracefully shutdown the router</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /system shutdown
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /system shutdown
 </span></span></code></pre></div><p>Answer y when prompted. Or, leave the router running. It will be used again shortly.</p>
 <h3 id="alpine-linux-vm">Alpine Linux VM</h3>
 <p>An Alpine ISO needs to be downloaded and installed onto a virtual hard disk.  I recommend using the <strong>user</strong> network mentioned earlier
 for the install as additional packages will need to be downloaded from the Internet.  The standard x86_64 image can be retrieved from the Alpine Linux <a href="https://alpinelinux.org/downloads/">downloads page</a>.</p>
 <p>Create a disk image to install the OS to with the qemu-img command.  The options will use the qcow2 format with a max size of 2GB.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img create -f qcow2 alpine_disk.qcow2 2G
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img create -f qcow2 alpine_disk.qcow2 2G
 </span></span></code></pre></div><p>Next step is to start a VM that boots from the Alpine ISO and connects to the Internet with the user network.  Because versions change, be
 sure to replace the ISO filename in the <strong>-cdrom</strong> option with the one that was downloaded.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-system-x86_64  -m <span style="color:#ae81ff">2048</span> -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial stdio  <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -boot once<span style="color:#f92672">=</span>d <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -cdrom ./alpine-standard-3.21.2-x86_64.iso <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -hda ./alpine_disk.qcow2 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -net nic,model<span style="color:#f92672">=</span>virtio -net user
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-system-x86_64  -m <span style="color:#ae81ff">2048</span> -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial stdio  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -boot once<span style="color:#f92672">=</span>d <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -cdrom ./alpine-standard-3.21.2-x86_64.iso <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -hda ./alpine_disk.qcow2 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -net nic,model<span style="color:#f92672">=</span>virtio -net user
 </span></span></code></pre></div><p>Once the VM has started, login as &ldquo;root&rdquo; and hit Enter for the empty password.  Next run <strong>setup-alpine</strong> and follow the prompts.
 Here are suggested answers to some of the prompts:</p>
 <ul>
@@ -2252,18 +2252,18 @@ Here are suggested answers to some of the prompts:</p>
 <p>When the installation script is complete, type <strong>reboot</strong> and use the new root password set during the install.  With
 the <code>-boot once=d</code> option, the VM will skip the ISO and boot directly from the newly installed virtual disk.</p>
 <p>Log in as root and install the dig and curl commands.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cmd" data-lang="cmd"><span style="display:flex;"><span># apk add bind-tools curl ca-certificates
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-cmd" data-lang="cmd"><span style="display:flex;"><span># apk add bind-tools curl ca-certificates
 </span></span></code></pre></div><p>When the package install has completed, gracefully shutdown the VM with <strong>poweroff</strong> command.</p>
 <h2 id="testing-the-nat-setup">Testing the NAT Setup</h2>
 <p>Check that the RouterOS VM is still running in the other terminal. It&rsquo;s acting as the NAT gateway for the Alpine VM and must be
 active for Internet access to work.  Then connect the new Alpine Linux VM to Network2 (vmnet-host) with this QEMU command.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% sudo qemu-system-x86_64  -m <span style="color:#ae81ff">2048</span> -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial mon:stdio  <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        -boot c <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        -hda alpine_disk.qcow2 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        -device virtio-net-pci,netdev<span style="color:#f92672">=</span>net2 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        -netdev vmnet-host,id<span style="color:#f92672">=</span>net2,start-address<span style="color:#f92672">=</span>192.168.2.1,end-address<span style="color:#f92672">=</span>192.168.2.254,subnet-mask<span style="color:#f92672">=</span>255.255.255.0,net-uuid<span style="color:#f92672">=</span>154780B0-F499-4968-9B20-E58C02FDF5FB
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% sudo qemu-system-x86_64  -m <span style="color:#ae81ff">2048</span> -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial mon:stdio  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>        -boot c <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>        -hda alpine_disk.qcow2 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>        -device virtio-net-pci,netdev<span style="color:#f92672">=</span>net2 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>        -netdev vmnet-host,id<span style="color:#f92672">=</span>net2,start-address<span style="color:#f92672">=</span>192.168.2.1,end-address<span style="color:#f92672">=</span>192.168.2.254,subnet-mask<span style="color:#f92672">=</span>255.255.255.0,net-uuid<span style="color:#f92672">=</span>154780B0-F499-4968-9B20-E58C02FDF5FB
 </span></span></code></pre></div><p>Log into the Alpine VM and verify it can reach the Internet.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>myvm:~$ ip addr show eth0         <span style="color:#75715e"># Confirm the IP is in the 192.168.2.x network range</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>myvm:~$ ip addr show eth0         <span style="color:#75715e"># Confirm the IP is in the 192.168.2.x network range</span>
 </span></span><span style="display:flex;"><span>    ...
 </span></span><span style="display:flex;"><span>    inet 192.168.2.100/24 scope global eth0
 </span></span><span style="display:flex;"><span>    ...
@@ -2300,11 +2300,11 @@ active for Internet access to work.  Then connect the new Alpine Linux VM to Net
 <p>macOS logs a large volume of network-related events, and it can be tricky to isolate the relevant ones. Fortunately, the <code>log show</code>
 and <code>log collect</code> tools make it easier to filter and investigate.</p>
 <p>Start by capturing a snapshot of system logs around the time your VMs are active:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% mkdir ./log_archive
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% mkdir ./log_archive
 </span></span><span style="display:flex;"><span>% ./start_lab <span style="color:#75715e"># start the VMs with a shell script</span>
 </span></span><span style="display:flex;"><span>% sudo log collect --output ./log_archive --last 3m  <span style="color:#75715e"># capture the previous 3 minutes of log events.</span>
 </span></span></code></pre></div><p>This captures the previous 3 minutes of logs and stores them in a binary archive. Then query the relevant subsystem:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% log show --archive log_archive/system_logs.logarchive --predicate <span style="color:#e6db74">&#39;subsystem == &#34;com.apple.NetworkSharing&#34;&#39;</span>  
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% log show --archive log_archive/system_logs.logarchive --predicate <span style="color:#e6db74">&#39;subsystem == &#34;com.apple.NetworkSharing&#34;&#39;</span>  
 </span></span></code></pre></div><p>I found the <code>subsystem == &quot;com.apple.NetworkSharing&quot;</code> query provided the most useful results.  Using other filters like <code>subsystem == &quot;com.apple.network&quot;</code>
 or <code>process == &quot;qemu-system-x86_64&quot;</code> included many unrelated events and were a little overwhelming.  This screenshot shows the networks being created
 when the VMs are started and then torn down when the VMs are stopped.</p>
@@ -2356,14 +2356,14 @@ supports compression, snapshots, and copy-on-write in addition to storage.</p>
 the output of <strong>qemu-img info</strong>.</p>
 <p>Here I create two storage devices, one with qemu-img which defaults to the raw format and another with the
 dd command.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img create my_disk.img +1m         
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img create my_disk.img +1m         
 </span></span><span style="display:flex;"><span>Formatting <span style="color:#e6db74">&#39;my_disk.img&#39;</span>, fmt<span style="color:#f92672">=</span>raw size<span style="color:#f92672">=</span><span style="color:#ae81ff">1048576</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>% dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>/dev/zero of<span style="color:#f92672">=</span>my_block.file count<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> bs<span style="color:#f92672">=</span>1m
 </span></span><span style="display:flex;"><span>1+0 records in
 </span></span><span style="display:flex;"><span>1+0 records out
 </span></span></code></pre></div><p>Now let&rsquo;s use <strong>qemu-img info</strong> to confirm there&rsquo;s no difference between the two files.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img info my_disk.img  
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img info my_disk.img  
 </span></span><span style="display:flex;"><span>image: my_disk.img
 </span></span><span style="display:flex;"><span>file format: raw
 </span></span><span style="display:flex;"><span>virtual size: <span style="color:#ae81ff">1</span> MiB <span style="color:#f92672">(</span><span style="color:#ae81ff">1048576</span> bytes<span style="color:#f92672">)</span>
@@ -2386,7 +2386,7 @@ dd command.</p>
 </span></span><span style="display:flex;"><span>    disk size: <span style="color:#ae81ff">1</span> MiB
 </span></span></code></pre></div><h2 id="qcow2-format">Qcow2 Format</h2>
 <p>Creating a disk in <strong>qcow2</strong> format enables zlib compression by default.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img create -f qcow2 my_disk.img 1M 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img create -f qcow2 my_disk.img 1M 
 </span></span><span style="display:flex;"><span>Formatting <span style="color:#e6db74">&#39;my_disk.img&#39;</span>, fmt<span style="color:#f92672">=</span>qcow2 cluster_size<span style="color:#f92672">=</span><span style="color:#ae81ff">65536</span> extended_l2<span style="color:#f92672">=</span>off compression_type<span style="color:#f92672">=</span>zlib size<span style="color:#f92672">=</span><span style="color:#ae81ff">1048576</span> lazy_refcounts<span style="color:#f92672">=</span>off refcount_bits<span style="color:#f92672">=</span><span style="color:#ae81ff">16</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>% qemu-img info my_disk.img 
@@ -2411,11 +2411,11 @@ dd command.</p>
 <p>It&rsquo;s possible to grow or shrink a QEMU storage device.  Think of this as expanding the physical SSD itself, not the filesystem
 that sits on it.  <strong>Important,</strong> when shrinking a image with negative values,
 <strong>always shrink the filesystem first</strong> using resize2fs before running qemu-img resize <strong>or risk data corruption.</strong></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img resize my_disk.img +1m  
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img resize my_disk.img +1m  
 </span></span><span style="display:flex;"><span>Image resized.
 </span></span></code></pre></div><p>When inspecting the new disk image, we see the new capacity is 2MB but the file size on disk is under 200KB.  This is because qcow2 supports
 copy-on-write and compression.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img info my_disk.img
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img info my_disk.img
 </span></span><span style="display:flex;"><span>image: my_disk.img
 </span></span><span style="display:flex;"><span>file format: qcow2
 </span></span><span style="display:flex;"><span>virtual size: <span style="color:#ae81ff">2</span> MiB <span style="color:#f92672">(</span><span style="color:#ae81ff">2097152</span> bytes<span style="color:#f92672">)</span>
@@ -2438,7 +2438,7 @@ copy-on-write and compression.</p>
 </span></span><span style="display:flex;"><span>-rw-r--r--  <span style="color:#ae81ff">1</span> adam  staff   192K Apr  <span style="color:#ae81ff">6</span> 10:19 my_disk.img
 </span></span></code></pre></div><p>If I were to resize a QEMU storage file formatted as raw, the file size on disk of 2MB matches the image capacity of 2MB as raw
 doesn&rsquo;t support compression or copy-on-write.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img create raw_disk.img +2m
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img create raw_disk.img +2m
 </span></span><span style="display:flex;"><span>Formatting <span style="color:#e6db74">&#39;raw_disk.img&#39;</span>, fmt<span style="color:#f92672">=</span>raw size<span style="color:#f92672">=</span><span style="color:#ae81ff">2097152</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>% ls -lh raw_disk.img 
@@ -2447,34 +2447,34 @@ doesn&rsquo;t support compression or copy-on-write.</p>
 <p>Snapshots are supported with qcow2 devices.  These are handy for creating a base disk image that&rsquo;s shareable and later modified
 for other purposes.  Snapshots also make a great backup point before making image changes.</p>
 <p>To create a snapshot named &ldquo;my_first_snapshot&rdquo; inside an existing qcow2 image.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img snapshot -c my_first_snapshot my_disk.img 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img snapshot -c my_first_snapshot my_disk.img 
 </span></span></code></pre></div><p>To list existing snapshots</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img snapshot -l my_disk.img 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img snapshot -l my_disk.img 
 </span></span><span style="display:flex;"><span>Snapshot list:
 </span></span><span style="display:flex;"><span>ID      TAG               VM_SIZE                DATE        VM_CLOCK     ICOUNT
 </span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span>       my_first_snapshot      <span style="color:#ae81ff">0</span> B 2025-04-06 10:37:07  0000:00:00.000          <span style="color:#ae81ff">0</span>
 </span></span></code></pre></div><p>To revert or &ldquo;apply&rdquo; a snapshot</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img snapshot -a my_first_snapshot my_disk.img 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img snapshot -a my_first_snapshot my_disk.img 
 </span></span></code></pre></div><p>To delete a snapshot from a file</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img snapshot -d my_first_snapshot my_disk.img 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img snapshot -d my_first_snapshot my_disk.img 
 </span></span></code></pre></div><h1 id="tip-three---modify-a-qemu-image">Tip Three - Modify a QEMU image</h1>
 <p>While many online guides suggest using the Network Block Device (NBD) kernel driver in Linux to mount and modify QEMU images, I
 use a different process that also works on MacOS.  My preferred method is to boot a VM using QEMU and attaching the image as a data drive.</p>
 <p>This example uses the <a href="https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/x86_64/alpine-extended-3.21.3-x86_64.iso">extended x86_64 Alpine Linux ISO</a>
 and a QEMU command that mounts the image as a data drive.  The Alpine extended ISO lets you log in as root with an empty password,
 which makes quick edits easy.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#75715e">#/bin/sh</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#75715e">#/bin/sh</span>
 </span></span><span style="display:flex;"><span>qemu-system-x86_64 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -m 2G -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial stdio <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -boot once<span style="color:#f92672">=</span>d  <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -drive file<span style="color:#f92672">=</span>./my_disk.img,format<span style="color:#f92672">=</span>qcow2,media<span style="color:#f92672">=</span>disk,cache<span style="color:#f92672">=</span>unsafe <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -drive file<span style="color:#f92672">=</span>./alpine-extended-3.21.2-x86_64.iso,format<span style="color:#f92672">=</span>raw,media<span style="color:#f92672">=</span>cdrom <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -nic user,model<span style="color:#f92672">=</span>virtio-net-pci,hostfwd<span style="color:#f92672">=</span>tcp::2222-:22
+</span></span></span><span style="display:flex;"><span>  -m 2G -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial stdio <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -boot once<span style="color:#f92672">=</span>d  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -drive file<span style="color:#f92672">=</span>./my_disk.img,format<span style="color:#f92672">=</span>qcow2,media<span style="color:#f92672">=</span>disk,cache<span style="color:#f92672">=</span>unsafe <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -drive file<span style="color:#f92672">=</span>./alpine-extended-3.21.2-x86_64.iso,format<span style="color:#f92672">=</span>raw,media<span style="color:#f92672">=</span>cdrom <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -nic user,model<span style="color:#f92672">=</span>virtio-net-pci,hostfwd<span style="color:#f92672">=</span>tcp::2222-:22
 </span></span></code></pre></div><p>Once logged in, you&rsquo;ll see the QEMU file we want to modify listed as /dev/sda.  The device hasn&rsquo;t been formatted with a filesystem, but if
 one were present it could be mounted within the VM, files edited within the image, and then unmounted.</p>
 <h1 id="tip-four---transfer-a-qemu-image-to-bare-metal">Tip Four - Transfer a QEMU image to bare-metal</h1>
 <p>It&rsquo;s possible to use a QEMU image with bare-metal by converting it to <strong>raw</strong> format.  Use the following to convert the image from qcow2 to raw.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img convert -f qcow2 -O raw my_disk.img raw_disk.img
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img convert -f qcow2 -O raw my_disk.img raw_disk.img
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>% qemu-img info raw_disk.img 
 </span></span><span style="display:flex;"><span>image: raw_disk.img
@@ -2488,7 +2488,7 @@ one were present it could be mounted within the VM, files edited within the imag
 </span></span><span style="display:flex;"><span>    disk size: <span style="color:#ae81ff">10</span> MiB
 </span></span></code></pre></div><p>Once we have the raw image, the <strong>dd</strong> command can be used to write the data to either a USB stick or physical SSD.  To avoid
 any destructive commands let&rsquo;s pretend raw_disk2.img represents /dev/sdc, your verified USB thumb drive.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>raw_disk.img of<span style="color:#f92672">=</span>raw_disk2.img bs<span style="color:#f92672">=</span>1m 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>raw_disk.img of<span style="color:#f92672">=</span>raw_disk2.img bs<span style="color:#f92672">=</span>1m 
 </span></span><span style="display:flex;"><span>10+0 records in
 </span></span><span style="display:flex;"><span>10+0 records out
 </span></span><span style="display:flex;"><span><span style="color:#ae81ff">10485760</span> bytes transferred in 0.006266 secs <span style="color:#f92672">(</span><span style="color:#ae81ff">1673437600</span> bytes/sec<span style="color:#f92672">)</span>
@@ -2498,7 +2498,7 @@ resize2fs will extend the filesystem to fill the entire thumb drive.  Tools used
 <p>Enough with the documentation, let&rsquo;s put it into practice with a real use case.  Presume that after reading my <a href="../../../articles/cloudinit/intro/">cloud-init
 tutorials</a> you wish to modify the <a href="https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/cloud/nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2">Alpine Linux cloud-init image</a> before installation.</p>
 <p>We can see the downloaded file is a qcow2 image with a capacity of 200Mb from <strong>qemu-img info</strong>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span> % qemu-img info nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span> % qemu-img info nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2 
 </span></span><span style="display:flex;"><span>image: nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2
 </span></span><span style="display:flex;"><span>file format: qcow2
 </span></span><span style="display:flex;"><span>virtual size: <span style="color:#ae81ff">200</span> MiB <span style="color:#f92672">(</span><span style="color:#ae81ff">209715200</span> bytes<span style="color:#f92672">)</span>
@@ -2506,7 +2506,7 @@ tutorials</a> you wish to modify the <a href="https://dl-cdn.alpinelinux.org/alp
 </span></span><span style="display:flex;"><span>...
 </span></span></code></pre></div><p>As we want to install our java app into the installer, we need to add space to the image with <strong>qemu-img resize</strong>.  But first,
 let’s create a snapshot. That way, if we make a mistake, we won’t need to re-download the cloud-init image.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img snapshot -c no_modifications nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img snapshot -c no_modifications nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2 
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>% qemu-img resize nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2 +800M
 </span></span><span style="display:flex;"><span>Image resized.
@@ -2524,21 +2524,21 @@ let’s create a snapshot. That way, if we make a mistake, we won’t need to re
 </span></span><span style="display:flex;"><span>...
 </span></span></code></pre></div><p>I&rsquo;m still using the Alpine extended ISO to boot the VM. Alpine cloud images require setup for ssh key authentication to login and an
 empty root password is much easier to use.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-system-x86_64 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -m 2G -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial stdio <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -boot once<span style="color:#f92672">=</span>d  <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -drive file<span style="color:#f92672">=</span>./nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2,format<span style="color:#f92672">=</span>qcow2,media<span style="color:#f92672">=</span>disk,cache<span style="color:#f92672">=</span>unsafe <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -drive file<span style="color:#f92672">=</span>./alpine-extended-3.21.2-x86_64.iso,format<span style="color:#f92672">=</span>raw,media<span style="color:#f92672">=</span>cdrom <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -nic user,model<span style="color:#f92672">=</span>virtio-net-pci,hostfwd<span style="color:#f92672">=</span>tcp::2222-:22
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-system-x86_64 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -m 2G -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial stdio <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -boot once<span style="color:#f92672">=</span>d  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -drive file<span style="color:#f92672">=</span>./nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2,format<span style="color:#f92672">=</span>qcow2,media<span style="color:#f92672">=</span>disk,cache<span style="color:#f92672">=</span>unsafe <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -drive file<span style="color:#f92672">=</span>./alpine-extended-3.21.2-x86_64.iso,format<span style="color:#f92672">=</span>raw,media<span style="color:#f92672">=</span>cdrom <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -nic user,model<span style="color:#f92672">=</span>virtio-net-pci,hostfwd<span style="color:#f92672">=</span>tcp::2222-:22
 </span></span></code></pre></div><p>Login as root and mount the disk device under /mnt</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>localhost:~# mount /dev/sda /mnt 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>localhost:~# mount /dev/sda /mnt 
 </span></span><span style="display:flex;"><span>localhost:~# ls /mnt
 </span></span><span style="display:flex;"><span>bin         home        mnt         run         tmp
 </span></span><span style="display:flex;"><span>boot        lib         opt         sbin        usr
 </span></span><span style="display:flex;"><span>dev         lost+found  proc        srv         var
 </span></span><span style="display:flex;"><span>etc         media       root        sys
 </span></span></code></pre></div><p>Then make changes to the cloud image, unmount the filesystem and you&rsquo;re done.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>localhost:~# echo <span style="color:#e6db74">&#34;Adam Faris was here&#34;</span> &gt; /mnt/etc/motd 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>localhost:~# echo <span style="color:#e6db74">&#34;Adam Faris was here&#34;</span> &gt; /mnt/etc/motd 
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>localhost:~# cat /mnt/etc/motd 
 </span></span><span style="display:flex;"><span>Adam Faris was here
@@ -2547,7 +2547,7 @@ empty root password is much easier to use.</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>localhost:~# poweroff
 </span></span></code></pre></div><p>Finally, convert our modified cloud image from qcow2 format to raw format, then use dd to write the raw image to a USB device.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img convert -f qcow2 -O nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2 alpine_cloudinit.raw
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img convert -f qcow2 -O nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2 alpine_cloudinit.raw
 </span></span><span style="display:flex;"><span>% dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>alpine_cloudinit.raw bs<span style="color:#f92672">=</span>1m of<span style="color:#f92672">=</span>/dev/...
 </span></span></code></pre></div><p>With the modified image written to the USB device, you can now boot a physical machine from it. Thanks for sticking with me until
 the end. If you find this content useful, follow me on <a href="https://bsky.app/profile/af9.us">BlueSky social</a> for future announcements.</p>
@@ -2579,7 +2579,7 @@ should become available.</p>
 <p>The <strong>status</strong> submenu from the cloud-init command provides a method of checking each stage for errors.  In this
 example I intentionally mistyped a schema key name that should be <code>passwd</code> as <code>password</code>.  Output shows the failure
 occurred during the init stage &amp; provides a suggestion on how to resolve it.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ cloud-init status --format json
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ cloud-init status --format json
 </span></span><span style="display:flex;"><span>...
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;extended_status&#34;</span>: <span style="color:#e6db74">&#34;degraded done&#34;</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;init&#34;</span>: <span style="color:#f92672">{</span>
@@ -2600,11 +2600,11 @@ occurred during the init stage &amp; provides a suggestion on how to resolve it.
 <li>/run/cloud-init/result.json  (summary of execution status)</li>
 </ul>
 <p>Example log output from cloud-init.log indicating a schema validation failure.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>2025-03-18 11:46:41,379 - schema.py<span style="color:#f92672">[</span>WARNING<span style="color:#f92672">]</span>: cloud-config failed schema validation! You may run <span style="color:#e6db74">&#39;sudo cloud-init schema --system&#39;</span> to check the details.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>2025-03-18 11:46:41,379 - schema.py<span style="color:#f92672">[</span>WARNING<span style="color:#f92672">]</span>: cloud-config failed schema validation! You may run <span style="color:#e6db74">&#39;sudo cloud-init schema --system&#39;</span> to check the details.
 </span></span></code></pre></div><h1 id="debugging-user-data-issues">Debugging User-Data Issues</h1>
 <p>cloud-init has a defined schema and it’s possible to validate user-data content with the <strong>schema</strong> submenu.
 To troubleshoot a possible schema issue on a remote host where a YAML key named <code>passwd</code> was mistyped as <code>password</code>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo cloud-init schema --system
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo cloud-init schema --system
 </span></span><span style="display:flex;"><span>Found cloud-config data types: user-data, vendor-data, network-config
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>1. user-data at /var/lib/cloud/instances/docker-demo/cloud-config.txt:
@@ -2623,7 +2623,7 @@ and contain the package.  The <strong>cloud-init-output.log</strong> file can sh
 try accessing the instance over the instance&rsquo;s serial console.</p>
 <p>Check for missing or incorrectly set permissions on scripts.</p>
 <p>Use <code>cloud-init analyze show</code> to help in identifying long-running stages.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ cloud-init analyze show
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ cloud-init analyze show
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>-- Boot Record <span style="color:#ae81ff">01</span> --
 </span></span><span style="display:flex;"><span>The total time elapsed since completing an event is printed after the <span style="color:#e6db74">&#34;@&#34;</span> character.
@@ -2647,7 +2647,7 @@ cached to disk.  If the cache exists on reboot, cloud-init will not run again.  
 run <code>cloud-init clean --logs</code> and reboot the instance.</p>
 <p>Issues with a specific module can be exposed by using <code>cloud-init single</code>.  This could be useful when
 troubleshooting user or vendor scripts.  Module names can be found with <code>grep &quot;Running module&quot; /var/log/cloud-init.log</code>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo cloud-init single --name set_passwords
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo cloud-init single --name set_passwords
 </span></span><span style="display:flex;"><span>Cloud-init v. 24.4.1-0ubuntu0~24.04.1 running <span style="color:#e6db74">&#39;single&#39;</span> at Fri, <span style="color:#ae81ff">21</span> Mar <span style="color:#ae81ff">2025</span> 20:45:47 +0000. Up 16145.16 seconds.
 </span></span></code></pre></div><p>When using the <strong>single</strong> submenu, it won&rsquo;t necessarily fix dependencies unless those are also explicitly re-triggered.  It&rsquo;s best
 to reprovision the instance after troubleshooting any failed modules.</p>
@@ -2755,7 +2755,7 @@ hostname of my-qemu-vm, creates an admin account named ubuntu, and assigns the u
 It&rsquo;s possible to generate a different secure password hash with openssl, as shown in
 this example: <code>echo abc123 |  openssl passwd -6 -stdin</code>.  Restart the QEMU VM so it boots from the
 virtual CD-ROM and modify the GRUB menu so it loads the new config when the VM boots.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">version</span>: <span style="color:#ae81ff">1</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">identity</span>:
@@ -2774,7 +2774,7 @@ possible to view the specified values from the user-data YAML file that have bee
 the install.  Other options like locale or the keyboard setup can be found in the autoinstall-user-data file and added ot the example below.  Restarting
 the QEMU VM and modifying the GRUB menu to reinstall the host OS is needed to apply the new changes to the YAML file.  Reinstalling
 the OS also demonstrates the ease of initializing a system to a known state with autoinstall &amp; cloud-init configs.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">version</span>: <span style="color:#ae81ff">1</span>
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">identity</span>:
@@ -2802,7 +2802,7 @@ This value will change based on which slot a PCI card is plugged into.  Luckily
 lets us wildcard the device names.</p>
 <p>This network example will work with either OpenRC or Systemd device names.  It&rsquo;s similar to what&rsquo;s used by
 <a href="https://git.launchpad.net/livecd-rootfs/tree/live-build/ubuntu-server/includes.chroot.ubuntu-server-minimal.ubuntu-server.installer/etc/cloud/cloud.cfg#n23">Ubuntu&rsquo;s LiveCD</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">network</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">network</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">version</span>: <span style="color:#ae81ff">2</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">ethernets</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">my-en-devices</span>:
@@ -2831,7 +2831,7 @@ can be complex when configuring per partition byte offsets. Luckily we can provi
 handle the details.  I&rsquo;ll show a basic lvm example but the other supported layouts are direct, and zfs.</p>
 <p>Here we specify a LVM configuration with a sizing policy to use the entire disk for the logical volume.  If sizing-policy
 were set to <code>scaled</code>, free space would be left on the storage device for things like snapshots or further expansion.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">storage</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">storage</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">layout</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">name</span>: <span style="color:#ae81ff">lvm</span>
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">sizing-policy</span>: <span style="color:#ae81ff">all</span>
@@ -2860,7 +2860,7 @@ Local Time is:    Tue Mar  4 05:45:56 2025 UTC
 SMART support is: Available - device has SMART capability.
 SMART support is: Enabled
 </code></pre><p>If we wanted to match this disk by wild-carding the model name, we would use the following.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">storage</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">layout</span>:
@@ -2870,7 +2870,7 @@ SMART support is: Enabled
 </span></span><span style="display:flex;"><span>            <span style="color:#f92672">model</span>: <span style="color:#ae81ff">QEMU*</span>
 </span></span></code></pre></div><p>Alternatively if our on-premise hardware instance had a 1GB SSD for the OS and a second 12GB spinning disk for data storage, we could
 use a match with size <code>size: smallest</code> to install the OS on the 1GB disk.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">storage</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">layout</span>:
@@ -2882,19 +2882,19 @@ use a match with size <code>size: smallest</code> to install the OS on the 1GB d
 <p>Running arbitrary commands is possible when autoinstall runs.  Commands are specified as a list and run under &ldquo;sh -c&rdquo;.
 Its  possible to specify if commands should run early in the autoinstall process, late, or when an error occurs.</p>
 <p>For example we want to hit a web endpoint when the installer has completed.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">late-commands</span>:
 </span></span><span style="display:flex;"><span>      - <span style="color:#f92672">curl -H &#39;Content-Type</span>: <span style="color:#ae81ff">application/json&#39; --data &#39;{&#34;host&#34;: &#34;&#39;$HOSTNAME&#39;&#34;}&#39; http://myapi.example.com/success</span>
 </span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">echo &#34;Install Success&#34;  &gt; /var/log/my.log</span>
 </span></span></code></pre></div><p>To run a command before the autoinstall process runs, like downloading internal x509 certificates:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">early-commands</span>:
 </span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">mkdir /etc/ssl/mycerts</span>
 </span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">wget -O /etc/ssl/mycerts/internal.pem &#34;http://x509api.example.com/certs/$HOSTNAME&#34;</span>
 </span></span></code></pre></div><p>Or reporting an error when autoinstall fails</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">error-commands</span>:
 </span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">echo &#34;Install failed&#34; &gt; /var/log/my.log</span>
@@ -2905,7 +2905,7 @@ the cloud-init entries under a user-data key.  Here&rsquo;s a cloud-init example
 <p>cloud-init and
 autoinstall sometimes perform similar tasks. When configuring a storage device with cloud-init, I found it was
 better to use autoinstall as the cloud-init changes were overwritten.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">user-data</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">package_update</span>: <span style="color:#66d9ef">true</span>    <span style="color:#75715e"># update the list of available packages</span>
@@ -2916,7 +2916,7 @@ better to use autoinstall as the cloud-init changes were overwritten.</p>
 </span></span></code></pre></div><h3 id="other">Other</h3>
 <p>It&rsquo;s possible to configure a local proxy for downloading software packages.  Running apt-cacher-ng as a package
 proxy inside a docker container on my laptop helps when I&rsquo;m on a high latency Internet connection.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">proxy</span>: <span style="color:#ae81ff">http://10.0.2.2:3142</span>
 </span></span></code></pre></div><h2 id="provision-a-physical-host">Provision a physical host</h2>
@@ -2969,7 +2969,7 @@ will need to be <a href="https://cloudinit.readthedocs.io/en/latest/tutorial/qem
 the VM with cloud-init to provide additional software packages and define a list of software packages to be installed on the VM.</p>
 <h4 id="add-external-ppa">Add External PPA</h4>
 <p>Add the 3rd-party <a href="https://cloudinit.readthedocs.io/en/latest/reference/modules.html#apt-configure">PPA</a> provided by Docker, Inc.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># Add Docker&#39;s PPA for Ubuntu</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># Add Docker&#39;s PPA for Ubuntu</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">apt</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">sources</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">docker.list</span>:
@@ -2979,14 +2979,14 @@ the VM with cloud-init to provide additional software packages and define a list
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">keyid</span>: <span style="color:#ae81ff">9DC858229FC7DD38854AE2D88D81803C0EBFCD88 </span>
 </span></span></code></pre></div><p>Should the GPG key ID for the Docker PPA change, I have left a comment above on how to find that value.<br>
 This is how the GPG output appears in 2025.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ gpg --show-keys &lt;<span style="color:#f92672">(</span>curl -s https://download.docker.com/linux/ubuntu/gpg<span style="color:#f92672">)</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ gpg --show-keys &lt;<span style="color:#f92672">(</span>curl -s https://download.docker.com/linux/ubuntu/gpg<span style="color:#f92672">)</span>
 </span></span><span style="display:flex;"><span>pub   rsa4096 2017-02-22 <span style="color:#f92672">[</span>SCEA<span style="color:#f92672">]</span>
 </span></span><span style="display:flex;"><span>      9DC858229FC7DD38854AE2D88D81803C0EBFCD88
 </span></span><span style="display:flex;"><span>uid                      Docker Release <span style="color:#f92672">(</span>CE deb<span style="color:#f92672">)</span> &lt;docker@docker.com&gt;
 </span></span><span style="display:flex;"><span>sub   rsa4096 2017-02-22 <span style="color:#f92672">[</span>S<span style="color:#f92672">]</span>
 </span></span></code></pre></div><h4 id="define-package-list">Define Package List</h4>
 <p>Specify a list of <a href="https://cloudinit.readthedocs.io/en/latest/reference/modules.html#package-update-upgrade-install">packages</a> to install.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># Update the list of packages available online</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># Update the list of packages available online</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">package_update</span>: <span style="color:#66d9ef">true</span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e"># Upgrade all installed packages</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">package_upgrade</span>: <span style="color:#66d9ef">true</span>
@@ -3010,10 +3010,10 @@ password hash is needed for cloud-init input.</p>
 <h4 id="secrets-generating-a-password-hash">Secrets: Generating a Password Hash</h4>
 <p>To create a password hash, use the <code>mkpasswd</code> command from Ubuntu&rsquo;s whois package.  This example will
 hash the weak password of &ldquo;abc123&rdquo; with the sha512 algorithm.  A password better than &ldquo;abc123&rdquo; should be used if following these examples.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ mkpasswd -m sha-512 <span style="color:#e6db74">&#34;abc123&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ mkpasswd -m sha-512 <span style="color:#e6db74">&#34;abc123&#34;</span>
 </span></span><span style="display:flex;"><span>$6$EkwQ38oDCPnJDuui$QKw3IISzY3emHXgJ/QHeEH8xyzGOKB3N6.bU/wAkwf4KDRsreB2iApa/EHULbunx6v9o9Q8foq4K.d8WtHukU/
 </span></span></code></pre></div><p>As mkpasswd is specific to Linux and doesn&rsquo;t work with MacOS, one can alternatively use <code>openssl</code> to create a password hash.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ echo abc123 |  openssl passwd -6 -stdin  
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ echo abc123 |  openssl passwd -6 -stdin  
 </span></span><span style="display:flex;"><span>$6$tdPON3RwkVViXg41$4O9euMZeGFJQXgJ3bvP3YtVcCw9BwIMHLLkix1s/R7woSuAAFvWWtrqqQ.33ESzgcUi9/HdEwelqB9jJUIrpU0
 </span></span></code></pre></div><h4 id="secrets-generating-a-ssh-public-private-key-pair">Secrets: Generating a SSH public private key pair</h4>
 <p>To create a SSH key pair, use ssh-keygen: <code>ssh-keygen -t ed25519 -f ./docker_vm_key -C &quot;app@docker_vm&quot; -P abc123</code>.  This will create a public &amp; private
@@ -3021,7 +3021,7 @@ ssh key in the current directory, with the easily guessable passphrase of <code>
 <h4 id="defining-the-user-account">Defining the User Account</h4>
 <p>This defines an application account named &ldquo;app&rdquo;.  The <code>ssh_authorized_keys</code> value comes from the contents of docker_vm_key.pub.<br>
 As a convenience, the <a href="./assets/docker_vm_key.pub">public</a> and <a href="./assets/docker_vm_key">private</a> ssh keys from this example are provided.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># create the docker group</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># create the docker group</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">groups</span>:
 </span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">docker</span>
 </span></span><span style="display:flex;"><span>
@@ -3039,9 +3039,9 @@ As a convenience, the <a href="./assets/docker_vm_key.pub">public</a> and <a hre
 Run the following to see cloud-init in action. This will create a virtual machine with 2 virtual CPU cores, 2 GB of ram,
 with a 4GB virtual disk using the LTS release of Ubuntu.  Depending on your Internet speed, this may take a few minutes as
 you&rsquo;ll be downloading packages from the Internet.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ multipass launch -n docker-demo --cloud-init docker-install.yaml -c <span style="color:#ae81ff">2</span> -m 2G -d 4G lts
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ multipass launch -n docker-demo --cloud-init docker-install.yaml -c <span style="color:#ae81ff">2</span> -m 2G -d 4G lts
 </span></span></code></pre></div><p>To find the new VM and access it over SSH with the private key so a docker command can be ran from a remote shell.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% mp list                                                                                                                             
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% mp list                                                                                                                             
 </span></span><span style="display:flex;"><span>Name                    State             IPv4             Image
 </span></span><span style="display:flex;"><span>docker-demo             Running           192.168.64.32    Ubuntu 24.04 LTS        
 </span></span><span style="display:flex;"><span>                                          172.17.0.1     

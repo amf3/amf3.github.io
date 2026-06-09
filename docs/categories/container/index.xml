@@ -106,7 +106,7 @@ level objects reference lower level objects by digest, construction begins with 
 to an object would change the layer digest, which would in turn invalidate the config and manifest digests above it.</p>
 <p>Begin with creating a staging directory for building our conatiner image and the compiled application.  The application is statically
 compiled and named <strong>hello</strong>. It prints a greeting defined by the <a href="./assets/hello.go">GREETING</a> environment variable, else it prints &ldquo;Hello World&rdquo;.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ mkdir -p myapp/blobs/sha256
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ mkdir -p myapp/blobs/sha256
 </span></span><span style="display:flex;"><span>$ tree myapp
 </span></span><span style="display:flex;"><span>myapp
 </span></span><span style="display:flex;"><span>└── blobs
@@ -118,7 +118,7 @@ compiled and named <strong>hello</strong>. It prints a greeting defined by the <
 </span></span><span style="display:flex;"><span>HELLO ADAM
 </span></span></code></pre></div><p>Next turn the &ldquo;hello&rdquo; application into a root filesystem blob.  Currently the build artifact is in the &ldquo;./build&rdquo; directory which
 gets archived with tar.  Compute the SHA256 digest on the tar archive and the archive is copied to the staging directory.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ tree build/
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ tree build/
 </span></span><span style="display:flex;"><span>build/
 </span></span><span style="display:flex;"><span>└── hello
 </span></span><span style="display:flex;"><span>
@@ -135,7 +135,7 @@ gets archived with tar.  Compute the SHA256 digest on the tar archive and the ar
 </span></span><span style="display:flex;"><span>        └── 0f11da71a27abfb549ba01cc400d393388116da84abb5f092572c5f2146398cb
 </span></span></code></pre></div><p>Create a config object which tells the container runtime how to execute the filesystem. For simplicity this example uses an uncompressed tar
 archive. The diff_ids value matches the layer digest.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ cat config.json 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ cat config.json 
 </span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;architecture&#34;</span>: <span style="color:#e6db74">&#34;amd64&#34;</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;os&#34;</span>: <span style="color:#e6db74">&#34;linux&#34;</span>,
@@ -157,7 +157,7 @@ archive. The diff_ids value matches the layer digest.</p>
 </span></span><span style="display:flex;"><span>$ cp config.json myapp/blobs/sha256/f86f75f0d7a7dd4c951a158aca51894ab59f46b0348558a341a589bfcc0d253c
 </span></span></code></pre></div><p>The manifest binds the configuration and layer digests into a single image descriptor. The manifest
 file also gets hashed and stored in the staging directory.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ cat manifest 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ cat manifest 
 </span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;schemaVersion&#34;</span>: 2,
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;mediaType&#34;</span>: <span style="color:#e6db74">&#34;application/vnd.oci.image.manifest.v1+json&#34;</span>,
@@ -180,7 +180,7 @@ file also gets hashed and stored in the staging directory.</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>$ cp manifest myapp/blobs/sha256/d6fceb45932ad49b50f9a1e24b21691b60f861bf46ed9e4a47bd74b8401a2ecd
 </span></span></code></pre></div><p>Finally create the container entry point and declare the myapp directory is the top level directory of a OCI compliant image.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ cat myapp/index.json
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ cat myapp/index.json
 </span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;schemaVersion&#34;</span>: 2,
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;manifests&#34;</span>: <span style="color:#f92672">[</span>

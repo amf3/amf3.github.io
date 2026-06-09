@@ -6,6 +6,16 @@
 git submodule update --remote --merge
 ```
 
+### Patch submodule
+
+If `make submodule-patch` fails, do the following to update or generate a new patch
+
+* cd to themes/PaperMod directory
+* git rm .github/workflows/<filename>
+* git diff --cached > ../../patches/PaperMod/00n_patch-name.patch
+* cd - && run `make submodule-reset` to remove any module changes. 
+* Repeat process for each patch to update or create
+
 ### Local builds
 
 Run the following to serve locally
@@ -46,6 +56,6 @@ To publish content to github
 
 ```shell
 go mod init github.com/<myusername>/<myBlogName>
-go get -tool github.com/gohugoio/hugo@v0.152.2
+go get -tool github.com/gohugoio/hugo@latest
 go tool hugo serve or whatever subcommand is needed
 ```

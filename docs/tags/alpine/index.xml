@@ -49,7 +49,7 @@ same macOS host and connected to virtual network interfaces using QEMU&rsquo;s s
 </ol>
 <h3 id="other-qemu-network-backends">Other QEMU Network Backends</h3>
 <p>To see a complete list of network backends supported by QEMU:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cmd" data-lang="cmd"><span style="display:flex;"><span>%  qemu-system-x86_64 -netdev help  
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-cmd" data-lang="cmd"><span style="display:flex;"><span>%  qemu-system-x86_64 -netdev help  
 </span></span><span style="display:flex;"><span>Available netdev backend types:
 </span></span><span style="display:flex;"><span>socket
 </span></span><span style="display:flex;"><span>stream
@@ -77,7 +77,7 @@ to remove the upload limit, the restriction doesn&rsquo;t prevent me from valida
 <p><img alt="RouterOS download page with &lsquo;Cloud Hosted Router&rsquo; and &lsquo;Raw disk image&rsquo; highlighted" loading="lazy" src="/articles/virtualization/macos_qemu_networks/assets/routerOS-dl-screenshot.png#center"></p>
 <hr>
 <p>First, convert the raw image to <code>qcow2</code> format. This allows snapshotting the VM, making it easy to roll back from bad config changes.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span> % qemu-img convert -f raw -O qcow2 chr-7.18.2.img chr-7.18.2.qcow2
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span> % qemu-img convert -f raw -O qcow2 chr-7.18.2.img chr-7.18.2.qcow2
 </span></span><span style="display:flex;"><span> % qemu-img snapshot -c original_image chr-7.18.2.qcow2
 </span></span><span style="display:flex;"><span> % qemu-img info chr-7.18.2.qcow2 
 </span></span><span style="display:flex;"><span>image: chr-7.18.2.qcow2
@@ -101,14 +101,14 @@ to remove the upload limit, the restriction doesn&rsquo;t prevent me from valida
 </span></span><span style="display:flex;"><span>    file length: 44.2 MiB <span style="color:#f92672">(</span><span style="color:#ae81ff">46333952</span> bytes<span style="color:#f92672">)</span>
 </span></span><span style="display:flex;"><span>    disk size: 44.2 MiB
 </span></span></code></pre></div><p>Now, start the RouterOS VM and create the two virtual networks with QEMU.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>sudo qemu-system-x86_64  -m <span style="color:#ae81ff">2048</span> -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial mon:stdio  <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device virtio-scsi-pci,id<span style="color:#f92672">=</span>scsi0 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -drive file<span style="color:#f92672">=</span>./chr-7.18.2.qcow2,if<span style="color:#f92672">=</span>none,format<span style="color:#f92672">=</span>qcow2,discard<span style="color:#f92672">=</span>unmap,id<span style="color:#f92672">=</span>hda <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device scsi-hd,drive<span style="color:#f92672">=</span>hda,bus<span style="color:#f92672">=</span>scsi0.0 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device virtio-net-pci,netdev<span style="color:#f92672">=</span>net1 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -netdev vmnet-shared,id<span style="color:#f92672">=</span>net1,start-address<span style="color:#f92672">=</span>172.16.0.1,end-address<span style="color:#f92672">=</span>172.31.255.254,subnet-mask<span style="color:#f92672">=</span>255.240.0.0 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device virtio-net-pci,netdev<span style="color:#f92672">=</span>net2 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -netdev vmnet-host,id<span style="color:#f92672">=</span>net2,start-address<span style="color:#f92672">=</span>192.168.2.1,end-address<span style="color:#f92672">=</span>192.168.2.254,subnet-mask<span style="color:#f92672">=</span>255.255.255.0,net-uuid<span style="color:#f92672">=</span>154780B0-F499-4968-9B20-E58C02FDF5FB
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>sudo qemu-system-x86_64  -m <span style="color:#ae81ff">2048</span> -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial mon:stdio  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -device virtio-scsi-pci,id<span style="color:#f92672">=</span>scsi0 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -drive file<span style="color:#f92672">=</span>./chr-7.18.2.qcow2,if<span style="color:#f92672">=</span>none,format<span style="color:#f92672">=</span>qcow2,discard<span style="color:#f92672">=</span>unmap,id<span style="color:#f92672">=</span>hda <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -device scsi-hd,drive<span style="color:#f92672">=</span>hda,bus<span style="color:#f92672">=</span>scsi0.0 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -device virtio-net-pci,netdev<span style="color:#f92672">=</span>net1 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -netdev vmnet-shared,id<span style="color:#f92672">=</span>net1,start-address<span style="color:#f92672">=</span>172.16.0.1,end-address<span style="color:#f92672">=</span>172.31.255.254,subnet-mask<span style="color:#f92672">=</span>255.240.0.0 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -device virtio-net-pci,netdev<span style="color:#f92672">=</span>net2 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -netdev vmnet-host,id<span style="color:#f92672">=</span>net2,start-address<span style="color:#f92672">=</span>192.168.2.1,end-address<span style="color:#f92672">=</span>192.168.2.254,subnet-mask<span style="color:#f92672">=</span>255.255.255.0,net-uuid<span style="color:#f92672">=</span>154780B0-F499-4968-9B20-E58C02FDF5FB
 </span></span></code></pre></div><ul>
 <li>Uses sudo to create vmnet interfaces (required on macOS).</li>
 <li>Allocates 2 GB of RAM and 4 vCPUs.</li>
@@ -129,7 +129,7 @@ to remove the upload limit, the restriction doesn&rsquo;t prevent me from valida
 </ul>
 <p>Once RouterOS boots, log in with username <strong>admin</strong> and press <strong>Enter</strong> for a blank password. You’ll be prompted to set a new one.</p>
 <p>To list interfaces:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /interface print 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /interface print 
 </span></span><span style="display:flex;"><span>Flags: R - RUNNING
 </span></span><span style="display:flex;"><span>Columns: NAME, TYPE, ACTUAL-MTU, MAC-ADDRESS
 </span></span><span style="display:flex;"><span><span style="color:#75715e">#   NAME    TYPE      ACTUAL-MTU  MAC-ADDRESS      </span>
@@ -137,7 +137,7 @@ to remove the upload limit, the restriction doesn&rsquo;t prevent me from valida
 </span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span> R ether2  ether           <span style="color:#ae81ff">1500</span>  52:54:00:12:34:57
 </span></span><span style="display:flex;"><span><span style="color:#ae81ff">2</span> R lo      loopback       <span style="color:#ae81ff">65536</span>  00:00:00:00:00:00
 </span></span></code></pre></div><p>To check assigned IPs:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip/address print
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip/address print
 </span></span><span style="display:flex;"><span>Flags: D - DYNAMIC
 </span></span><span style="display:flex;"><span>Columns: ADDRESS, NETWORK, INTERFACE
 </span></span><span style="display:flex;"><span><span style="color:#75715e">#   ADDRESS        NETWORK     INTERFACE</span>
@@ -152,7 +152,7 @@ on the router.</p>
 <li>create a dhcpd server</li>
 <li>enable NAT</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip address add address<span style="color:#f92672">=</span>192.168.2.1/24 interface<span style="color:#f92672">=</span>ether2 network<span style="color:#f92672">=</span>192.168.2.0
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip address add address<span style="color:#f92672">=</span>192.168.2.1/24 interface<span style="color:#f92672">=</span>ether2 network<span style="color:#f92672">=</span>192.168.2.0
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip pool add name<span style="color:#f92672">=</span>dhcp ranges<span style="color:#f92672">=</span>192.168.2.50-192.168.2.100
 </span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /ip dhcp-server add address-pool<span style="color:#f92672">=</span>dhcp interface<span style="color:#f92672">=</span>ether2 lease-time<span style="color:#f92672">=</span>1h name<span style="color:#f92672">=</span>defconf
@@ -163,20 +163,20 @@ on the router.</p>
 <p>⚠️ The example does not set any firewall rules. Use it as a starting point only.</p>
 </blockquote>
 <p>To gracefully shutdown the router</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /system shutdown
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>admin@MikroTik<span style="color:#f92672">]</span> &gt; /system shutdown
 </span></span></code></pre></div><p>Answer y when prompted. Or, leave the router running. It will be used again shortly.</p>
 <h3 id="alpine-linux-vm">Alpine Linux VM</h3>
 <p>An Alpine ISO needs to be downloaded and installed onto a virtual hard disk.  I recommend using the <strong>user</strong> network mentioned earlier
 for the install as additional packages will need to be downloaded from the Internet.  The standard x86_64 image can be retrieved from the Alpine Linux <a href="https://alpinelinux.org/downloads/">downloads page</a>.</p>
 <p>Create a disk image to install the OS to with the qemu-img command.  The options will use the qcow2 format with a max size of 2GB.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img create -f qcow2 alpine_disk.qcow2 2G
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-img create -f qcow2 alpine_disk.qcow2 2G
 </span></span></code></pre></div><p>Next step is to start a VM that boots from the Alpine ISO and connects to the Internet with the user network.  Because versions change, be
 sure to replace the ISO filename in the <strong>-cdrom</strong> option with the one that was downloaded.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-system-x86_64  -m <span style="color:#ae81ff">2048</span> -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial stdio  <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -boot once<span style="color:#f92672">=</span>d <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -cdrom ./alpine-standard-3.21.2-x86_64.iso <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -hda ./alpine_disk.qcow2 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -net nic,model<span style="color:#f92672">=</span>virtio -net user
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% qemu-system-x86_64  -m <span style="color:#ae81ff">2048</span> -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial stdio  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -boot once<span style="color:#f92672">=</span>d <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -cdrom ./alpine-standard-3.21.2-x86_64.iso <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -hda ./alpine_disk.qcow2 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -net nic,model<span style="color:#f92672">=</span>virtio -net user
 </span></span></code></pre></div><p>Once the VM has started, login as &ldquo;root&rdquo; and hit Enter for the empty password.  Next run <strong>setup-alpine</strong> and follow the prompts.
 Here are suggested answers to some of the prompts:</p>
 <ul>
@@ -189,18 +189,18 @@ Here are suggested answers to some of the prompts:</p>
 <p>When the installation script is complete, type <strong>reboot</strong> and use the new root password set during the install.  With
 the <code>-boot once=d</code> option, the VM will skip the ISO and boot directly from the newly installed virtual disk.</p>
 <p>Log in as root and install the dig and curl commands.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cmd" data-lang="cmd"><span style="display:flex;"><span># apk add bind-tools curl ca-certificates
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-cmd" data-lang="cmd"><span style="display:flex;"><span># apk add bind-tools curl ca-certificates
 </span></span></code></pre></div><p>When the package install has completed, gracefully shutdown the VM with <strong>poweroff</strong> command.</p>
 <h2 id="testing-the-nat-setup">Testing the NAT Setup</h2>
 <p>Check that the RouterOS VM is still running in the other terminal. It&rsquo;s acting as the NAT gateway for the Alpine VM and must be
 active for Internet access to work.  Then connect the new Alpine Linux VM to Network2 (vmnet-host) with this QEMU command.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% sudo qemu-system-x86_64  -m <span style="color:#ae81ff">2048</span> -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial mon:stdio  <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        -boot c <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        -hda alpine_disk.qcow2 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        -device virtio-net-pci,netdev<span style="color:#f92672">=</span>net2 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        -netdev vmnet-host,id<span style="color:#f92672">=</span>net2,start-address<span style="color:#f92672">=</span>192.168.2.1,end-address<span style="color:#f92672">=</span>192.168.2.254,subnet-mask<span style="color:#f92672">=</span>255.255.255.0,net-uuid<span style="color:#f92672">=</span>154780B0-F499-4968-9B20-E58C02FDF5FB
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% sudo qemu-system-x86_64  -m <span style="color:#ae81ff">2048</span> -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> -serial mon:stdio  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>        -boot c <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>        -hda alpine_disk.qcow2 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>        -device virtio-net-pci,netdev<span style="color:#f92672">=</span>net2 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>        -netdev vmnet-host,id<span style="color:#f92672">=</span>net2,start-address<span style="color:#f92672">=</span>192.168.2.1,end-address<span style="color:#f92672">=</span>192.168.2.254,subnet-mask<span style="color:#f92672">=</span>255.255.255.0,net-uuid<span style="color:#f92672">=</span>154780B0-F499-4968-9B20-E58C02FDF5FB
 </span></span></code></pre></div><p>Log into the Alpine VM and verify it can reach the Internet.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>myvm:~$ ip addr show eth0         <span style="color:#75715e"># Confirm the IP is in the 192.168.2.x network range</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>myvm:~$ ip addr show eth0         <span style="color:#75715e"># Confirm the IP is in the 192.168.2.x network range</span>
 </span></span><span style="display:flex;"><span>    ...
 </span></span><span style="display:flex;"><span>    inet 192.168.2.100/24 scope global eth0
 </span></span><span style="display:flex;"><span>    ...
@@ -237,11 +237,11 @@ active for Internet access to work.  Then connect the new Alpine Linux VM to Net
 <p>macOS logs a large volume of network-related events, and it can be tricky to isolate the relevant ones. Fortunately, the <code>log show</code>
 and <code>log collect</code> tools make it easier to filter and investigate.</p>
 <p>Start by capturing a snapshot of system logs around the time your VMs are active:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% mkdir ./log_archive
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% mkdir ./log_archive
 </span></span><span style="display:flex;"><span>% ./start_lab <span style="color:#75715e"># start the VMs with a shell script</span>
 </span></span><span style="display:flex;"><span>% sudo log collect --output ./log_archive --last 3m  <span style="color:#75715e"># capture the previous 3 minutes of log events.</span>
 </span></span></code></pre></div><p>This captures the previous 3 minutes of logs and stores them in a binary archive. Then query the relevant subsystem:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% log show --archive log_archive/system_logs.logarchive --predicate <span style="color:#e6db74">&#39;subsystem == &#34;com.apple.NetworkSharing&#34;&#39;</span>  
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>% log show --archive log_archive/system_logs.logarchive --predicate <span style="color:#e6db74">&#39;subsystem == &#34;com.apple.NetworkSharing&#34;&#39;</span>  
 </span></span></code></pre></div><p>I found the <code>subsystem == &quot;com.apple.NetworkSharing&quot;</code> query provided the most useful results.  Using other filters like <code>subsystem == &quot;com.apple.network&quot;</code>
 or <code>process == &quot;qemu-system-x86_64&quot;</code> included many unrelated events and were a little overwhelming.  This screenshot shows the networks being created
 when the VMs are started and then torn down when the VMs are stopped.</p>

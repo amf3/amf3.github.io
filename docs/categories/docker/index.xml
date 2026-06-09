@@ -28,7 +28,7 @@ discuss alternatives.</p>
 by creating a Unix socket with python and not using Docker at all.</p>
 <p>This code block will create a Unix socket and wait for clients to connect.  When the client connects, the server prints received
 data to standard out.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python3" data-lang="python3"><span style="display:flex;"><span><span style="color:#75715e">#! /usr/bin/env python3</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python3" data-lang="python3"><span style="display:flex;"><span><span style="color:#75715e">#! /usr/bin/env python3</span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e"># Save as server.py</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
@@ -58,7 +58,7 @@ data to standard out.</p>
 </span></span><span style="display:flex;"><span>    conn<span style="color:#f92672">.</span>sendall(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;ack</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
 </span></span></code></pre></div><p>The next block contains the client code.  Notice that the client socket path (/mnt/control.sock) is different from the server (/tmp/control.sock)
 as it&rsquo;s using the read only bind mount created in the next step.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python3" data-lang="python3"><span style="display:flex;"><span><span style="color:#75715e">#! /usr/bin/env python3</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python3" data-lang="python3"><span style="display:flex;"><span><span style="color:#75715e">#! /usr/bin/env python3</span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e"># Save as client.py</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
 </span></span><span style="display:flex;"><span>
@@ -69,7 +69,7 @@ as it&rsquo;s using the read only bind mount created in the next step.</p>
 </span></span><span style="display:flex;"><span>print(sock<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>))
 </span></span></code></pre></div><p>Start the server code to create <code>/tmp/control.sock</code> and then bind mount the socket
 to a new mount point with read-only access.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo touch /mnt/control.sock                           <span style="color:#75715e"># create the mount point</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo touch /mnt/control.sock                           <span style="color:#75715e"># create the mount point</span>
 </span></span><span style="display:flex;"><span>$ sudo mount --bind /tmp/control.sock /mnt/control.sock  <span style="color:#75715e"># mount the socket to a new mount point</span>
 </span></span><span style="display:flex;"><span>$ sudo mount -o remount,ro,bind /mnt/control.sock        <span style="color:#75715e"># Remount the socket mount point with read only options</span>
 </span></span><span style="display:flex;"><span>
@@ -78,7 +78,7 @@ to a new mount point with read-only access.</p>
 </span></span></code></pre></div><p>Next run the client.  At this point it <strong>should not</strong> be possible to write to the socket, but this screen shot shows otherwise.</p>
 <p><img alt="Screenshot Demo" loading="lazy" src="/articles/virtualization/docker_socket/assets/socket_demo.jpg"></p>
 <p>If running the demo locally, don&rsquo;t forget to clean up the bind mount.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo umount /mnt/control.sock  <span style="color:#75715e"># unmount the read-only bind mount</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo umount /mnt/control.sock  <span style="color:#75715e"># unmount the read-only bind mount</span>
 </span></span><span style="display:flex;"><span>sudo rm /mnt/control.sock      <span style="color:#75715e"># remove the mount point</span>
 </span></span><span style="display:flex;"><span>rm /tmp/control.sock           <span style="color:#75715e"># remove the control.sock socket created by the python server code.</span>
 </span></span></code></pre></div><h3 id="how-did-this-work">How did this work?</h3>
@@ -101,7 +101,7 @@ verbs, the HTTP endpoints don&rsquo;t map cleanly between safe and unsafe operat
 and explains why granting a container access to the Docker socket implicitly grants elevated capabilities for that container.</p>
 <p>This example only uses HTTP GET requests to demonstrate the missing separation of safe and unsafe operations in the Docker API. The
 example is able to exfiltrate TLS certificates from a running container. No container restart, privilege escalation, or filesystem write is required.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ <span style="color:#75715e"># Get a list of running containers</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ <span style="color:#75715e"># Get a list of running containers</span>
 </span></span><span style="display:flex;"><span>$ curl -s --unix-socket /var/run/docker.sock -X GET http://localhost/containers/json | jq <span style="color:#e6db74">&#39;.[] | {Names, Id, Image}&#39;</span> 
 </span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;Names&#34;</span>: <span style="color:#f92672">[</span>
@@ -188,7 +188,7 @@ storage without needing CAP_SYS_ADMIN privileges.</p>
 <p>Plugins for Volume Drivers are usually installed as special containers using the <strong>docker plugin</strong> command. Plugin containers run
 in their own namespaces and don&rsquo;t behave like normal containers. However, if the plugin includes a shell, it&rsquo;s possible to enter the
 namespace using <a href="https://docs.docker.com/engine/extend/#debugging-plugins">runc</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>ubuntu@docker-dev:~/work$ sudo runc --root /run/docker/runtime-runc/plugins.moby list 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>ubuntu@docker-dev:~/work$ sudo runc --root /run/docker/runtime-runc/plugins.moby list 
 </span></span><span style="display:flex;"><span>ID                                                                 PID         STATUS      BUNDLE                                                                                                                        CREATED                          OWNER
 </span></span><span style="display:flex;"><span>bae595da4deac656921a48f4b3d854992c692777f46db891934310ae863746c1   <span style="color:#ae81ff">24503</span>       running     /run/containerd/io.containerd.runtime.v2.task/plugins.moby/bae595da4deac656921a48f4b3d854992c692777f46db891934310ae863746c1   2025-06-27T03:55:42.927740463Z   root
 </span></span><span style="display:flex;"><span>
@@ -253,7 +253,7 @@ with minimal privileges and lightweight tooling. I have to admit that the proces
 <p><img alt="Docker Documentation Screenshot of Building a Plugin" loading="lazy" src="/articles/storage/docker_volumes/assets/doc.jpg"></p>
 <p>Fortunately, someone wrapped these steps in a <a href="https://github.com/vieux/docker-volume-sshfs/blob/1e0cd2fcb72d6af0a2ad4689faed8c312124517c/Makefile">Makefile</a>
 which can be used as a starting point.  Here&rsquo;s a snippet from the docker-volume-sshfs repo.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-make" data-lang="make"><span style="display:flex;"><span><span style="color:#a6e22e">rootfs</span><span style="color:#f92672">:</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-make" data-lang="make"><span style="display:flex;"><span><span style="color:#a6e22e">rootfs</span><span style="color:#f92672">:</span>
 </span></span><span style="display:flex;"><span>	@echo <span style="color:#e6db74">&#34;### docker build: rootfs image with docker-volume-sshfs&#34;</span>
 </span></span><span style="display:flex;"><span>	@docker build -q -t <span style="color:#e6db74">${</span>PLUGIN_NAME<span style="color:#e6db74">}</span>:rootfs .
 </span></span><span style="display:flex;"><span>	@echo <span style="color:#e6db74">&#34;### create rootfs directory in ./plugin/rootfs&#34;</span>
@@ -285,7 +285,7 @@ using it is optional.  I came across several projects like rclone and SeaweedFS 
 <h3 id="code-highlights">Code Highlights</h3>
 <p>The plugin I built is intentionaly minimal.  When a container calls <strong>mount</strong> on the volume, the function creates a hello.txt file in the volume directory.<br>
 It simulates downloading data from remote storage while keeping things simple:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Go" data-lang="Go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">d</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">myDriver</span>) <span style="color:#a6e22e">Mount</span>(<span style="color:#a6e22e">req</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">volume</span>.<span style="color:#a6e22e">MountRequest</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">volume</span>.<span style="color:#a6e22e">MountResponse</span>, <span style="color:#66d9ef">error</span>) {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-Go" data-lang="Go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">d</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">myDriver</span>) <span style="color:#a6e22e">Mount</span>(<span style="color:#a6e22e">req</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">volume</span>.<span style="color:#a6e22e">MountRequest</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">volume</span>.<span style="color:#a6e22e">MountResponse</span>, <span style="color:#66d9ef">error</span>) {
 </span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">volPath</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">filepath</span>.<span style="color:#a6e22e">Join</span>(<span style="color:#a6e22e">pluginRoot</span>, <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">Name</span>)
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>	<span style="color:#75715e">// Write a hello.txt file</span>
@@ -324,7 +324,7 @@ permissions. This step could be used to sync local changes back to remote storag
 <ol>
 <li>Build the Go code and create a plugin image</li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ docker build -t rootfsimage .
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ docker build -t rootfsimage .
 </span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>+<span style="color:#f92672">]</span> Building 6.1s <span style="color:#f92672">(</span>13/13<span style="color:#f92672">)</span> FINISHED                                                                                                   docker:default
 </span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>internal<span style="color:#f92672">]</span> load build definition from Dockerfile                                                                                 0.0s
 </span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; transferring dockerfile: 461B                                                                                                 0.0s

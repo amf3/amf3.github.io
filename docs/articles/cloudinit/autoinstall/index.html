@@ -12,7 +12,7 @@
 <link rel="canonical" href="https://amf3.github.io/articles/cloudinit/autoinstall/">
 <meta name="google-site-verification" content="6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E">
 <meta name="msvalidate.01" content="C1E02AC59FE7ECBDB6D9EFB7D5E02B65">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.4b72e7725c68fccaac08b7b94b4bf3724ac8531837c6717dbd3e55b5a23b0117.css" integrity="sha256-S3Lnclxo/MqsCLe5S0vzckrIUxg3xnF9vT5VtaI7ARc=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://amf3.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://amf3.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://amf3.github.io/favicon-32x32.png">
@@ -70,7 +70,7 @@
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-MKR06D6KGD"></script>
       <script>
         var doNotTrack = false;
-        if ( false ) {
+        if ( true ) {
           var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
           var doNotTrack = (dnt == "1" || dnt == "yes");
         }
@@ -152,12 +152,12 @@
             <a href="https://amf3.github.io/" accesskey="h" title="Adam Faris (Alt + H)">Adam Faris</a>
             <div class="logo-switches">
                 <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
-                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
-                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
                         <circle cx="12" cy="12" r="5"></circle>
@@ -189,6 +189,11 @@
                     <span>about</span>
                 </a>
             </li>
+            <li>
+                <a href="https://amf3.github.io/archives/" title="archives">
+                    <span>archives</span>
+                </a>
+            </li>
         </ul>
     </nav>
 </header>
@@ -197,19 +202,26 @@
 <article class="post-single">
   <header class="post-header">
     <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
-    <a href='https://amf3.github.io/'>Home</a>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+            <a href="/">Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
                 <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
-            <a href="https://amf3.github.io/articles/">articles</a></nav>
+            <a href="/articles/">articles</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
     <h1 class="post-title entry-hint-parent">
       Unattended Ubuntu Installs - Virtual Machines to Bare-Metal
     </h1>
     <div class="post-description">
       Using cloud-init to deploy Linux on either bare-metal or virtual machines
     </div>
-    <div class="post-meta"><span title='2025-03-03 23:07:23 -0800 PST'>March 3, 2025</span>&nbsp;·&nbsp;<span>2082 words</span>
+    <div class="post-meta">
+
+<span title='2025-03-03 23:07:23 -0800 PST'>March 3, 2025</span>&nbsp;·&nbsp;<span>2082 words</span>
 
 </div>
   </header> <details class="toc" >
@@ -307,7 +319,7 @@ hostname of my-qemu-vm, creates an admin account named ubuntu, and assigns the u
 It&rsquo;s possible to generate a different secure password hash with openssl, as shown in
 this example: <code>echo abc123 |  openssl passwd -6 -stdin</code>.  Restart the QEMU VM so it boots from the
 virtual CD-ROM and modify the GRUB menu so it loads the new config when the VM boots.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">version</span>: <span style="color:#ae81ff">1</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">identity</span>:
@@ -326,7 +338,7 @@ possible to view the specified values from the user-data YAML file that have bee
 the install.  Other options like locale or the keyboard setup can be found in the autoinstall-user-data file and added ot the example below.  Restarting
 the QEMU VM and modifying the GRUB menu to reinstall the host OS is needed to apply the new changes to the YAML file.  Reinstalling
 the OS also demonstrates the ease of initializing a system to a known state with autoinstall &amp; cloud-init configs.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">version</span>: <span style="color:#ae81ff">1</span>
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">identity</span>:
@@ -354,7 +366,7 @@ This value will change based on which slot a PCI card is plugged into.  Luckily
 lets us wildcard the device names.</p>
 <p>This network example will work with either OpenRC or Systemd device names.  It&rsquo;s similar to what&rsquo;s used by
 <a href="https://git.launchpad.net/livecd-rootfs/tree/live-build/ubuntu-server/includes.chroot.ubuntu-server-minimal.ubuntu-server.installer/etc/cloud/cloud.cfg#n23">Ubuntu&rsquo;s LiveCD</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">network</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">network</span>:
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">version</span>: <span style="color:#ae81ff">2</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">ethernets</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">my-en-devices</span>:
@@ -383,7 +395,7 @@ can be complex when configuring per partition byte offsets. Luckily we can provi
 handle the details.  I&rsquo;ll show a basic lvm example but the other supported layouts are direct, and zfs.</p>
 <p>Here we specify a LVM configuration with a sizing policy to use the entire disk for the logical volume.  If sizing-policy
 were set to <code>scaled</code>, free space would be left on the storage device for things like snapshots or further expansion.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">storage</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">storage</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">layout</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">name</span>: <span style="color:#ae81ff">lvm</span>
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">sizing-policy</span>: <span style="color:#ae81ff">all</span>
@@ -412,7 +424,7 @@ Local Time is:    Tue Mar  4 05:45:56 2025 UTC
 SMART support is: Available - device has SMART capability.
 SMART support is: Enabled
 </code></pre><p>If we wanted to match this disk by wild-carding the model name, we would use the following.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">storage</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">layout</span>:
@@ -422,7 +434,7 @@ SMART support is: Enabled
 </span></span><span style="display:flex;"><span>            <span style="color:#f92672">model</span>: <span style="color:#ae81ff">QEMU*</span>
 </span></span></code></pre></div><p>Alternatively if our on-premise hardware instance had a 1GB SSD for the OS and a second 12GB spinning disk for data storage, we could
 use a match with size <code>size: smallest</code> to install the OS on the 1GB disk.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">storage</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">layout</span>:
@@ -434,19 +446,19 @@ use a match with size <code>size: smallest</code> to install the OS on the 1GB d
 <p>Running arbitrary commands is possible when autoinstall runs.  Commands are specified as a list and run under &ldquo;sh -c&rdquo;.
 Its  possible to specify if commands should run early in the autoinstall process, late, or when an error occurs.</p>
 <p>For example we want to hit a web endpoint when the installer has completed.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">late-commands</span>:
 </span></span><span style="display:flex;"><span>      - <span style="color:#f92672">curl -H &#39;Content-Type</span>: <span style="color:#ae81ff">application/json&#39; --data &#39;{&#34;host&#34;: &#34;&#39;$HOSTNAME&#39;&#34;}&#39; http://myapi.example.com/success</span>
 </span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">echo &#34;Install Success&#34;  &gt; /var/log/my.log</span>
 </span></span></code></pre></div><p>To run a command before the autoinstall process runs, like downloading internal x509 certificates:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">early-commands</span>:
 </span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">mkdir /etc/ssl/mycerts</span>
 </span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">wget -O /etc/ssl/mycerts/internal.pem &#34;http://x509api.example.com/certs/$HOSTNAME&#34;</span>
 </span></span></code></pre></div><p>Or reporting an error when autoinstall fails</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">error-commands</span>:
 </span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">echo &#34;Install failed&#34; &gt; /var/log/my.log</span>
@@ -457,7 +469,7 @@ the cloud-init entries under a user-data key.  Here&rsquo;s a cloud-init example
 <p>cloud-init and
 autoinstall sometimes perform similar tasks. When configuring a storage device with cloud-init, I found it was
 better to use autoinstall as the cloud-init changes were overwritten.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">user-data</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">package_update</span>: <span style="color:#66d9ef">true</span>    <span style="color:#75715e"># update the list of available packages</span>
@@ -468,7 +480,7 @@ better to use autoinstall as the cloud-init changes were overwritten.</p>
 </span></span></code></pre></div><h3 id="other">Other<a hidden class="anchor" aria-hidden="true" href="#other">#</a></h3>
 <p>It&rsquo;s possible to configure a local proxy for downloading software packages.  Running apt-cacher-ng as a package
 proxy inside a docker container on my laptop helps when I&rsquo;m on a high latency Internet connection.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#cloud-config</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">autoinstall</span>:
 </span></span><span style="display:flex;"><span>   <span style="color:#f92672">proxy</span>: <span style="color:#ae81ff">http://10.0.2.2:3142</span>
 </span></span></code></pre></div><h2 id="provision-a-physical-host">Provision a physical host<a hidden class="anchor" aria-hidden="true" href="#provision-a-physical-host">#</a></h2>
@@ -507,9 +519,11 @@ on <a href="https://bsky.app/profile/af9.us">Bluesky</a>.</p>
 <footer class="footer">
         <span>&copy; 2026 <a href="https://amf3.github.io/">Adam Faris</a></span> · 
 
+    
+    
     <span>
         Powered by
-        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
         <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
     </span>
 </footer>

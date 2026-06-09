@@ -48,12 +48,12 @@ wrap QEMU, but it felt unnecessary for this simple use case.  Invoking QEMU dire
 sure the qemu-utils and qemu-system-x86 packages are installed.  I wanted a service account to run the virtual router process.  I
 created a user named <strong>qemu</strong> and gave it access to the <strong>kvm</strong> group.</p>
 <p>If doing this by hand:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo useradd -r -s /usr/sbin/nologin qemu
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo useradd -r -s /usr/sbin/nologin qemu
 </span></span><span style="display:flex;"><span>sudo usermod -aG kvm qemu
 </span></span></code></pre></div><h3 id="isolating-network-cards">Isolating Network Cards</h3>
 <p>This step is generic to isolating PCI cards for any type of virtual machine.   The first step is to get the PCI ID tuple that&rsquo;s
 burned into the card&rsquo;s firmware.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ lspci -nn | grep Ethernet
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ lspci -nn | grep Ethernet
 </span></span><span style="display:flex;"><span>01:00.0 Ethernet controller <span style="color:#f92672">[</span>0200<span style="color:#f92672">]</span>: Intel Corporation I350 Gigabit Network Connection <span style="color:#f92672">[</span>8086:1521<span style="color:#f92672">]</span> <span style="color:#f92672">(</span>rev 01<span style="color:#f92672">)</span>
 </span></span><span style="display:flex;"><span>01:00.1 Ethernet controller <span style="color:#f92672">[</span>0200<span style="color:#f92672">]</span>: Intel Corporation I350 Gigabit Network Connection <span style="color:#f92672">[</span>8086:1521<span style="color:#f92672">]</span> <span style="color:#f92672">(</span>rev 01<span style="color:#f92672">)</span>
 </span></span><span style="display:flex;"><span>06:00.0 Ethernet controller <span style="color:#f92672">[</span>0200<span style="color:#f92672">]</span>: Realtek Semiconductor Co., Ltd. RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller <span style="color:#f92672">[</span>10ec:8168<span style="color:#f92672">]</span> <span style="color:#f92672">(</span>rev 0c<span style="color:#f92672">)</span>
@@ -63,10 +63,10 @@ are the &ldquo;8086:1521&rdquo; tuple.  The first value (8086) in the tuple is r
 family of network controllers.</p>
 <p>Because I want to assign the Intel network card to the router VM, I first need to denylist the IGB driver to prevent the host OS
 from using it.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;blacklist igb&#34;</span> | sudo tee /etc/modprobe.d/blacklist-igb.conf
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;blacklist igb&#34;</span> | sudo tee /etc/modprobe.d/blacklist-igb.conf
 </span></span><span style="display:flex;"><span>sudo update-initramfs -u
 </span></span></code></pre></div><p>Next I need to load the vfio-pci module at boot time so the network card can be assigned to the VM.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#39;GRUB_CMDLINE_LINUX_DEFAULT=&#34;$GRUB_CMDLINE_LINUX intel_iommu=on vfio-pci.ids=8086:1521&#34;&#39;</span> | sudo tee /etc/default/grub.d/virtualRouterNic.cfg
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#39;GRUB_CMDLINE_LINUX_DEFAULT=&#34;$GRUB_CMDLINE_LINUX intel_iommu=on vfio-pci.ids=8086:1521&#34;&#39;</span> | sudo tee /etc/default/grub.d/virtualRouterNic.cfg
 </span></span><span style="display:flex;"><span>sudo update-grub
 </span></span><span style="display:flex;"><span>sudo reboot
 </span></span></code></pre></div><p>Now the steps I listed aren&rsquo;t ideal for everyone but they work for me. Deny listing the IGB kernel module impacts all Intel
@@ -80,15 +80,15 @@ IGB kernel module and use that for the host OS.  It&rsquo;s something to plan fo
 can modify behavior during hardware detection.  The qemu user, a member of the kvm group, is running the router VM process and
 normally doesn&rsquo;t have write access to the Intel network card being assigned to the router VM.  The updated udev rules will grant
 the kvm group members write permissions to the vfio device.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo vi /etc/udev/rules.d/99-qemu-vfio.rules 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo vi /etc/udev/rules.d/99-qemu-vfio.rules 
 </span></span><span style="display:flex;"><span>KERNEL<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;vfio&#34;</span>, GROUP<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;kvm&#34;</span>, MODE<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;0660&#34;</span>
 </span></span><span style="display:flex;"><span>KERNEL<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;[0-9]*&#34;</span>, SUBSYSTEM<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;vfio&#34;</span>, GROUP<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;kvm&#34;</span>, MODE<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;0660&#34;</span>
 </span></span><span style="display:flex;"><span>KERNEL<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;kvm&#34;</span>, GROUP<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;kvm&#34;</span>, MODE<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;0660&#34;</span>
 </span></span></code></pre></div><p>Reload the udev rules with:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo udevadm control --reload-rules
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo udevadm control --reload-rules
 </span></span><span style="display:flex;"><span>sudo udevadm trigger --action<span style="color:#f92672">=</span>add /dev/vfio/1
 </span></span></code></pre></div><p>Then validate that members of the kvm group can write to the vfio device.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ id qemu
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ id qemu
 </span></span><span style="display:flex;"><span>uid<span style="color:#f92672">=</span>999<span style="color:#f92672">(</span>qemu<span style="color:#f92672">)</span> gid<span style="color:#f92672">=</span>987<span style="color:#f92672">(</span>qemu<span style="color:#f92672">)</span> groups<span style="color:#f92672">=</span>987<span style="color:#f92672">(</span>qemu<span style="color:#f92672">)</span>,993<span style="color:#f92672">(</span>kvm<span style="color:#f92672">)</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>$ ls -l /dev/vfio/
@@ -113,7 +113,7 @@ the <a href="https://mikrotik.com/download">raw image</a> which
 I later <a href="https://amf3.github.io/articles/virtualization/qemuimage_tips/#tip-four---transfer-a-qemu-image-to-bare-metal">converted into a qcow2 image</a>
 that allows taking snapshots.  Network card drivers included with CHR are the default drivers from the Linux kernel and a few others.
 Here&rsquo;s a partial module list from one of <a href="https://mikrotik.com/download/changelogs">Mikrotik&rsquo;s change log</a> entries (v7.12).</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>x86 - added support for Mellanox ConnectX-6 Dx NIC;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>x86 - added support for Mellanox ConnectX-6 Dx NIC;
 </span></span><span style="display:flex;"><span> *) x86 - i40e updated driver to 2.23.17 version;
 </span></span><span style="display:flex;"><span> *) x86 - igb updated driver to 5.14.16 version;
 </span></span><span style="display:flex;"><span> *) x86 - igbvf updated driver from in-tree Linux kernel;
@@ -134,7 +134,7 @@ reference in the template file is missing from the vault, the CLI will fail to g
 This prevents generating router configs with incomplete or missing commands.</p>
 <p>Here&rsquo;s an example where I declare a secret reference in a file called router_config.tmpl. I then use the op command to generate
 a new file containing plain-text secrets named router_config.rsc.  router_config.rsc is what&rsquo;s uploaded to the router.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ cat router_config.templ
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ cat router_config.templ
 </span></span><span style="display:flex;"><span>/user set <span style="color:#f92672">[</span>find name<span style="color:#f92672">=</span>admin<span style="color:#f92672">]</span> password<span style="color:#f92672">={{</span> op://API_Vault/Test_Login/password <span style="color:#f92672">}}</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>$ op inject -i router_config.templ -o router_config.rsc   
@@ -152,21 +152,21 @@ These are the qemu options I use when starting the router VM.</p>
 <li><strong>-device</strong> entries specify the Intel PCI card bus ID.  If the card were moved to a different motherboard slot, those values would need to be updated.</li>
 <li><strong>-serial</strong> and <strong>-monitor</strong> options create sockets to the VM&rsquo;s and QEMU&rsquo;s console that I can access with socat.</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ /usr/bin/qemu-system-x86_64 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -machine q35,accel<span style="color:#f92672">=</span>kvm <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -cpu host -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -m 512M -boot c <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -nic none <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -drive file<span style="color:#f92672">=</span>/srv/virtual_machines/routeros/chr-7.19.3.qcow2,if<span style="color:#f92672">=</span>virtio,format<span style="color:#f92672">=</span>qcow2 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -serial unix:/srv/virtual_machines/routeros/console.sock,server,nowait <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -monitor unix:/srv/virtual_machines/routeros/monitor.sock,server,nowait <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -display none -vga none <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device vfio-pci,host<span style="color:#f92672">=</span>01:00.0 <span style="color:#ae81ff">\
-</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    -device vfio-pci,host<span style="color:#f92672">=</span>01:00.1
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ /usr/bin/qemu-system-x86_64 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -machine q35,accel<span style="color:#f92672">=</span>kvm <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -cpu host -smp cpus<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -m 512M -boot c <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -nic none <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -drive file<span style="color:#f92672">=</span>/srv/virtual_machines/routeros/chr-7.19.3.qcow2,if<span style="color:#f92672">=</span>virtio,format<span style="color:#f92672">=</span>qcow2 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -serial unix:/srv/virtual_machines/routeros/console.sock,server,nowait <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -monitor unix:/srv/virtual_machines/routeros/monitor.sock,server,nowait <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -display none -vga none <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -device vfio-pci,host<span style="color:#f92672">=</span>01:00.0 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -device vfio-pci,host<span style="color:#f92672">=</span>01:00.1
 </span></span></code></pre></div><p>And the socat command to access the VM console or QEMU monitor.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo -u qemu socat STDIO,cfmakeraw,isig<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> UNIX:/srv/virtual_machines/routeros/console.sock
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo -u qemu socat STDIO,cfmakeraw,isig<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> UNIX:/srv/virtual_machines/routeros/console.sock
 </span></span></code></pre></div><p>To ensure the router is automatically started on reboots, I wrapped the qemu command inside a systemd service unit named routeros.service.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#66d9ef">[Unit]</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#66d9ef">[Unit]</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">Description</span><span style="color:#f92672">=</span><span style="color:#e6db74">RouterOS VM (QEMU)</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">After</span><span style="color:#f92672">=</span><span style="color:#e6db74">network-online.target</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">Wants</span><span style="color:#f92672">=</span><span style="color:#e6db74">network-online.target</span>
@@ -223,7 +223,7 @@ These are the qemu options I use when starting the router VM.</p>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">[Install]</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">WantedBy</span><span style="color:#f92672">=</span><span style="color:#e6db74">multi-user.target</span>
 </span></span></code></pre></div><p>Don&rsquo;t forget to refresh systemd to pick up the changes before issuing enable or restart commands for the new service.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo systemctl daemon-reload
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo systemctl daemon-reload
 </span></span></code></pre></div><h2 id="maintenance-and-recovery">Maintenance and Recovery</h2>
 <h3 id="monitoringalerting">Monitoring/Alerting</h3>
 <p>I keep alerting for the router uncomplicated.  If the Internet stops working, I know there&rsquo;s a problem.</p>
@@ -239,11 +239,11 @@ virtual machine using QEMU.  The router only cares about interfaces being availa
 config file allows me to track changes in a git repo.  Mikrotik uses a script-like text file format where CLI commands
 are applied as the file is processed.  This example shows how the external interface receives a DHCP address from my Internet provider
 while defining a RFC 1918 address for internal use on a second interface.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>/ip dhcp-client add comment<span style="color:#f92672">=</span>admin_interface disabled<span style="color:#f92672">=</span>no interface<span style="color:#f92672">=</span>ether1  use-peer-dns<span style="color:#f92672">=</span>yes 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>/ip dhcp-client add comment<span style="color:#f92672">=</span>admin_interface disabled<span style="color:#f92672">=</span>no interface<span style="color:#f92672">=</span>ether1  use-peer-dns<span style="color:#f92672">=</span>yes 
 </span></span><span style="display:flex;"><span>/ip address add address<span style="color:#f92672">=</span>192.168.10.1/24 interface<span style="color:#f92672">=</span>ether2 network<span style="color:#f92672">=</span>192.168.10.0
 </span></span></code></pre></div><p>The file is transferred to the router&rsquo;s local filesystem by either using the web interface to upload the file or scp.  Once
 stored on the router, I issue a router reset command that wipes all settings and reapplies the configuration.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>/system/reset-configuration keep-users<span style="color:#f92672">=</span>no no-defaults<span style="color:#f92672">=</span>yes skip-backup<span style="color:#f92672">=</span>yes run-after-reset<span style="color:#f92672">=</span>router_config.rsc
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>/system/reset-configuration keep-users<span style="color:#f92672">=</span>no no-defaults<span style="color:#f92672">=</span>yes skip-backup<span style="color:#f92672">=</span>yes run-after-reset<span style="color:#f92672">=</span>router_config.rsc
 </span></span></code></pre></div><p>Other routing projects offer similar features.  OpenWRT supports text based configs with it&rsquo;s Unified Configuration Interface API
 and Opnsense can be configured with it&rsquo;s config.xml file.  Meaning this approach isn&rsquo;t limited to Mikrotik software.</p>
 <h3 id="router-recovery">Router Recovery</h3>

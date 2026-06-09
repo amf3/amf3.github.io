@@ -1,5 +1,5 @@
 ---
-title: "Declarative Builds"
+title: "Declarative Container Builds"
 description: "Demonstrating an Opinionated Build Process for Container Images"
 date: 2026-04-17T23:20:00
 draft: false
