@@ -6,8 +6,8 @@ jobs:
   check-and-submit:
     runs-on: ubuntu-latest
     steps:
-      - name: Submit URLs to IndexNow
-        uses: bojanrajh/indexnow-action@v3
+      - name: Submit_URLs_to_IndexNow
+        uses: bojieyang/indexnow-action@v3
         with:
           sitemap-location: 'https://amf3.github.io/sitemap.xml'
           key: '44baec4b8ee14975a89a42146489fc40'  # This is an ID not a secret key
