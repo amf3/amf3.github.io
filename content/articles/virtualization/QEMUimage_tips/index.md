@@ -86,7 +86,7 @@ Child node '/file':
     disk size: 196 KiB
 ```
 
-# Tip One - Resize an image file
+## Tip One - Resize an image file
 
 It's possible to grow or shrink a QEMU storage device.  Think of this as expanding the physical SSD itself, not the filesystem 
 that sits on it.  **Important,** when shrinking a image with negative values, 
@@ -135,7 +135,7 @@ Formatting 'raw_disk.img', fmt=raw size=2097152
 -rw-r--r--  1 adam  staff   2.0M Apr  6 10:22 raw_disk.img
 ```
 
-# Tip Two - Snapshots
+## Tip Two - Snapshots
 
 Snapshots are supported with qcow2 devices.  These are handy for creating a base disk image that's shareable and later modified
 for other purposes.  Snapshots also make a great backup point before making image changes.
@@ -167,7 +167,7 @@ To delete a snapshot from a file
 % qemu-img snapshot -d my_first_snapshot my_disk.img 
 ```
 
-# Tip Three - Modify a QEMU image
+## Tip Three - Modify a QEMU image
 
 While many online guides suggest using the Network Block Device (NBD) kernel driver in Linux to mount and modify QEMU images, I 
 use a different process that also works on MacOS.  My preferred method is to boot a VM using QEMU and attaching the image as a data drive.
@@ -189,7 +189,7 @@ qemu-system-x86_64 \
 Once logged in, you'll see the QEMU file we want to modify listed as /dev/sda.  The device hasn't been formatted with a filesystem, but if 
 one were present it could be mounted within the VM, files edited within the image, and then unmounted.
 
-# Tip Four - Transfer a QEMU image to bare-metal
+## Tip Four - Transfer a QEMU image to bare-metal
 
 It's possible to use a QEMU image with bare-metal by converting it to **raw** format.  Use the following to convert the image from qcow2 to raw.
 
@@ -221,7 +221,7 @@ any destructive commands let's pretend raw_disk2.img represents /dev/sdc, your v
 Because our raw file is only 10MB in size, only 10MB will be used on the thumb drive.  This is where follow up tools like LVM or 
 resize2fs will extend the filesystem to fill the entire thumb drive.  Tools used for expansion depends on how the filesystem was created.
 
-# Putting it all together
+## Putting it all together
 
 Enough with the documentation, let's put it into practice with a real use case.  Presume that after reading my [cloud-init
 tutorials](../../../articles/cloudinit/intro/) you wish to modify the [Alpine Linux cloud-init image](https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/cloud/nocloud_alpine-3.21.2-x86_64-bios-cloudinit-r0.qcow2) before installation.

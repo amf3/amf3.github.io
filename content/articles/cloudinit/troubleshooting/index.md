@@ -12,7 +12,7 @@ I previously wrote an [introduction](../../../articles/cloudinit/intro/) to clou
 troubleshooting. cloud-init failures on remote hosts can be challenging. Depending on the failure point, cloud-init may or may not
 provide clear error indicators.  These are methods I use during provisioning issues related to cloud-init.
 
-# Understanding cloud-init execution stages
+## Understanding cloud-init execution stages
 
 Before continuing, let's cover some background.  cloud-init follows
 [five stages](https://cloudinit.readthedocs.io/en/latest/explanation/boot.html) during boot which run sequentially. If
@@ -32,7 +32,7 @@ should become available.
 
 **Final stage:** Installs packages, applies configuration management plugins like puppet or chef, and runs user or vendor defined scripts.
 
-# Checking Stage Status
+## Checking Stage Status
 
 The **status** submenu from the cloud-init command provides a method of checking each stage for errors.  In this
 example I intentionally mistyped a schema key name that should be `passwd` as `password`.  Output shows the failure
@@ -54,7 +54,7 @@ $ cloud-init status --format json
   "status": "done"
 ```
 
-# Checking logs for Errors
+## Checking logs for Errors
 
 When the issue is not obvious, there logs are available for further examination.
 
@@ -68,7 +68,7 @@ Example log output from cloud-init.log indicating a schema validation failure.
 2025-03-18 11:46:41,379 - schema.py[WARNING]: cloud-config failed schema validation! You may run 'sudo cloud-init schema --system' to check the details.
 ```
 
-# Debugging User-Data Issues
+## Debugging User-Data Issues
 
 cloud-init has a defined schema and it’s possible to validate user-data content with the **schema** submenu.
 To troubleshoot a possible schema issue on a remote host where a YAML key named `passwd` was mistyped as `password`.
@@ -88,7 +88,7 @@ To test changes made to user-data content prior to provisioning: `cloud-init sch
 
 For timeout issues in user or vendor scripts, `cloud-init analyze` will print execution times which pinpoint delays.
 
-# Common Failure Scenarios and Fixes
+## Common Failure Scenarios and Fixes
 
 A typical source of failures is from syntax errors in the user-data file.  As already mentioned, `cloud-init schema` will
 show schema issues in user-data.  Manually check for typos within the values in user-data. A mistyped value is
@@ -123,7 +123,7 @@ Starting stage: init-network
 ...
 ```
 
-# Recovery and Re-Runs
+## Recovery and Re-Runs
 
 Additional steps are needed after modifying user-data files on the failed instance. When cloud-init runs, output is 
 cached to disk.  If the cache exists on reboot, cloud-init will not run again.  To clean cached instance data, 
@@ -140,7 +140,7 @@ Cloud-init v. 24.4.1-0ubuntu0~24.04.1 running 'single' at Fri, 21 Mar 2025 20:45
 When using the **single** submenu, it won't necessarily fix dependencies unless those are also explicitly re-triggered.  It's best
 to reprovision the instance after troubleshooting any failed modules.
 
-# Takeaways
+## Takeaways
 
 There’s no simple fix for understanding why instance provisioning with cloud-init failed.  That’s why I’m
 closing with a checklist.
