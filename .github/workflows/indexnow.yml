@@ -12,5 +12,6 @@ jobs:
           sitemap-location: 'https://amf3.github.io/sitemap.xml'
           key: '44baec4b8ee14975a89a42146489fc40'  # This is an ID not a secret key
           key-location: 'https://amf3.github.io/44baec4b8ee14975a89a42146489fc40.txt'
-          since: 0
+          since: 9999
+          since-unit: day
           lastmod-required: false
