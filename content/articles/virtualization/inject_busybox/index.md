@@ -6,11 +6,11 @@ draft: false
 searchHidden: false
 showtoc: true
 categories: [Docker, Cloud]
-images: ["./assets/rowboat.jpeg"]
+images: ["./assets/rowboat.jpg"]
 
 ---
 
-![A minimal rowboat is like a minimal container. Photo taken on the Isle of Malta, a historical shipping center.](./assets/rowboat.jpeg)
+![A minimal rowboat is like a minimal container. Photo taken on the Isle of Malta, a historical shipping center.](./assets/rowboat.jpg)
 
 Minimal or distroless container images provide only the components required to run an application. By design, they exclude shells and 
 common troubleshooting utilities. While this keeps images small and secure, reality kicks in when you need to debug something. You 
