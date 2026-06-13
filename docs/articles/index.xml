@@ -14,7 +14,7 @@
       <pubDate>Wed, 10 Jun 2026 11:01:27 -0700</pubDate>
       <guid>https://amf3.github.io/articles/virtualization/inject_busybox/</guid>
       <description>Injecting BusyBox into Minimal/Distroless Containers</description>
-      <content:encoded><![CDATA[<p><img alt="A minimal rowboat is like a minimal container. Photo taken on the Isle of Malta, a historical shipping center." loading="lazy" src="./assets/rowboat.jpeg"></p>
+      <content:encoded><![CDATA[<p><img alt="A minimal rowboat is like a minimal container. Photo taken on the Isle of Malta, a historical shipping center." loading="lazy" src="/articles/virtualization/inject_busybox/assets/rowboat.jpg"></p>
 <p>Minimal or distroless container images provide only the components required to run an application. By design, they exclude shells and
 common troubleshooting utilities. While this keeps images small and secure, reality kicks in when you need to debug something. You
 could find yourself needing a shell for runtime initialization scripts, health checks, or troubleshooting.</p>
