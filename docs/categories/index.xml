@@ -6,13 +6,20 @@
     <description>Recent content in Categories on Adam Faris</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 22 Apr 2026 21:27:51 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 10 Jun 2026 11:01:27 -0700</lastBuildDate>
     <atom:link href="https://amf3.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Cloud</title>
       <link>https://amf3.github.io/categories/cloud/</link>
-      <pubDate>Wed, 22 Apr 2026 21:27:51 +0000</pubDate>
+      <pubDate>Wed, 10 Jun 2026 11:01:27 -0700</pubDate>
       <guid>https://amf3.github.io/categories/cloud/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Docker</title>
+      <link>https://amf3.github.io/categories/docker/</link>
+      <pubDate>Wed, 10 Jun 2026 11:01:27 -0700</pubDate>
+      <guid>https://amf3.github.io/categories/docker/</guid>
       <description></description>
     </item>
     <item>
@@ -34,13 +41,6 @@
       <link>https://amf3.github.io/categories/virtualization/</link>
       <pubDate>Mon, 23 Feb 2026 16:29:59 -0800</pubDate>
       <guid>https://amf3.github.io/categories/virtualization/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Docker</title>
-      <link>https://amf3.github.io/categories/docker/</link>
-      <pubDate>Mon, 05 Jan 2026 12:25:30 -0800</pubDate>
-      <guid>https://amf3.github.io/categories/docker/</guid>
       <description></description>
     </item>
     <item>
