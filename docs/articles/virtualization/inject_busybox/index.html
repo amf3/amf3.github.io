@@ -89,10 +89,10 @@
     <meta property="article:section" content="articles">
     <meta property="article:published_time" content="2026-06-10T11:01:27-07:00">
     <meta property="article:modified_time" content="2026-06-10T11:01:27-07:00">
-      <meta property="og:image" content="https://amf3.github.io/assets/rowboat.jpeg">
+      <meta property="og:image" content="https://amf3.github.io/assets/rowboat.jpg">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://amf3.github.io/assets/rowboat.jpeg">
+  <meta name="twitter:image" content="https://amf3.github.io/assets/rowboat.jpg">
   <meta name="twitter:title" content="No Shell in Your Container? No Problem">
   <meta name="twitter:description" content="Injecting BusyBox into Minimal/Distroless Containers">
 
@@ -130,7 +130,7 @@
   "articleBody": "\nMinimal or distroless container images provide only the components required to run an application. By design, they exclude shells and common troubleshooting utilities. While this keeps images small and secure, reality kicks in when you need to debug something. You could find yourself needing a shell for runtime initialization scripts, health checks, or troubleshooting.\nThis article shows how to add BusyBox to a minimal container image and use it as the container’s shell.\nDownload BusyBox BusyBox combines many common Unix utilities into a single executable. The executable also includes the Almquist Shell (ash). There are a few ways to obtain the executable.\nDownload a precompiled binary file from the BusyBox project. Copy the executable from a pre-existing container image. For me, copying the executable from an existing container image is simpler because it avoids concerns about CPU architecture. Here’s a partial Dockerfile example.\nFROM ghcr.io/amf3/just_enough/busybox:latest AS my-busybox # This image contains a statically compiled BusyBox binary. FROM ghcr.io/amf3/just_enough/unbound_dns:latest # This is a minimalist unbound_dns image that does not have a shell COPY --from=my-busybox /bin/busybox /bin/busybox # Add the BusyBox binary to the minimal container Configure the Shell Docker and Podman use /bin/sh by default when processing shell form RUN instructions. Since BusyBox provides ash, we need to change the default shell used for RUN instructions.\nSHELL [\"/bin/busybox\", \"sh\", \"-c\"] # Set the default shell to busybox BusyBox can create symbolic links for utilities such as ls, cat, or wget, but I prefer not to create the symlinks in minimal container images. Calling commands through /bin/busybox keeps the image contents explicit and avoids adding additional filesystem entries.\nIf you still would like the convenience of using named shell commands, create the symbolic links with:\nRUN /bin/busybox --install -s /bin # Install the symlinked program names for shell commands to the /bin directory Using the Shell Now that we have a working shell environment, let’s see some examples.\nStartup Scripts This example initializes the environment by creating a temporary directory before starting the application.\nFROM ghcr.io/amf3/just_enough/busybox:latest AS my-busybox FROM ghcr.io/amf3/just_enough/unbound_dns:latest COPY --from=my-busybox /bin/busybox /bin/busybox SHELL [\"/bin/busybox\", \"sh\", \"-c\"] ENTRYPOINT [\"/bin/busybox\", \"sh\", \"-c\"] CMD [\"echo 'Initializing...'; mkdir -p /tmp/data; exec /usr/sbin/unbound -d -c /etc/unbound/unbound.conf\"] The exec is needed to replace the shell and ensure signals are delivered correctly.\nHealth Checks This example adds a health check to a minimal container image using BusyBox.\nHEALTHCHECK CMD [\"/bin/busybox\",\"wget\",\"-q\",\"-O\",\"-\",\"http://127.0.0.1:8080/health\"] Interactive Troubleshooting BusyBox also provides an easy way to inspect a running container interactively.\ndocker exec -it my_running_container /bin/busybox sh Conclusion By adding a single file to the image, we gain support for health checks, initialization scripts, and interactive troubleshooting. BusyBox is a single binary that doesn’t need a full distribution to work. While this blurs the definition of a minimal container, adding a single BusyBox binary is a reasonable compromise between functionality and the philosophy of keeping container images small and focused.\n",
   "wordCount" : "476",
   "inLanguage": "en",
-  "image": "https://amf3.github.io/assets/rowboat.jpeg","datePublished": "2026-06-10T11:01:27-07:00",
+  "image": "https://amf3.github.io/assets/rowboat.jpg","datePublished": "2026-06-10T11:01:27-07:00",
   "dateModified": "2026-06-10T11:01:27-07:00",
   "mainEntityOfPage": {
     "@type": "WebPage",
@@ -253,7 +253,7 @@
     </div>
 </details>
 
-  <div class="post-content md-content"><p><img alt="A minimal rowboat is like a minimal container. Photo taken on the Isle of Malta, a historical shipping center." loading="lazy" src="./assets/rowboat.jpeg"></p>
+  <div class="post-content md-content"><p><img alt="A minimal rowboat is like a minimal container. Photo taken on the Isle of Malta, a historical shipping center." loading="lazy" src="/articles/virtualization/inject_busybox/assets/rowboat.jpg"></p>
 <p>Minimal or distroless container images provide only the components required to run an application. By design, they exclude shells and
 common troubleshooting utilities. While this keeps images small and secure, reality kicks in when you need to debug something. You
 could find yourself needing a shell for runtime initialization scripts, health checks, or troubleshooting.</p>
