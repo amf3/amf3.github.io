@@ -6,8 +6,68 @@
     <description>Recent content on Adam Faris</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 22 Apr 2026 21:27:51 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 10 Jun 2026 11:01:27 -0700</lastBuildDate>
     <atom:link href="https://amf3.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>No Shell in Your Container? No Problem</title>
+      <link>https://amf3.github.io/articles/virtualization/inject_busybox/</link>
+      <pubDate>Wed, 10 Jun 2026 11:01:27 -0700</pubDate>
+      <guid>https://amf3.github.io/articles/virtualization/inject_busybox/</guid>
+      <description>Injecting BusyBox into Minimal/Distroless Containers</description>
+      <content:encoded><![CDATA[<p><img alt="A minimal rowboat is like a minimal container. Photo taken on the Isle of Malta, a historical shipping center." loading="lazy" src="./assets/rowboat.jpeg"></p>
+<p>Minimal or distroless container images provide only the components required to run an application. By design, they exclude shells and
+common troubleshooting utilities. While this keeps images small and secure, reality kicks in when you need to debug something. You
+could find yourself needing a shell for runtime initialization scripts, health checks, or troubleshooting.</p>
+<p>This article shows how to add BusyBox to a minimal container image and use it as the container&rsquo;s shell.</p>
+<h2 id="download-busybox">Download BusyBox</h2>
+<p>BusyBox combines many common Unix utilities into a single executable.  The executable also includes the Almquist Shell (ash).
+There are a few ways to obtain the executable.</p>
+<ul>
+<li>Download a <a href="https://busybox.net">precompiled</a> binary file from the BusyBox project.</li>
+<li>Copy the executable from a <a href="https://github.com/amf3/just_enough/pkgs/container/just_enough%2Fbusybox/909494266?tag=latest">pre-existing</a> container image.</li>
+</ul>
+<p>For me, copying the executable from an existing container image is simpler because it avoids concerns about CPU architecture.  Here&rsquo;s
+a partial Dockerfile example.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">ghcr.io/amf3/just_enough/busybox:latest</span> <span style="color:#66d9ef">AS</span> <span style="color:#e6db74">my-busybox</span>   <span style="color:#75715e"># This image contains a statically compiled BusyBox binary.</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">ghcr.io/amf3/just_enough/unbound_dns:latest</span>             <span style="color:#75715e"># This is a minimalist unbound_dns image that does not have a shell</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">COPY</span> --from<span style="color:#f92672">=</span>my-busybox /bin/busybox /bin/busybox             <span style="color:#75715e"># Add the BusyBox binary to the minimal container</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><h2 id="configure-the-shell">Configure the Shell</h2>
+<p>Docker and Podman use /bin/sh by default when processing shell form RUN instructions.  Since BusyBox provides ash, we need to change
+the default shell used for RUN instructions.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">SHELL</span> [<span style="color:#e6db74">&#34;/bin/busybox&#34;</span>, <span style="color:#e6db74">&#34;sh&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>]       <span style="color:#75715e"># Set the default shell to busybox</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>BusyBox can create symbolic links for utilities such as <code>ls</code>, <code>cat</code>, or <code>wget</code>, but I prefer not to create the symlinks in
+minimal container images.  Calling commands through <code>/bin/busybox</code> keeps the image contents explicit and avoids adding additional
+filesystem entries.</p>
+<p>If you still would like the convenience of using named shell commands, create the symbolic links with:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">RUN</span> /bin/busybox --install -s /bin       <span style="color:#75715e"># Install the symlinked program names for shell commands to the /bin directory</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><h2 id="using-the-shell">Using the Shell</h2>
+<p>Now that we have a working shell environment, let&rsquo;s see some examples.</p>
+<h3 id="startup-scripts">Startup Scripts</h3>
+<p>This example initializes the environment by creating a temporary directory before starting the application.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">ghcr.io/amf3/just_enough/busybox:latest</span> <span style="color:#66d9ef">AS</span> <span style="color:#e6db74">my-busybox</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">ghcr.io/amf3/just_enough/unbound_dns:latest</span>             <span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">COPY</span> --from<span style="color:#f92672">=</span>my-busybox /bin/busybox /bin/busybox             <span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SHELL</span> [<span style="color:#e6db74">&#34;/bin/busybox&#34;</span>, <span style="color:#e6db74">&#34;sh&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>]<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">ENTRYPOINT</span> [<span style="color:#e6db74">&#34;/bin/busybox&#34;</span>, <span style="color:#e6db74">&#34;sh&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>]<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;echo &#39;Initializing...&#39;; mkdir -p /tmp/data; exec /usr/sbin/unbound -d -c /etc/unbound/unbound.conf&#34;</span>]<span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>The <code>exec</code> is needed to replace the shell and ensure signals are delivered correctly.</p>
+<h3 id="health-checks">Health Checks</h3>
+<p>This example adds a health check to a minimal container image using BusyBox.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">HEALTHCHECK</span> CMD <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;/bin/busybox&#34;</span>,<span style="color:#e6db74">&#34;wget&#34;</span>,<span style="color:#e6db74">&#34;-q&#34;</span>,<span style="color:#e6db74">&#34;-O&#34;</span>,<span style="color:#e6db74">&#34;-&#34;</span>,<span style="color:#e6db74">&#34;http://127.0.0.1:8080/health&#34;</span><span style="color:#f92672">]</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><h3 id="interactive-troubleshooting">Interactive Troubleshooting</h3>
+<p>BusyBox also provides an easy way to inspect a running container interactively.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>docker exec -it my_running_container /bin/busybox sh
+</span></span></code></pre></div><h2 id="conclusion">Conclusion</h2>
+<p>By adding a single file to the image, we gain support for health checks, initialization scripts, and interactive troubleshooting.
+BusyBox is a single binary that doesn&rsquo;t need a full distribution to work.  While this blurs the definition of a minimal
+container, adding a single BusyBox binary is a reasonable compromise between functionality and the philosophy of keeping container
+images small and focused.</p>
+]]></content:encoded>
+    </item>
     <item>
       <title>Container Image Validation</title>
       <link>https://amf3.github.io/articles/virtualization/container_validation/</link>

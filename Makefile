@@ -51,7 +51,7 @@ submodule-reset:
 # Run Hugo for local development
 hugo-serve: submodule-check
 	@echo "Generating HTML for development and serving on localhost"
-	go tool hugo serve
+	go tool hugo serve --logLevel=debug
 
 # Run Hugo for production
 hugo-publish: submodule-check

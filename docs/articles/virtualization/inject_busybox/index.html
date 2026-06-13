@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>No Shell in Your Container? No Problem | Adam Faris</title>
+<meta name="keywords" content="">
+<meta name="description" content="Injecting BusyBox into Minimal/Distroless Containers">
+<meta name="author" content="">
+<link rel="canonical" href="https://amf3.github.io/articles/virtualization/inject_busybox/">
+<meta name="google-site-verification" content="6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E">
+<meta name="msvalidate.01" content="C1E02AC59FE7ECBDB6D9EFB7D5E02B65">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://amf3.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://amf3.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://amf3.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://amf3.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://amf3.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://amf3.github.io/articles/virtualization/inject_busybox/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-MKR06D6KGD"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-MKR06D6KGD');
+        }
+      </script><meta property="og:url" content="https://amf3.github.io/articles/virtualization/inject_busybox/">
+  <meta property="og:site_name" content="Adam Faris">
+  <meta property="og:title" content="No Shell in Your Container? No Problem">
+  <meta property="og:description" content="Injecting BusyBox into Minimal/Distroless Containers">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="articles">
+    <meta property="article:published_time" content="2026-06-10T11:01:27-07:00">
+    <meta property="article:modified_time" content="2026-06-10T11:01:27-07:00">
+      <meta property="og:image" content="https://amf3.github.io/assets/rowboat.jpeg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://amf3.github.io/assets/rowboat.jpeg">
+  <meta name="twitter:title" content="No Shell in Your Container? No Problem">
+  <meta name="twitter:description" content="Injecting BusyBox into Minimal/Distroless Containers">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "articles",
+      "item": "https://amf3.github.io/articles/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "No Shell in Your Container? No Problem",
+      "item": "https://amf3.github.io/articles/virtualization/inject_busybox/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "No Shell in Your Container? No Problem",
+  "name": "No Shell in Your Container? No Problem",
+  "description": "Injecting BusyBox into Minimal/Distroless Containers",
+  "keywords": [
+    
+  ],
+  "articleBody": "\nMinimal or distroless container images provide only the components required to run an application. By design, they exclude shells and common troubleshooting utilities. While this keeps images small and secure, reality kicks in when you need to debug something. You could find yourself needing a shell for runtime initialization scripts, health checks, or troubleshooting.\nThis article shows how to add BusyBox to a minimal container image and use it as the container’s shell.\nDownload BusyBox BusyBox combines many common Unix utilities into a single executable. The executable also includes the Almquist Shell (ash). There are a few ways to obtain the executable.\nDownload a precompiled binary file from the BusyBox project. Copy the executable from a pre-existing container image. For me, copying the executable from an existing container image is simpler because it avoids concerns about CPU architecture. Here’s a partial Dockerfile example.\nFROM ghcr.io/amf3/just_enough/busybox:latest AS my-busybox # This image contains a statically compiled BusyBox binary. FROM ghcr.io/amf3/just_enough/unbound_dns:latest # This is a minimalist unbound_dns image that does not have a shell COPY --from=my-busybox /bin/busybox /bin/busybox # Add the BusyBox binary to the minimal container Configure the Shell Docker and Podman use /bin/sh by default when processing shell form RUN instructions. Since BusyBox provides ash, we need to change the default shell used for RUN instructions.\nSHELL [\"/bin/busybox\", \"sh\", \"-c\"] # Set the default shell to busybox BusyBox can create symbolic links for utilities such as ls, cat, or wget, but I prefer not to create the symlinks in minimal container images. Calling commands through /bin/busybox keeps the image contents explicit and avoids adding additional filesystem entries.\nIf you still would like the convenience of using named shell commands, create the symbolic links with:\nRUN /bin/busybox --install -s /bin # Install the symlinked program names for shell commands to the /bin directory Using the Shell Now that we have a working shell environment, let’s see some examples.\nStartup Scripts This example initializes the environment by creating a temporary directory before starting the application.\nFROM ghcr.io/amf3/just_enough/busybox:latest AS my-busybox FROM ghcr.io/amf3/just_enough/unbound_dns:latest COPY --from=my-busybox /bin/busybox /bin/busybox SHELL [\"/bin/busybox\", \"sh\", \"-c\"] ENTRYPOINT [\"/bin/busybox\", \"sh\", \"-c\"] CMD [\"echo 'Initializing...'; mkdir -p /tmp/data; exec /usr/sbin/unbound -d -c /etc/unbound/unbound.conf\"] The exec is needed to replace the shell and ensure signals are delivered correctly.\nHealth Checks This example adds a health check to a minimal container image using BusyBox.\nHEALTHCHECK CMD [\"/bin/busybox\",\"wget\",\"-q\",\"-O\",\"-\",\"http://127.0.0.1:8080/health\"] Interactive Troubleshooting BusyBox also provides an easy way to inspect a running container interactively.\ndocker exec -it my_running_container /bin/busybox sh Conclusion By adding a single file to the image, we gain support for health checks, initialization scripts, and interactive troubleshooting. BusyBox is a single binary that doesn’t need a full distribution to work. While this blurs the definition of a minimal container, adding a single BusyBox binary is a reasonable compromise between functionality and the philosophy of keeping container images small and focused.\n",
+  "wordCount" : "476",
+  "inLanguage": "en",
+  "image": "https://amf3.github.io/assets/rowboat.jpeg","datePublished": "2026-06-10T11:01:27-07:00",
+  "dateModified": "2026-06-10T11:01:27-07:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://amf3.github.io/articles/virtualization/inject_busybox/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Adam Faris",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://amf3.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="https://amf3.github.io/" accesskey="h" title="Adam Faris (Alt + H)">Adam Faris</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="https://amf3.github.io/search/" title="search (Alt &#43; /)" accesskey=/>
+                    <span>search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/articles/" title="articles">
+                    <span>articles</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/about/" title="about">
+                    <span>about</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/archives/" title="archives">
+                    <span>archives</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/">Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/articles/">articles</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+    <h1 class="post-title entry-hint-parent">
+      No Shell in Your Container? No Problem
+    </h1>
+    <div class="post-description">
+      Injecting BusyBox into Minimal/Distroless Containers
+    </div>
+    <div class="post-meta">
+
+<span title='2026-06-10 11:01:27 -0700 PDT'>June 10, 2026</span>&nbsp;·&nbsp;<span>476 words</span>
+
+</div>
+  </header> <details class="toc" >
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">Table of Contents</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#download-busybox" aria-label="Download BusyBox">Download BusyBox</a></li>
+            <li>
+                <a href="#configure-the-shell" aria-label="Configure the Shell">Configure the Shell</a></li>
+            <li>
+                <a href="#using-the-shell" aria-label="Using the Shell">Using the Shell</a><ul>
+                    
+            <li>
+                <a href="#startup-scripts" aria-label="Startup Scripts">Startup Scripts</a></li>
+            <li>
+                <a href="#health-checks" aria-label="Health Checks">Health Checks</a></li>
+            <li>
+                <a href="#interactive-troubleshooting" aria-label="Interactive Troubleshooting">Interactive Troubleshooting</a></li></ul>
+            </li>
+            <li>
+                <a href="#conclusion" aria-label="Conclusion">Conclusion</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+  <div class="post-content md-content"><p><img alt="A minimal rowboat is like a minimal container. Photo taken on the Isle of Malta, a historical shipping center." loading="lazy" src="./assets/rowboat.jpeg"></p>
+<p>Minimal or distroless container images provide only the components required to run an application. By design, they exclude shells and
+common troubleshooting utilities. While this keeps images small and secure, reality kicks in when you need to debug something. You
+could find yourself needing a shell for runtime initialization scripts, health checks, or troubleshooting.</p>
+<p>This article shows how to add BusyBox to a minimal container image and use it as the container&rsquo;s shell.</p>
+<h2 id="download-busybox">Download BusyBox<a hidden class="anchor" aria-hidden="true" href="#download-busybox">#</a></h2>
+<p>BusyBox combines many common Unix utilities into a single executable.  The executable also includes the Almquist Shell (ash).
+There are a few ways to obtain the executable.</p>
+<ul>
+<li>Download a <a href="https://busybox.net">precompiled</a> binary file from the BusyBox project.</li>
+<li>Copy the executable from a <a href="https://github.com/amf3/just_enough/pkgs/container/just_enough%2Fbusybox/909494266?tag=latest">pre-existing</a> container image.</li>
+</ul>
+<p>For me, copying the executable from an existing container image is simpler because it avoids concerns about CPU architecture.  Here&rsquo;s
+a partial Dockerfile example.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">ghcr.io/amf3/just_enough/busybox:latest</span> <span style="color:#66d9ef">AS</span> <span style="color:#e6db74">my-busybox</span>   <span style="color:#75715e"># This image contains a statically compiled BusyBox binary.</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">ghcr.io/amf3/just_enough/unbound_dns:latest</span>             <span style="color:#75715e"># This is a minimalist unbound_dns image that does not have a shell</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">COPY</span> --from<span style="color:#f92672">=</span>my-busybox /bin/busybox /bin/busybox             <span style="color:#75715e"># Add the BusyBox binary to the minimal container</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><h2 id="configure-the-shell">Configure the Shell<a hidden class="anchor" aria-hidden="true" href="#configure-the-shell">#</a></h2>
+<p>Docker and Podman use /bin/sh by default when processing shell form RUN instructions.  Since BusyBox provides ash, we need to change
+the default shell used for RUN instructions.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">SHELL</span> [<span style="color:#e6db74">&#34;/bin/busybox&#34;</span>, <span style="color:#e6db74">&#34;sh&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>]       <span style="color:#75715e"># Set the default shell to busybox</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>BusyBox can create symbolic links for utilities such as <code>ls</code>, <code>cat</code>, or <code>wget</code>, but I prefer not to create the symlinks in
+minimal container images.  Calling commands through <code>/bin/busybox</code> keeps the image contents explicit and avoids adding additional
+filesystem entries.</p>
+<p>If you still would like the convenience of using named shell commands, create the symbolic links with:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">RUN</span> /bin/busybox --install -s /bin       <span style="color:#75715e"># Install the symlinked program names for shell commands to the /bin directory</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><h2 id="using-the-shell">Using the Shell<a hidden class="anchor" aria-hidden="true" href="#using-the-shell">#</a></h2>
+<p>Now that we have a working shell environment, let&rsquo;s see some examples.</p>
+<h3 id="startup-scripts">Startup Scripts<a hidden class="anchor" aria-hidden="true" href="#startup-scripts">#</a></h3>
+<p>This example initializes the environment by creating a temporary directory before starting the application.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">ghcr.io/amf3/just_enough/busybox:latest</span> <span style="color:#66d9ef">AS</span> <span style="color:#e6db74">my-busybox</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">ghcr.io/amf3/just_enough/unbound_dns:latest</span>             <span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">COPY</span> --from<span style="color:#f92672">=</span>my-busybox /bin/busybox /bin/busybox             <span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SHELL</span> [<span style="color:#e6db74">&#34;/bin/busybox&#34;</span>, <span style="color:#e6db74">&#34;sh&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>]<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">ENTRYPOINT</span> [<span style="color:#e6db74">&#34;/bin/busybox&#34;</span>, <span style="color:#e6db74">&#34;sh&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>]<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;echo &#39;Initializing...&#39;; mkdir -p /tmp/data; exec /usr/sbin/unbound -d -c /etc/unbound/unbound.conf&#34;</span>]<span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>The <code>exec</code> is needed to replace the shell and ensure signals are delivered correctly.</p>
+<h3 id="health-checks">Health Checks<a hidden class="anchor" aria-hidden="true" href="#health-checks">#</a></h3>
+<p>This example adds a health check to a minimal container image using BusyBox.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">HEALTHCHECK</span> CMD <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;/bin/busybox&#34;</span>,<span style="color:#e6db74">&#34;wget&#34;</span>,<span style="color:#e6db74">&#34;-q&#34;</span>,<span style="color:#e6db74">&#34;-O&#34;</span>,<span style="color:#e6db74">&#34;-&#34;</span>,<span style="color:#e6db74">&#34;http://127.0.0.1:8080/health&#34;</span><span style="color:#f92672">]</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><h3 id="interactive-troubleshooting">Interactive Troubleshooting<a hidden class="anchor" aria-hidden="true" href="#interactive-troubleshooting">#</a></h3>
+<p>BusyBox also provides an easy way to inspect a running container interactively.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>docker exec -it my_running_container /bin/busybox sh
+</span></span></code></pre></div><h2 id="conclusion">Conclusion<a hidden class="anchor" aria-hidden="true" href="#conclusion">#</a></h2>
+<p>By adding a single file to the image, we gain support for health checks, initialization scripts, and interactive troubleshooting.
+BusyBox is a single binary that doesn&rsquo;t need a full distribution to work.  While this blurs the definition of a minimal
+container, adding a single BusyBox binary is a reasonable compromise between functionality and the philosophy of keeping container
+images small and focused.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+
+<ul class="share-buttons">
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://amf3.github.io/">Adam Faris</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
