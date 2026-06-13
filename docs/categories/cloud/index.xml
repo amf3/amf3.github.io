@@ -15,9 +15,9 @@
       <guid>https://amf3.github.io/articles/virtualization/inject_busybox/</guid>
       <description>Injecting BusyBox into Minimal/Distroless Containers</description>
       <content:encoded><![CDATA[<p><img alt="A minimal rowboat is like a minimal container. Photo taken on the Isle of Malta, a historical shipping center." loading="lazy" src="./assets/rowboat.jpeg"></p>
-<p>Minimal or distroless container images provide only the components required to run an application.  By design they exclude shells and
-common troubleshooting utilities.  While this keeps images small and focused, there are situations where the shell is useful.  Shell
-scripts may be required during runtime initialization, health checks, or general troubleshooting.</p>
+<p>Minimal or distroless container images provide only the components required to run an application. By design, they exclude shells and
+common troubleshooting utilities. While this keeps images small and secure, reality kicks in when you need to debug something. You
+could find yourself needing a shell for runtime initialization scripts, health checks, or troubleshooting.</p>
 <p>This article shows how to add BusyBox to a minimal container image and use it as the container&rsquo;s shell.</p>
 <h2 id="download-busybox">Download BusyBox</h2>
 <p>BusyBox combines many common Unix utilities into a single executable.  The executable also includes the Almquist Shell (ash).
@@ -32,7 +32,7 @@ a partial Dockerfile example.</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">ghcr.io/amf3/just_enough/busybox:latest</span> <span style="color:#66d9ef">AS</span> <span style="color:#e6db74">my-busybox</span>   <span style="color:#75715e"># This image contains a statically compiled BusyBox binary.</span><span style="color:#960050;background-color:#1e0010">
 </span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">ghcr.io/amf3/just_enough/unbound_dns:latest</span>             <span style="color:#75715e"># This is a minimalist unbound_dns image that does not have a shell</span><span style="color:#960050;background-color:#1e0010">
 </span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">COPY</span> --from<span style="color:#f92672">=</span>my-busybox /bin/busybox /bin/busybox.            <span style="color:#75715e"># Add the BusyBox binary to the minimal container</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">COPY</span> --from<span style="color:#f92672">=</span>my-busybox /bin/busybox /bin/busybox             <span style="color:#75715e"># Add the BusyBox binary to the minimal container</span><span style="color:#960050;background-color:#1e0010">
 </span></span></span></code></pre></div><h2 id="configure-the-shell">Configure the Shell</h2>
 <p>Docker and Podman use /bin/sh by default when processing shell form RUN instructions.  Since BusyBox provides ash, we need to change
 the default shell used for RUN instructions.</p>
@@ -45,7 +45,7 @@ filesystem entries.</p>
 </span></span></span></code></pre></div><h2 id="using-the-shell">Using the Shell</h2>
 <p>Now that we have a working shell environment, let&rsquo;s see some examples.</p>
 <h3 id="startup-scripts">Startup Scripts</h3>
-<p>This example initializes the environment by creating a temporary directory before starting the application</p>
+<p>This example initializes the environment by creating a temporary directory before starting the application.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">ghcr.io/amf3/just_enough/busybox:latest</span> <span style="color:#66d9ef">AS</span> <span style="color:#e6db74">my-busybox</span><span style="color:#960050;background-color:#1e0010">
 </span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">ghcr.io/amf3/just_enough/unbound_dns:latest</span>             <span style="color:#960050;background-color:#1e0010">
 </span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
@@ -54,7 +54,7 @@ filesystem entries.</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
 </span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">ENTRYPOINT</span> [<span style="color:#e6db74">&#34;/bin/busybox&#34;</span>, <span style="color:#e6db74">&#34;sh&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>]<span style="color:#960050;background-color:#1e0010">
 </span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;echo &#39;Initializing...&#39;; mkdir -p /tmp/data; exec /usr/sbin/unbound -d -c /etc/unbound/unbound.conf&#34;</span>]<span style="color:#960050;background-color:#1e0010">
-</span></span></span></code></pre></div><p>The exec is needed to replace the shell and ensure signals are delivered correctly.</p>
+</span></span></span></code></pre></div><p>The <code>exec</code> is needed to replace the shell and ensure signals are delivered correctly.</p>
 <h3 id="health-checks">Health Checks</h3>
 <p>This example adds a health check to a minimal container image using BusyBox.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">HEALTHCHECK</span> CMD <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;/bin/busybox&#34;</span>,<span style="color:#e6db74">&#34;wget&#34;</span>,<span style="color:#e6db74">&#34;-q&#34;</span>,<span style="color:#e6db74">&#34;-O&#34;</span>,<span style="color:#e6db74">&#34;-&#34;</span>,<span style="color:#e6db74">&#34;http://127.0.0.1:8080/health&#34;</span><span style="color:#f92672">]</span><span style="color:#960050;background-color:#1e0010">

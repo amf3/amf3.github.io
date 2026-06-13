@@ -12,9 +12,9 @@ images: ["./assets/rowboat.jpeg"]
 
 ![A minimal rowboat is like a minimal container. Photo taken on the Isle of Malta, a historical shipping center.](./assets/rowboat.jpeg)
 
-Minimal or distroless container images provide only the components required to run an application.  By design they exclude shells and 
-common troubleshooting utilities.  While this keeps images small and focused, there are situations where the shell is useful.  Shell
-scripts may be required during runtime initialization, health checks, or general troubleshooting.
+Minimal or distroless container images provide only the components required to run an application. By design, they exclude shells and 
+common troubleshooting utilities. While this keeps images small and secure, reality kicks in when you need to debug something. You 
+could find yourself needing a shell for runtime initialization scripts, health checks, or troubleshooting.
 
 This article shows how to add BusyBox to a minimal container image and use it as the container's shell.
 
@@ -34,7 +34,7 @@ a partial Dockerfile example.
 FROM ghcr.io/amf3/just_enough/busybox:latest AS my-busybox   # This image contains a statically compiled BusyBox binary.
 FROM ghcr.io/amf3/just_enough/unbound_dns:latest             # This is a minimalist unbound_dns image that does not have a shell
 
-COPY --from=my-busybox /bin/busybox /bin/busybox.            # Add the BusyBox binary to the minimal container
+COPY --from=my-busybox /bin/busybox /bin/busybox             # Add the BusyBox binary to the minimal container
 
 ```
 
@@ -63,7 +63,7 @@ Now that we have a working shell environment, let's see some examples.
 
 ### Startup Scripts
 
-This example initializes the environment by creating a temporary directory before starting the application
+This example initializes the environment by creating a temporary directory before starting the application.
 
 ```dockerfile
 FROM ghcr.io/amf3/just_enough/busybox:latest AS my-busybox
@@ -76,7 +76,7 @@ ENTRYPOINT ["/bin/busybox", "sh", "-c"]
 CMD ["echo 'Initializing...'; mkdir -p /tmp/data; exec /usr/sbin/unbound -d -c /etc/unbound/unbound.conf"]
 ```
 
-The exec is needed to replace the shell and ensure signals are delivered correctly.
+The `exec` is needed to replace the shell and ensure signals are delivered correctly.
 
 ### Health Checks
 
