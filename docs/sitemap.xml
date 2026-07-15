@@ -11,20 +11,29 @@
     <loc>https://amf3.github.io/categories/</loc>
     <lastmod>2026-07-11T11:58:20-07:00</lastmod>
   </url><url>
-    <loc>https://amf3.github.io/categories/cloud/</loc>
-    <lastmod>2026-07-11T11:58:20-07:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/categories/docker/</loc>
+    <loc>https://amf3.github.io/tags/docker/</loc>
     <lastmod>2026-07-11T11:58:20-07:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/articles/virtualization/inject_busybox/</loc>
     <lastmod>2026-07-11T11:58:20-07:00</lastmod>
   </url><url>
+    <loc>https://amf3.github.io/tags/oci-image/</loc>
+    <lastmod>2026-07-11T11:58:20-07:00</lastmod>
+  </url><url>
+    <loc>https://amf3.github.io/categories/systems/</loc>
+    <lastmod>2026-07-11T11:58:20-07:00</lastmod>
+  </url><url>
+    <loc>https://amf3.github.io/tags/</loc>
+    <lastmod>2026-07-11T11:58:20-07:00</lastmod>
+  </url><url>
     <loc>https://amf3.github.io/articles/virtualization/container_validation/</loc>
     <lastmod>2026-04-22T21:27:51+00:00</lastmod>
   </url><url>
-    <loc>https://amf3.github.io/categories/containers/</loc>
+    <loc>https://amf3.github.io/tags/runc/</loc>
     <lastmod>2026-04-22T21:27:51+00:00</lastmod>
+  </url><url>
+    <loc>https://amf3.github.io/tags/buildroot/</loc>
+    <lastmod>2026-04-17T23:20:00+00:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/articles/virtualization/declarative_builds/</loc>
     <lastmod>2026-04-17T23:20:00+00:00</lastmod>
@@ -32,31 +41,25 @@
     <loc>https://amf3.github.io/articles/virtualization/base_image/</loc>
     <lastmod>2026-04-12T18:23:15+00:00</lastmod>
   </url><url>
-    <loc>https://amf3.github.io/categories/container/</loc>
-    <lastmod>2026-02-23T16:29:59-08:00</lastmod>
+    <loc>https://amf3.github.io/tags/python/</loc>
+    <lastmod>2026-04-12T18:23:15+00:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/articles/virtualization/oci_image/</loc>
-    <lastmod>2026-02-23T16:29:59-08:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/categories/virtualization/</loc>
     <lastmod>2026-02-23T16:29:59-08:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/articles/virtualization/docker_socket/</loc>
     <lastmod>2026-01-05T12:25:30-08:00</lastmod>
   </url><url>
-    <loc>https://amf3.github.io/categories/architecture/</loc>
-    <lastmod>2025-12-16T21:51:16-08:00</lastmod>
+    <loc>https://amf3.github.io/tags/security/</loc>
+    <lastmod>2026-01-05T12:25:30-08:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/articles/arch/2swarm_nodes/</loc>
     <lastmod>2025-12-16T21:51:16-08:00</lastmod>
   </url><url>
-    <loc>https://amf3.github.io/categories/homelab/</loc>
+    <loc>https://amf3.github.io/tags/storage/</loc>
     <lastmod>2025-12-16T21:51:16-08:00</lastmod>
   </url><url>
-    <loc>https://amf3.github.io/tags/linux/</loc>
-    <lastmod>2025-11-19T00:06:09-08:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/tags/mikrotik/</loc>
+    <loc>https://amf3.github.io/tags/homelab/</loc>
     <lastmod>2025-11-19T00:06:09-08:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/tags/networking/</loc>
@@ -65,25 +68,19 @@
     <loc>https://amf3.github.io/tags/qemu/</loc>
     <lastmod>2025-11-19T00:06:09-08:00</lastmod>
   </url><url>
-    <loc>https://amf3.github.io/tags/routeros/</loc>
-    <lastmod>2025-11-19T00:06:09-08:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/tags/</loc>
-    <lastmod>2025-11-19T00:06:09-08:00</lastmod>
-  </url><url>
     <loc>https://amf3.github.io/articles/virtualization/virtual_router/</loc>
     <lastmod>2025-11-19T00:06:09-08:00</lastmod>
   </url><url>
-    <loc>https://amf3.github.io/tags/virtualization/</loc>
-    <lastmod>2025-11-19T00:06:09-08:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/categories/code/</loc>
-    <lastmod>2025-09-29T17:17:10-04:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/categories/go/</loc>
+    <loc>https://amf3.github.io/tags/go/</loc>
     <lastmod>2025-09-29T17:17:10-04:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/articles/code/go/cli_args/</loc>
+    <lastmod>2025-09-29T17:17:10-04:00</lastmod>
+  </url><url>
+    <loc>https://amf3.github.io/categories/software/</loc>
+    <lastmod>2025-09-29T17:17:10-04:00</lastmod>
+  </url><url>
+    <loc>https://amf3.github.io/tags/tips/</loc>
     <lastmod>2025-09-29T17:17:10-04:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/about/</loc>
@@ -95,58 +92,34 @@
     <loc>https://amf3.github.io/articles/code/go/real_world_generics/</loc>
     <lastmod>2025-07-11T21:11:43-07:00</lastmod>
   </url><url>
-    <loc>https://amf3.github.io/categories/api/</loc>
-    <lastmod>2025-07-04T22:43:09-07:00</lastmod>
-  </url><url>
     <loc>https://amf3.github.io/articles/api/hello_openapi/</loc>
-    <lastmod>2025-07-04T22:43:09-07:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/categories/python/</loc>
     <lastmod>2025-07-04T22:43:09-07:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/articles/storage/docker_volumes/</loc>
     <lastmod>2025-06-26T22:37:40-07:00</lastmod>
   </url><url>
-    <loc>https://amf3.github.io/categories/storage/</loc>
-    <lastmod>2025-06-26T22:37:40-07:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/categories/object-store/</loc>
-    <lastmod>2025-05-30T16:46:07-07:00</lastmod>
-  </url><url>
     <loc>https://amf3.github.io/articles/storage/tar_objectstore/</loc>
     <lastmod>2025-05-30T16:46:07-07:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/tags/alpine/</loc>
-    <lastmod>2025-05-14T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/tags/macos/</loc>
-    <lastmod>2025-05-14T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/articles/virtualization/macos_qemu_networks/</loc>
     <lastmod>2025-05-14T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://amf3.github.io/categories/qemu/</loc>
-    <lastmod>2025-04-06T07:41:29-04:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/categories/tips/</loc>
-    <lastmod>2025-04-06T07:41:29-04:00</lastmod>
-  </url><url>
     <loc>https://amf3.github.io/articles/virtualization/qemuimage_tips/</loc>
     <lastmod>2025-04-06T07:41:29-04:00</lastmod>
   </url><url>
-    <loc>https://amf3.github.io/categories/automation/</loc>
+    <loc>https://amf3.github.io/tags/cloud-init/</loc>
     <lastmod>2025-03-21T16:28:54-04:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/articles/cloudinit/troubleshooting/</loc>
-    <lastmod>2025-03-21T16:28:54-04:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/categories/operations/</loc>
     <lastmod>2025-03-21T16:28:54-04:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/articles/cloudinit/autoinstall/</loc>
     <lastmod>2025-03-03T23:07:23-08:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/articles/cloudinit/intro/</loc>
+    <lastmod>2025-02-21T23:06:35-08:00</lastmod>
+  </url><url>
+    <loc>https://amf3.github.io/tags/multipass/</loc>
     <lastmod>2025-02-21T23:06:35-08:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/about/about/</loc>

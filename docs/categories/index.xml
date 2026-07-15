@@ -9,122 +9,17 @@
     <lastBuildDate>Sat, 11 Jul 2026 11:58:20 -0700</lastBuildDate>
     <atom:link href="https://amf3.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Cloud</title>
-      <link>https://amf3.github.io/categories/cloud/</link>
+      <title>Systems</title>
+      <link>https://amf3.github.io/categories/systems/</link>
       <pubDate>Wed, 10 Jun 2026 11:01:27 -0700</pubDate>
-      <guid>https://amf3.github.io/categories/cloud/</guid>
+      <guid>https://amf3.github.io/categories/systems/</guid>
       <description></description>
     </item>
     <item>
-      <title>Docker</title>
-      <link>https://amf3.github.io/categories/docker/</link>
-      <pubDate>Wed, 10 Jun 2026 11:01:27 -0700</pubDate>
-      <guid>https://amf3.github.io/categories/docker/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Containers</title>
-      <link>https://amf3.github.io/categories/containers/</link>
-      <pubDate>Wed, 22 Apr 2026 21:27:51 +0000</pubDate>
-      <guid>https://amf3.github.io/categories/containers/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Container</title>
-      <link>https://amf3.github.io/categories/container/</link>
-      <pubDate>Mon, 23 Feb 2026 16:29:59 -0800</pubDate>
-      <guid>https://amf3.github.io/categories/container/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Virtualization</title>
-      <link>https://amf3.github.io/categories/virtualization/</link>
-      <pubDate>Mon, 23 Feb 2026 16:29:59 -0800</pubDate>
-      <guid>https://amf3.github.io/categories/virtualization/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Architecture</title>
-      <link>https://amf3.github.io/categories/architecture/</link>
-      <pubDate>Tue, 16 Dec 2025 21:51:16 -0800</pubDate>
-      <guid>https://amf3.github.io/categories/architecture/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Homelab</title>
-      <link>https://amf3.github.io/categories/homelab/</link>
-      <pubDate>Tue, 16 Dec 2025 21:51:16 -0800</pubDate>
-      <guid>https://amf3.github.io/categories/homelab/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Code</title>
-      <link>https://amf3.github.io/categories/code/</link>
+      <title>Software</title>
+      <link>https://amf3.github.io/categories/software/</link>
       <pubDate>Mon, 29 Sep 2025 17:17:10 -0400</pubDate>
-      <guid>https://amf3.github.io/categories/code/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Go</title>
-      <link>https://amf3.github.io/categories/go/</link>
-      <pubDate>Mon, 29 Sep 2025 17:17:10 -0400</pubDate>
-      <guid>https://amf3.github.io/categories/go/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>API</title>
-      <link>https://amf3.github.io/categories/api/</link>
-      <pubDate>Fri, 04 Jul 2025 22:43:09 -0700</pubDate>
-      <guid>https://amf3.github.io/categories/api/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Python</title>
-      <link>https://amf3.github.io/categories/python/</link>
-      <pubDate>Fri, 04 Jul 2025 22:43:09 -0700</pubDate>
-      <guid>https://amf3.github.io/categories/python/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Storage</title>
-      <link>https://amf3.github.io/categories/storage/</link>
-      <pubDate>Thu, 26 Jun 2025 22:37:40 -0700</pubDate>
-      <guid>https://amf3.github.io/categories/storage/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Object Store</title>
-      <link>https://amf3.github.io/categories/object-store/</link>
-      <pubDate>Fri, 30 May 2025 16:46:07 -0700</pubDate>
-      <guid>https://amf3.github.io/categories/object-store/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Qemu</title>
-      <link>https://amf3.github.io/categories/qemu/</link>
-      <pubDate>Sun, 06 Apr 2025 07:41:29 -0400</pubDate>
-      <guid>https://amf3.github.io/categories/qemu/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Tips</title>
-      <link>https://amf3.github.io/categories/tips/</link>
-      <pubDate>Sun, 06 Apr 2025 07:41:29 -0400</pubDate>
-      <guid>https://amf3.github.io/categories/tips/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Automation</title>
-      <link>https://amf3.github.io/categories/automation/</link>
-      <pubDate>Fri, 21 Mar 2025 16:28:54 -0400</pubDate>
-      <guid>https://amf3.github.io/categories/automation/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Operations</title>
-      <link>https://amf3.github.io/categories/operations/</link>
-      <pubDate>Fri, 21 Mar 2025 16:28:54 -0400</pubDate>
-      <guid>https://amf3.github.io/categories/operations/</guid>
+      <guid>https://amf3.github.io/categories/software/</guid>
       <description></description>
     </item>
   </channel>
