@@ -1,0 +1,16 @@
+{{ $related := .Site.RegularPages.Related . | first 3 }}
+{{ with $related }}
+<div class="related-wrapper">
+  <hr class="related-divider" />
+  <div class="related-card">
+    <h3 class="related-title">Related Posts</h3>
+    <ul class="related-list">
+      {{ range . }}
+      <li>
+        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+      </li>
+      {{ end }}
+    </ul>
+  </div>
+</div>
+{{ end }}

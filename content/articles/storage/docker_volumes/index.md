@@ -5,7 +5,8 @@ date: 2025-06-26T22:37:40-07:00
 draft: false
 searchHidden: false
 showtoc: true
-categories: [Docker, storage]
+categories: [systems]
+tags: [storage, docker, go]
 ---
 
 With Docker, it’s not always obvious what storage options exist beyond the built-in **local** volume driver or a traditional **bind mount**.

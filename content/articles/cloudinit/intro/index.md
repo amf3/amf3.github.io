@@ -5,7 +5,8 @@ date: 2025-02-21T23:06:35-08:00
 draft: false
 searchHidden: false
 showtoc: true
-categories: [cloud, automation, operations]
+categories: [systems]
+tags: [cloud-init, multipass]
 ---
 
 Cloud compute companies like GCP, AWS, or Azure offer a management API for allocating resources. In the on-premise space,

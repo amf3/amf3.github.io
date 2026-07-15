@@ -5,7 +5,8 @@ date: 2025-05-30T16:46:07-07:00
 draft: false
 searchHidden: false
 showtoc: true
-categories: [object store, storage]
+categories: [software]
+tags: [python, storage]
 ---
 
 I'm looking at how object storage systems manage data on disk. Especially the idea of using append only archives with an index for fast retrieveal.  While reading

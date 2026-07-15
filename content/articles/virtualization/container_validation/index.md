@@ -5,7 +5,8 @@ date: 2026-04-22T21:27:51
 draft: false
 searchHidden: false
 showtoc: true
-categories: [containers, cloud]
+categories: [systems]
+tags: [oci-image, runc]
 images: ["./assets/loading_containers.png"]
 ---
 

@@ -5,7 +5,8 @@ date: 2025-03-03T23:07:23-08:00
 draft: false
 searchHidden: false
 showtoc: true
-categories: [cloud, automation, operations]
+categories: [systems]
+tags: [cloud-init, qemu]
 ---
 
 In a [previous post](../../../articles/cloudinit/intro/), I discussed using cloud-init and Multipass as a method of provisioning

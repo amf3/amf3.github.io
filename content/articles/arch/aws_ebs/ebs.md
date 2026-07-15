@@ -2,7 +2,7 @@
 title: "Elastic Block Store Design for Home Lab Use"
 date: 2023-08-25T07:38:23-07:00
 draft: true
-categories: [homelab, architecture]
+categories: [systems]
 robotsNoIndex: true
 searchHidden: true
 ---

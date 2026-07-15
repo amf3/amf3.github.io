@@ -5,7 +5,8 @@ date: 2026-01-05T12:25:30-08:00
 draft: false
 searchHidden: false
 showtoc: true
-categories: [Docker, cloud, virtualization]
+categories: [systems]
+tags: [docker, security]
 ---
 
 There's a popular myth in the Docker community.

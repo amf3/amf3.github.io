@@ -5,7 +5,8 @@ date: 2025-07-04T22:43:09-07:00
 draft: false
 searchHidden: false
 showtoc: true
-categories: [API, Go, Python]
+categories: [software]
+tags: [python, go]
 ---
 
 OpenAPI is a specification for documenting HTTP APIs for both humans and machines to consume.  As OpenAPI is a specification,

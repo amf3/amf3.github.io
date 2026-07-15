@@ -2,8 +2,9 @@
 title: "Virtual Router Lab on macOS with QEMU"
 date: 2025-05-14
 description: Debugging macOS QEMU networking with unified logging and lightweight Linux VMs
-tags: [qemu, macos, mikrotik, routeros, alpine, virtualization, networking]
 showtoc: true
+categories: [systems]
+tags: [qemu, networking, homelab]
 ---
 
 [UTM](https://github.com/utmapp/UTM) and [Multipass](https://canonical.com/multipass) are great apps for virtualization on macOS.  

@@ -5,7 +5,8 @@ date: 2026-02-23T16:29:59-08:00
 draft: false
 searchHidden: false
 showtoc: true
-categories: [Container, cloud, virtualization]
+categories: [systems]
+tags: [oci-image]
 images: ["./assets/containers.jpg"]
 ---
 
