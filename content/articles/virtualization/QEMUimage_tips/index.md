@@ -5,7 +5,8 @@ date: 2025-04-06T07:41:29-04:00
 draft: false
 searchHidden: false
 showtoc: true
-categories: [cloud, virtualization, tips, qemu]
+categories: [systems]
+tags: [qemu, storage, homelab]
 ---
 
 QEMU uses files to emulate storage devices, and the features available

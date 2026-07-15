@@ -5,7 +5,8 @@ date: 2026-04-17T23:20:00
 draft: false
 searchHidden: false
 showtoc: true
-categories: [containers, cloud]
+categories: [systems]
+tags: [oci-image, buildroot, docker]
 images: ["./assets/container_loading.jpeg"]
 ---
 

@@ -5,7 +5,8 @@ date: 2025-09-29T17:17:10-04:00
 draft: false
 searchHidden: false
 showtoc: true
-categories: [Go, Code]
+categories: [software]
+tags: [go, tips]
 ---
 
 ## Adding Subcommands to Go CLIs

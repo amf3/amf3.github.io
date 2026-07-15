@@ -5,7 +5,8 @@ date: 2025-12-16T21:51:16-08:00
 draft: false
 searchHidden: false
 showtoc: true
-categories: [homelab, architecture]
+categories: [systems]
+tags: [docker, storage]
 ---
 
 ## Who Should Not Read This Post

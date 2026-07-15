@@ -4,7 +4,8 @@ description: "Using Generics for Testing Pointers In Structs"
 date: 2025-07-11T21:11:43-07:00
 draft: false
 searchHidden: false
-categories: [Go, Code]
+categories: [software]
+tags: [go, tips]
 ---
 
 Until recently, I haven't had many opportunities to use Go's generics.  I ran into

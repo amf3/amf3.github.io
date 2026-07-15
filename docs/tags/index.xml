@@ -6,20 +6,62 @@
     <description>Recent content in Tags on Adam Faris</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 19 Nov 2025 00:06:09 -0800</lastBuildDate>
+    <lastBuildDate>Sat, 11 Jul 2026 11:58:20 -0700</lastBuildDate>
     <atom:link href="https://amf3.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Linux</title>
-      <link>https://amf3.github.io/tags/linux/</link>
-      <pubDate>Wed, 19 Nov 2025 00:06:09 -0800</pubDate>
-      <guid>https://amf3.github.io/tags/linux/</guid>
+      <title>Docker</title>
+      <link>https://amf3.github.io/tags/docker/</link>
+      <pubDate>Wed, 10 Jun 2026 11:01:27 -0700</pubDate>
+      <guid>https://amf3.github.io/tags/docker/</guid>
       <description></description>
     </item>
     <item>
-      <title>Mikrotik</title>
-      <link>https://amf3.github.io/tags/mikrotik/</link>
+      <title>Oci-Image</title>
+      <link>https://amf3.github.io/tags/oci-image/</link>
+      <pubDate>Wed, 10 Jun 2026 11:01:27 -0700</pubDate>
+      <guid>https://amf3.github.io/tags/oci-image/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Runc</title>
+      <link>https://amf3.github.io/tags/runc/</link>
+      <pubDate>Wed, 22 Apr 2026 21:27:51 +0000</pubDate>
+      <guid>https://amf3.github.io/tags/runc/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Buildroot</title>
+      <link>https://amf3.github.io/tags/buildroot/</link>
+      <pubDate>Fri, 17 Apr 2026 23:20:00 +0000</pubDate>
+      <guid>https://amf3.github.io/tags/buildroot/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Python</title>
+      <link>https://amf3.github.io/tags/python/</link>
+      <pubDate>Sun, 12 Apr 2026 18:23:15 +0000</pubDate>
+      <guid>https://amf3.github.io/tags/python/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Security</title>
+      <link>https://amf3.github.io/tags/security/</link>
+      <pubDate>Mon, 05 Jan 2026 12:25:30 -0800</pubDate>
+      <guid>https://amf3.github.io/tags/security/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Storage</title>
+      <link>https://amf3.github.io/tags/storage/</link>
+      <pubDate>Tue, 16 Dec 2025 21:51:16 -0800</pubDate>
+      <guid>https://amf3.github.io/tags/storage/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Homelab</title>
+      <link>https://amf3.github.io/tags/homelab/</link>
       <pubDate>Wed, 19 Nov 2025 00:06:09 -0800</pubDate>
-      <guid>https://amf3.github.io/tags/mikrotik/</guid>
+      <guid>https://amf3.github.io/tags/homelab/</guid>
       <description></description>
     </item>
     <item>
@@ -37,31 +79,31 @@
       <description></description>
     </item>
     <item>
-      <title>Routeros</title>
-      <link>https://amf3.github.io/tags/routeros/</link>
-      <pubDate>Wed, 19 Nov 2025 00:06:09 -0800</pubDate>
-      <guid>https://amf3.github.io/tags/routeros/</guid>
+      <title>Go</title>
+      <link>https://amf3.github.io/tags/go/</link>
+      <pubDate>Mon, 29 Sep 2025 17:17:10 -0400</pubDate>
+      <guid>https://amf3.github.io/tags/go/</guid>
       <description></description>
     </item>
     <item>
-      <title>Virtualization</title>
-      <link>https://amf3.github.io/tags/virtualization/</link>
-      <pubDate>Wed, 19 Nov 2025 00:06:09 -0800</pubDate>
-      <guid>https://amf3.github.io/tags/virtualization/</guid>
+      <title>Tips</title>
+      <link>https://amf3.github.io/tags/tips/</link>
+      <pubDate>Mon, 29 Sep 2025 17:17:10 -0400</pubDate>
+      <guid>https://amf3.github.io/tags/tips/</guid>
       <description></description>
     </item>
     <item>
-      <title>Alpine</title>
-      <link>https://amf3.github.io/tags/alpine/</link>
-      <pubDate>Wed, 14 May 2025 00:00:00 +0000</pubDate>
-      <guid>https://amf3.github.io/tags/alpine/</guid>
+      <title>Cloud-Init</title>
+      <link>https://amf3.github.io/tags/cloud-init/</link>
+      <pubDate>Fri, 21 Mar 2025 16:28:54 -0400</pubDate>
+      <guid>https://amf3.github.io/tags/cloud-init/</guid>
       <description></description>
     </item>
     <item>
-      <title>Macos</title>
-      <link>https://amf3.github.io/tags/macos/</link>
-      <pubDate>Wed, 14 May 2025 00:00:00 +0000</pubDate>
-      <guid>https://amf3.github.io/tags/macos/</guid>
+      <title>Multipass</title>
+      <link>https://amf3.github.io/tags/multipass/</link>
+      <pubDate>Fri, 21 Feb 2025 23:06:35 -0800</pubDate>
+      <guid>https://amf3.github.io/tags/multipass/</guid>
       <description></description>
     </item>
   </channel>

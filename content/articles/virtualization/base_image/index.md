@@ -5,7 +5,8 @@ date: 2026-04-12T18:23:15
 draft: false
 searchHidden: false
 showtoc: true
-categories: [containers, cloud]
+categories: [systems]
+tags: [oci-image, docker, python]
 images: ["./assets/base_ship"]
 ---
 

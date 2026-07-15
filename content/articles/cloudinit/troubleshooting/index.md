@@ -5,7 +5,8 @@ date: 2025-03-21T16:28:54-04:00
 draft: false
 searchHidden: false
 showtoc: true
-categories: [cloud, automation, operations]
+categories: [systems]
+tags: [cloud-init, tips]
 ---
 
 I previously wrote an [introduction](../../../articles/cloudinit/intro/) to cloud-init. I'd like to now follow up with a discussion on

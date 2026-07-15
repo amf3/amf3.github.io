@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Buildroot on Adam Faris</title>
+    <link>https://amf3.github.io/tags/buildroot/</link>
+    <description>Recent content in Buildroot on Adam Faris</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 17 Apr 2026 23:20:00 +0000</lastBuildDate>
+    <atom:link href="https://amf3.github.io/tags/buildroot/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Declarative Container Builds</title>
+      <link>https://amf3.github.io/articles/virtualization/declarative_builds/</link>
+      <pubDate>Fri, 17 Apr 2026 23:20:00 +0000</pubDate>
+      <guid>https://amf3.github.io/articles/virtualization/declarative_builds/</guid>
+      <description>Demonstrating an Opinionated Build Process for Container Images</description>
+    </item>
+  </channel>
+</rss>

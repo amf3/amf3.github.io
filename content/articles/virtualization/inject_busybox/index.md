@@ -6,7 +6,8 @@ lastmod: 2026-07-11T11:58:20-07:00
 draft: false
 searchHidden: false
 showtoc: true
-categories: [Docker, Cloud]
+categories: [systems]
+tags: [oci-image, docker]
 images: ["./assets/rowboat.jpg"]
 ---
 

@@ -6,13 +6,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
 <title>Hidden Systems in Base Container Images | Adam Faris</title>
-<meta name="keywords" content="">
+<meta name="keywords" content="oci-image, docker, python">
 <meta name="description" content="You&#39;re not choosing an image. You&#39;re inheriting a system.">
 <meta name="author" content="">
 <link rel="canonical" href="https://amf3.github.io/articles/virtualization/base_image/">
 <meta name="google-site-verification" content="6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E">
 <meta name="msvalidate.01" content="C1E02AC59FE7ECBDB6D9EFB7D5E02B65">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a9dee1160239c080e21943d7a8576d3f0eee73f3885c24e93fc94aa929af9f86.css" integrity="sha256-qd7hFgI5wIDiGUPXqFdtPw7uc/OIXCTpP8lKqSmvn4Y=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://amf3.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://amf3.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://amf3.github.io/favicon-32x32.png">
@@ -89,6 +89,9 @@
     <meta property="article:section" content="articles">
     <meta property="article:published_time" content="2026-04-12T18:23:15+00:00">
     <meta property="article:modified_time" content="2026-04-12T18:23:15+00:00">
+    <meta property="article:tag" content="Oci-Image">
+    <meta property="article:tag" content="Docker">
+    <meta property="article:tag" content="Python">
       <meta property="og:image" content="https://amf3.github.io/assets/base_ship">
 
   <meta name="twitter:card" content="summary_large_image">
@@ -125,7 +128,7 @@
   "name": "Hidden Systems in Base Container Images",
   "description": "You're not choosing an image. You're inheriting a system.",
   "keywords": [
-    
+    "oci-image", "docker", "python"
   ],
   "articleBody": "\nMany container images start with FROM python:3.x. What gets imported is not only Python, its a preassembled filesystem of decisions you didn’t make. Understanding what’s inherited from the base image is key to building container images. Instead of implicitly trusting what’s included with the base image, think of the image as a collection of artifacts that are intentionally assembled.\nLarge Container Images The official Python container image hosted on Docker Hub is a great demonstration of inheriting unknown layers. For Linux environments, the Python image comes with either a Debian or Alpine base image. Both base images come with additional applications not required by Python.\nThe Debian based image ships with a Perl interpreter. Yes, you read that correctly.\n% docker run --rm -it python:3.14.3-trixie /bin/perl -v This is perl 5, version 40, subversion 1 (v5.40.1) built for aarch64-linux-gnu-thread-multi (with 48 registered patches, see perl -V for more detail) Copyright 1987-2025, Larry Wall Perl isn’t there for Python. It’s a legacy dependency inherited from Debian Trixie. To be clear, Perl is not a Python dependency or requirement.\nThe Python container image built on Alpine is better focused, but still includes tools like showkey, lsusb, and chvt. These utilities interact with physical keyboards, USB buses, and Linux virtual consoles. Things that don’t exist in the typical container environment.\nBoth images demonstrate inheritance issues that can be avoided with declarative builds.\nCurated Run times Container images from either the Distroless or Docker Hardened Image (DHI) projects provide a curated runtime by starting with a complete distribution and aggressively remove shells, package managers, development tools, and unnecessary services.\nHowever while exploring the DHI Python 3.14 image, I found remnants of the package manager, orphaned binaries, and scripts referencing nonexistent shells.\n% ls -l rootfs/bin/gawk -rwxr-xr-x 1 adam staff 795024 Oct 29 2024 rootfs/bin/gawk % file rootfs/sbin/* rootfs/sbin/dpkg-preconfigure: Perl script text executable rootfs/sbin/dpkg-reconfigure: Perl script text executable rootfs/sbin/update-ca-certificates: POSIX shell script text executable, ASCII text The concern isn’t that these artifacts are dangerous, it’s that they exist in the container without intent. Smaller images are often seen as better, but size is actually a side effect. The goal is being able to explain every artifact that ships in your container.\nDeclarative Image Composition Base images provide a working system but also provide a moving target. When using FROM python:3.x you’re not only choosing Python, you’re accepting a snapshot of someone else’s system at a point in time. The snapshot includes everything needed to make the image function, but the contents are undeclared. An image rebuild tomorrow could produce a different result, even if your Dockerfile hasn’t changed.\nDeclarative composition inverts this process. Instead of inheriting a filesystem, an image is assembled from known artifacts. A Python runtime becomes the output of a build pipeline that compiles from downloaded source. This is similar to building packages, but instead each file in the image can be traced back to a build step. When something changes inside the container image it’s because an input changed. The result is not a smaller image, but one that is explainable as the content is defined.\nAt first creating an image in this manner seems simple.\nFROM scratch COPY python-rootfs/ / CMD [\"/usr/bin/python3\"] In practice the Python runtime is not a single artifact. It needs dynamically linked libraries, a runtime loader, and a full standard library. A Python 3.14 build can easily produce hundreds of megabytes under /usr/lib. The base image hides dependency complexities. Declarative builds expose dependencies and trade convenience for control over what ships inside the container. A follow up article will assemble a container runtime from a declarative build pipeline using Buildroot.\nThe Developer Experience Developers want familiar environments that are easy to debug, have working defaults, and are simple to update. A container built against a full distro is going to include a package manager, a shell, and a familiar set of tools. If something breaks, it’s simple to docker exec into the container and install a debugging utility to inspect the running container.\nDeclarative images change this workflow but not in the way minimal or distroless images behave. Instead of removing tools, the goal is to make their presence intentional. If a shell is required for debugging, it’s included as part of the image. The shell isn’t inherited from a base image, but is added as a known artifact with defined content and dependencies. This shifts the developer experience from modifying a running container to defining what the container should contain ahead of time.\nSecurity typically fails at adoption, not in design. Developers will route around tooling if processes are opaque or the debugging workflow fails. A declarative approach only works if the intent behind each component is understood by the people maintaining the image.\nTrade offs and Reality Base images optimize for convenience and familiarity, while declarative composition optimizes for control and transparency. Neither approach is universally better. The choice depends on whether simplicity or control is the primary goal. Building images from scratch is less about minimalism and more about making dependencies explicit. The challenge is not in removing components, but defining the complete runtime in a way that explains why every file exists.\n",
   "wordCount" : "860",
@@ -203,18 +206,7 @@
 
 <article class="post-single">
   <header class="post-header">
-    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
-            <a href="/">Home</a>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
-                <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-            <a href="/articles/">articles</a>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
-        <polyline points="9 18 15 12 9 6"></polyline>
-    </svg>
-</nav>
+    
     <h1 class="post-title entry-hint-parent">
       Hidden Systems in Base Container Images
     </h1>
@@ -316,13 +308,37 @@ in a way that explains why every file exists.</p>
 
   </div>
 
+  
+
+<div class="related-wrapper">
+  <hr class="related-divider" />
+  <div class="related-card">
+    <h3 class="related-title">Related Posts</h3>
+    <ul class="related-list">
+      
+      <li>
+        <a href="/articles/virtualization/inject_busybox/">No Shell in Your Container? No Problem</a>
+      </li>
+      
+      <li>
+        <a href="/articles/virtualization/declarative_builds/">Declarative Container Builds</a>
+      </li>
+      
+      <li>
+        <a href="/articles/virtualization/container_validation/">Container Image Validation</a>
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+
   <footer class="post-footer">
     <ul class="post-tags">
+      <li><a href="https://amf3.github.io/tags/oci-image/">Oci-Image</a></li>
+      <li><a href="https://amf3.github.io/tags/docker/">Docker</a></li>
+      <li><a href="https://amf3.github.io/tags/python/">Python</a></li>
     </ul>
-
-<ul class="share-buttons">
-</ul>
-
   </footer>
 </article>
     </main>

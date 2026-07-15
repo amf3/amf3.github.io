@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Oci-Image on Adam Faris</title>
+    <link>https://amf3.github.io/tags/oci-image/</link>
+    <description>Recent content in Oci-Image on Adam Faris</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 11 Jul 2026 11:58:20 -0700</lastBuildDate>
+    <atom:link href="https://amf3.github.io/tags/oci-image/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>No Shell in Your Container? No Problem</title>
+      <link>https://amf3.github.io/articles/virtualization/inject_busybox/</link>
+      <pubDate>Wed, 10 Jun 2026 11:01:27 -0700</pubDate>
+      <guid>https://amf3.github.io/articles/virtualization/inject_busybox/</guid>
+      <description>Injecting Busybox into Minimal/Distroless Containers</description>
+    </item>
+    <item>
+      <title>Container Image Validation</title>
+      <link>https://amf3.github.io/articles/virtualization/container_validation/</link>
+      <pubDate>Wed, 22 Apr 2026 21:27:51 +0000</pubDate>
+      <guid>https://amf3.github.io/articles/virtualization/container_validation/</guid>
+      <description>Ensuring containers have what they need. Nothing more, nothing less.</description>
+    </item>
+    <item>
+      <title>Declarative Container Builds</title>
+      <link>https://amf3.github.io/articles/virtualization/declarative_builds/</link>
+      <pubDate>Fri, 17 Apr 2026 23:20:00 +0000</pubDate>
+      <guid>https://amf3.github.io/articles/virtualization/declarative_builds/</guid>
+      <description>Demonstrating an Opinionated Build Process for Container Images</description>
+    </item>
+    <item>
+      <title>Hidden Systems in Base Container Images</title>
+      <link>https://amf3.github.io/articles/virtualization/base_image/</link>
+      <pubDate>Sun, 12 Apr 2026 18:23:15 +0000</pubDate>
+      <guid>https://amf3.github.io/articles/virtualization/base_image/</guid>
+      <description>You&amp;#39;re not choosing an image. You&amp;#39;re inheriting a system.</description>
+    </item>
+    <item>
+      <title>Open Container Image Format</title>
+      <link>https://amf3.github.io/articles/virtualization/oci_image/</link>
+      <pubDate>Mon, 23 Feb 2026 16:29:59 -0800</pubDate>
+      <guid>https://amf3.github.io/articles/virtualization/oci_image/</guid>
+      <description>From Local TAR file to Open Container Image</description>
+    </item>
+  </channel>
+</rss>

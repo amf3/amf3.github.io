@@ -1,4 +1,0 @@
-{
-  "Name": "myplugin",
-  "Addr": "unix:///run/docker/plugins/myplugin.sock"
-}

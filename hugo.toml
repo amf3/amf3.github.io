@@ -34,17 +34,16 @@ home = [ "HTML", "RSS", "JSON" ]
 rss = ['rss']
 
 [params]
-ShowBreadCrumbs = 'false'
-ShowShareButtons = 'true'
-ShareButtons = ['rss']
-ShowRssButtonInSectionTermList = 'true'
-ShowFullTextinRSS = 'false'
+ShowBreadCrumbs = false
+ShowShareButtons = false
+ShowRssButtonInSectionTermList = true
+ShowFullTextinRSS = false
 mainSections = ['articles']
 analytics.google.SiteVerificationTag = '6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E'
 analytics.bing.SiteVerificationTag = 'C1E02AC59FE7ECBDB6D9EFB7D5E02B65'
-ShowWordCount = 'true'
+ShowWordCount = true
 env = 'production'
-ShowCodeCopyButtons = 'true'
+ShowCodeCopyButtons = true
 
 [services.googleAnalytics]
 ID = 'G-MKR06D6KGD'
@@ -64,3 +63,24 @@ url = '/index.xml'
 
 [markup.goldmark.renderer]
 unsafe = false
+
+[related]
+threshold = 20
+includeNewer = true
+toLower = true
+
+# 1. Tags are now your most granular and valuable matching signals
+[[related.indices]]
+name = "tags"
+weight = 100
+
+# 2. Categories act as a baseline logical tie-breaker (but don't override tag matches)
+[[related.indices]]
+name = "categories"
+weight = 30
+
+# 3. Date keeps things fresh so newer posts bubble up when tags/categories are equal
+[[related.indices]]
+name = "date"
+weight = 10
+
