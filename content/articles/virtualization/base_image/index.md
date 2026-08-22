@@ -7,7 +7,7 @@ searchHidden: false
 showtoc: true
 categories: [systems]
 tags: [oci-image, docker, python]
-images: ["./assets/base_ship"]
+images: ["./assets/base_ship.jpeg"]
 ---
 
 ![Image of a near empty cargo ship](./assets/base_ship.jpeg)
