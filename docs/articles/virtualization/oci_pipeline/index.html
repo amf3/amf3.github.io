@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Building and Maintaining an Open Container Image Distribution | Adam Faris</title>
+<meta name="keywords" content="oci-image, docker">
+<meta name="description" content="Presenting a Collection of Minimal OCI Images From a Shared Buildroot Artifact">
+<meta name="author" content="">
+<link rel="canonical" href="https://amf3.github.io/articles/virtualization/oci_pipeline/">
+<meta name="google-site-verification" content="6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E">
+<meta name="msvalidate.01" content="C1E02AC59FE7ECBDB6D9EFB7D5E02B65">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a9dee1160239c080e21943d7a8576d3f0eee73f3885c24e93fc94aa929af9f86.css" integrity="sha256-qd7hFgI5wIDiGUPXqFdtPw7uc/OIXCTpP8lKqSmvn4Y=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://amf3.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://amf3.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://amf3.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://amf3.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://amf3.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://amf3.github.io/articles/virtualization/oci_pipeline/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-MKR06D6KGD"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-MKR06D6KGD');
+        }
+      </script><meta property="og:url" content="https://amf3.github.io/articles/virtualization/oci_pipeline/">
+  <meta property="og:site_name" content="Adam Faris">
+  <meta property="og:title" content="Building and Maintaining an Open Container Image Distribution">
+  <meta property="og:description" content="Presenting a Collection of Minimal OCI Images From a Shared Buildroot Artifact">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="articles">
+    <meta property="article:published_time" content="2026-08-08T15:59:56+02:00">
+    <meta property="article:modified_time" content="2026-08-08T15:59:56+02:00">
+    <meta property="article:tag" content="Oci-Image">
+    <meta property="article:tag" content="Docker">
+      <meta property="og:image" content="https://amf3.github.io/assets/containers.jpeg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://amf3.github.io/assets/containers.jpeg">
+  <meta name="twitter:title" content="Building and Maintaining an Open Container Image Distribution">
+  <meta name="twitter:description" content="Presenting a Collection of Minimal OCI Images From a Shared Buildroot Artifact">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "articles",
+      "item": "https://amf3.github.io/articles/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Building and Maintaining an Open Container Image Distribution",
+      "item": "https://amf3.github.io/articles/virtualization/oci_pipeline/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Building and Maintaining an Open Container Image Distribution",
+  "name": "Building and Maintaining an Open Container Image Distribution",
+  "description": "Presenting a Collection of Minimal OCI Images From a Shared Buildroot Artifact",
+  "keywords": [
+    "oci-image", "docker"
+  ],
+  "articleBody": "\nIntro I’ve been working on the JustEnough project on and off for the last several years. It started after examining upstream container images and realizing they could be a lot simpler.\nAfter watching a presentation from Brian Harrington of CoreOS fame, I started using Buildroot to create a minimal root filesystem that got imported into the container image. This worked great for a single container image, but got unwieldy when building multiple container images.\nThe maintenance issues led me to writing about declarative manifests for assembling OCI images a few months ago. Today I’m currently managing three base images using this process.\nJustEnough Image Image Description BusyBox minimal utility/debugging image Python3.14 Application Runtime Unbound DNS Infrastructure Service I have plans to introduce a fourth base image that will be discussed later.\nThe Maintenance Challenge Like many projects, time and effort were the reasons for changing the build process of using a single Buildroot filesystem per container image to using declarative builds.\nMy build times were growing rapidly by using distinct Buildroot configs for each container image. This isn’t a Buildroot issue, but an implementation issue I introduced. By recreating common components like GCC for the build toolchain or glibc within the image, build times skyrocketed. It wouldn’t have mattered if I was using other projects like Yocto or Linux From Scratch to build the root filesystem. The build time issue was I kept rebuilding common components for each container base image.\nA second challenge was keeping multiple Buildroot config files in sync. When the upstream Buildroot project deprecated a package, I needed to remove that package from each of my local Buildroot config files.\nSo why not use individual Dockerfiles in place of Buildroot? In summary, it’s because we don’t actually know what’s inside an upstream container image. A lot of base container images are distro based, where files and applications are stripped from the final image. Another problem is upstream content can change without notice. An upstream distro package the container image is using can have its contents change without the image maintainer realizing it.\nUsing a single Buildroot filesystem artifact containing multiple packages have both reduced my build times and simplified updates to Buildroot configs. While I do use unique Dockerfiles for each of the JustEnough base images, Dockerfile content is essentially copy everything from each container image’s staging directory into a scratch image.\nFrom Primitives to a Distribution Several reusable primitives evolved when writing about declarative builds.\nBuildroot is responsible for creating the source filesystem artifact. The artifact contains application binaries and their dependencies. All container images use files from the same source filesystem artifact. While Buildroot is the current source of the filesystem artifact, it’s not a requirement. The source filesystem artifact only needs to be a directory structure containing binaries and their dependencies.\nThe Container Manifest is a YAML file that defines what goes into a container image. There are several top level keys that describe the container’s filesystem. Binaries list compiled binaries, Data entries track data components like config files, Directories ensure that directory structures are present in the container image, and Symlinks track symbolic links.\nAn Assembler uses the Container Manifest to copy files from the Buildroot filesystem artifact into a staging directory specific to that container image.\nTo confirm container images have required libraries and filesystem paths, a Validator process uses eBPF to track system calls made by the running container process. The Validator helps identify missing runtime files, so the Container Manifest can be updated before the image is uploaded to a public registry like GHCR.\nBuild and Release Pipeline The pipeline uses GitHub Actions, but could be any command runner capable of running shell commands and scripts.\nBuild the Source Filesystem Artifact The actual pipeline begins with building the source filesystem artifact with Buildroot. This is created once for all container images. My current BusyBox, Python, and Unbound DNS images are based from this one artifact. With this approach, I use Oras to push the source filesystem artifact to GHCR where it can be accessed by other pipelines or inspected as a standalone layer.\nAssemble the Container Image The manifest file describes the intentional contents of the image. The assembler discovers the dependencies needed to make those contents executable.\nManifest entries under Binaries receive special handling. The ELF header is inspected for dependencies and automatically get copied to the container’s staging directory. This is why we don’t need to list libc.so.6 in the manifest.\nValidate the container image We still need to validate the container image, even after static analysis of reading ELF header from the binaries. Sometimes libraries are lazily loaded at runtime or access unexpected file paths like /etc/openssl.cnf by Unbound DNS.\nAfter tracing system calls made by the running container, the Validator generates a report detailing file read and write access attempts. Reading the report is more art than science as libraries often probe non-existent paths to inspect the local environment, meaning failed file access attempts aren’t always a failure condition.\nValidation remains a manual step because the system call output isn’t deterministic. Additional work is needed to normalize the runtime traces before using GitHub actions.\nGenerate Metadata and Release During container assembly, a Software Bill of Materials (SBOM) is generated from the staging directory and inserted into each container image as it’s being built.\nAfter the the container image is created, attestation is added to state which GitHub Action Build number built that container and which git tag from the Buildroot project was used to generate the Buildroot artifact.\nFinally the container image with updated tags is pushed to GHCR container registry.\nKeeping Images Updated The release tag from the upstream Buildroot project is attached to the newly created container image. I also tag the container image with the current git hash from the JustEnough project. Together, these tags identify both the Buildroot source used to build the image and the JustEnough configuration that assembled it. This makes it possible to identify how an existing release was built.\nIt’s possible to use local patches with Buildroot and override the project settings. This is useful for when the Buildroot project is in the middle of a release cycle and I need to patch a critical CVE within the container. Creating a package patch isn’t complicated. Each package has a *.mk file which contains the upstream version number and upstream git hash, both of which can be easily overridden. Patching is also how one can add or remove build options for a package.\nCreating a New Image Because of the primitives listed above, creating a new container image is simple. These are the steps I took when adding a new Python interpreter as a base image.\nEnable the Python 3.14 and Pip packages in the Buildroot config. Create a container manifest file that lists the Python and Pip binaries with their dependencies. Create a Dockerfile to copy content from the containers staging directory into the new container. Use the Validator tool to confirm the new container image is working Add the new Python container to an appliance array within the GitHub workflow. With the new build pipeline, the updates are mostly additions and modifications are minimal.\nGenerated Images as Building Blocks To validate these images with real world usage, also known as dogfooding the project, I needed a service to build with those components. I wanted a self hosted DNS based advertisement blocking service at home as a lightweight alternative to the Pihole project. In addition to ad list support, I wanted a local resolver, split-horizon records, and reporting. The Pihole replacement seemed like a great test case.\nI ended up using the Python and Unbound images for the foundation of the adlist generator project that downloads ad-block lists and generates a local DNS based ad blocker.\nThe Python container image provided the runtime for the generator. Unbound provides the DNS resolver. The adlist generator is a Python project that downloads ad block lists and formats them to be used with Unbound DNS. The generator also writes Unbound DNS configs to support the other features I listed.\nI ran into one minor issue when using the Python and Unbound DNS container images in a multi-stage build for the adlist generator. I found out the pip command expects a shell environment. As there’s no shell in my containers, I needed to invoke the pip command as a module. You can see this in the generator project’s Dockerfile.\nRUN [\"python\", \"-m\", \"pip\", \"install\", \"--no-cache-dir\", \"-r\", \"requirements.txt\"] Otherwise, using the JustEnough container image as building blocks worked great.\nWhat’s Next In the intro I mentioned a fourth container is planned. I want to create a Samba container image that’s focused on Apple’s Time Machine backups.\nThe existing images are straightforward application runtimes and static utilities. The Samba container image will be a more demanding test of the pipeline, because of dynamic configurations, user/group permission mappings, and persistent storage mounts.\nSupporting stateful container images will show which declarative primitives hold up, which need to evolve, and whether the design can scale beyond the simple images the project started with.\n",
+  "wordCount" : "1517",
+  "inLanguage": "en",
+  "image": "https://amf3.github.io/assets/containers.jpeg","datePublished": "2026-08-08T15:59:56+02:00",
+  "dateModified": "2026-08-08T15:59:56+02:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://amf3.github.io/articles/virtualization/oci_pipeline/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Adam Faris",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://amf3.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="https://amf3.github.io/" accesskey="h" title="Adam Faris (Alt + H)">Adam Faris</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="https://amf3.github.io/search/" title="search (Alt &#43; /)" accesskey=/>
+                    <span>search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/articles/" title="articles">
+                    <span>articles</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/about/" title="about">
+                    <span>about</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/archives/" title="archives">
+                    <span>archives</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Building and Maintaining an Open Container Image Distribution
+    </h1>
+    <div class="post-description">
+      Presenting a Collection of Minimal OCI Images From a Shared Buildroot Artifact
+    </div>
+    <div class="post-meta">
+
+<span title='2026-08-08 15:59:56 +0200 +0200'>August 8, 2026</span>&nbsp;·&nbsp;<span>1517 words</span>
+
+</div>
+  </header> <details class="toc" >
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">Table of Contents</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#intro" aria-label="Intro">Intro</a></li>
+            <li>
+                <a href="#the-maintenance-challenge" aria-label="The Maintenance Challenge">The Maintenance Challenge</a></li>
+            <li>
+                <a href="#from-primitives-to-a-distribution" aria-label="From Primitives to a Distribution">From Primitives to a Distribution</a></li>
+            <li>
+                <a href="#build-and-release-pipeline" aria-label="Build and Release Pipeline">Build and Release Pipeline</a><ul>
+                    
+            <li>
+                <a href="#build-the-source-filesystem-artifact" aria-label="Build the Source Filesystem Artifact">Build the Source Filesystem Artifact</a></li>
+            <li>
+                <a href="#assemble-the-container-image" aria-label="Assemble the Container Image">Assemble the Container Image</a></li>
+            <li>
+                <a href="#validate-the-container-image" aria-label="Validate the container image">Validate the container image</a></li>
+            <li>
+                <a href="#generate-metadata-and-release" aria-label="Generate Metadata and Release">Generate Metadata and Release</a></li></ul>
+            </li>
+            <li>
+                <a href="#keeping-images-updated" aria-label="Keeping Images Updated">Keeping Images Updated</a></li>
+            <li>
+                <a href="#creating-a-new-image" aria-label="Creating a New Image">Creating a New Image</a></li>
+            <li>
+                <a href="#generated-images-as-building-blocks" aria-label="Generated Images as Building Blocks">Generated Images as Building Blocks</a></li>
+            <li>
+                <a href="#whats-next" aria-label="What&rsquo;s Next">What&rsquo;s Next</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+  <div class="post-content md-content"><p><img alt="Multiple shipping containers stacked on a pier." loading="lazy" src="/articles/virtualization/oci_pipeline/assets/containers.jpeg"></p>
+<h2 id="intro">Intro<a hidden class="anchor" aria-hidden="true" href="#intro">#</a></h2>
+<p>I&rsquo;ve been working on the <a href="https://github.com/amf3/just_enough">JustEnough</a> project on and off for the last several years.  It started after examining upstream container images and realizing they could be a lot simpler.</p>
+<p>After watching a presentation from <a href="https://www.youtube.com/watch?v=gMpldbcMHuI">Brian Harrington</a> of CoreOS fame, I started using Buildroot to create a minimal root filesystem that got imported into the container image.  This worked great for a single container image, but got unwieldy when building multiple container images.</p>
+<p>The maintenance issues led me to writing about <a href="../virtualization/declarative_builds/index.html">declarative manifests</a> for assembling OCI images a few months ago.  Today I&rsquo;m currently managing three base images using this process.</p>
+<table>
+	<thead>
+			<tr>
+					<th style="text-align: center">JustEnough Image</th>
+					<th style="text-align: center">Image Description</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td style="text-align: center"><a href="https://github.com/amf3/just_enough/pkgs/container/just_enough%2Fbusybox">BusyBox</a></td>
+					<td style="text-align: center">minimal utility/debugging image</td>
+			</tr>
+			<tr>
+					<td style="text-align: center"><a href="https://github.com/amf3/just_enough/pkgs/container/just_enough%2Fpython3.14">Python3.14</a></td>
+					<td style="text-align: center">Application Runtime</td>
+			</tr>
+			<tr>
+					<td style="text-align: center"><a href="https://github.com/amf3/just_enough/pkgs/container/just_enough%2Funbound_dns">Unbound DNS</a></td>
+					<td style="text-align: center">Infrastructure Service</td>
+			</tr>
+	</tbody>
+</table>
+<p>I have plans to introduce a fourth base image that will be discussed later.</p>
+<h2 id="the-maintenance-challenge">The Maintenance Challenge<a hidden class="anchor" aria-hidden="true" href="#the-maintenance-challenge">#</a></h2>
+<p>Like many projects, time and effort were the reasons for changing the build process of using a single Buildroot filesystem per container image to using declarative builds.</p>
+<p>My build times were growing rapidly by using distinct Buildroot configs for each container image.  This isn&rsquo;t a Buildroot issue, but an implementation issue I introduced.  By recreating common components like GCC for the build toolchain or glibc within the image, build times skyrocketed.  It wouldn&rsquo;t have mattered if I was using other projects like Yocto or Linux From Scratch to build the root filesystem.  The build time issue was I kept rebuilding common components for each container base image.</p>
+<p>A second challenge was keeping multiple Buildroot config files in sync.  When the upstream Buildroot project deprecated a package, I needed to remove that package from each of my local Buildroot config files.</p>
+<p>So why not use individual Dockerfiles in place of Buildroot? In summary, it&rsquo;s because we don&rsquo;t actually know what&rsquo;s inside an upstream container image.  A lot of <a href="../base_image/index.md">base container images</a> are distro based, where files and applications are stripped from the final image.  Another problem is upstream content can change without notice.  An upstream distro package the container image is using can have its contents change without the image maintainer realizing it.</p>
+<p>Using a single Buildroot filesystem artifact containing multiple packages have both reduced my build times and simplified updates to Buildroot configs.  While I do use unique Dockerfiles for each of the JustEnough base images, Dockerfile content is essentially copy everything from each container image&rsquo;s staging directory into a scratch image.</p>
+<h2 id="from-primitives-to-a-distribution">From Primitives to a Distribution<a hidden class="anchor" aria-hidden="true" href="#from-primitives-to-a-distribution">#</a></h2>
+<p>Several reusable primitives evolved when writing about declarative builds.</p>
+<p><strong>Buildroot</strong> is responsible for creating the source filesystem artifact. The artifact contains application binaries and their dependencies. All container images use files from the same source filesystem artifact.  While Buildroot is the current source of the filesystem artifact, it&rsquo;s not a requirement.  The source filesystem artifact only needs to be a directory structure containing binaries and their dependencies.</p>
+<p>The <strong>Container Manifest</strong> is a <a href="https://github.com/amf3/just_enough/blob/main/project_manifest/docs/manifest.md">YAML file</a> that defines what goes into a container image.  There are several top level keys that describe the container&rsquo;s filesystem. <em>Binaries</em> list compiled binaries, <em>Data</em> entries track data components like config files, <em>Directories</em> ensure that directory structures are present in the container image, and <em>Symlinks</em> track symbolic links.</p>
+<p>An <strong>Assembler</strong> uses the Container Manifest to copy files from the Buildroot filesystem artifact into a staging directory specific to that container image.</p>
+<p>To confirm container images have required libraries and filesystem paths, a <strong>Validator</strong> process uses eBPF to track system calls made by the running container process.  The Validator helps identify missing runtime files, so the Container Manifest can be updated before the image is uploaded to a public registry like GHCR.</p>
+<h2 id="build-and-release-pipeline">Build and Release Pipeline<a hidden class="anchor" aria-hidden="true" href="#build-and-release-pipeline">#</a></h2>
+<p>The pipeline uses GitHub Actions, but could be any command runner capable of running shell commands and scripts.</p>
+<p><img alt="Build pipeline steps" loading="lazy" src="/articles/virtualization/oci_pipeline/assets/Pipeline.png"></p>
+<h3 id="build-the-source-filesystem-artifact">Build the Source Filesystem Artifact<a hidden class="anchor" aria-hidden="true" href="#build-the-source-filesystem-artifact">#</a></h3>
+<p>The actual pipeline begins with building the source filesystem artifact with Buildroot.  This is created once for all container images. My current BusyBox, Python, and Unbound DNS images are based from this one artifact.  With this approach, I use <a href="https://oras.land">Oras</a> to push the source filesystem artifact to <a href="https://github.com/amf3/just_enough/pkgs/container/just_enough%2Fkitchen-sink">GHCR</a> where it can be accessed by other pipelines or inspected as a standalone layer.</p>
+<h3 id="assemble-the-container-image">Assemble the Container Image<a hidden class="anchor" aria-hidden="true" href="#assemble-the-container-image">#</a></h3>
+<p>The manifest file describes the intentional contents of the image. The assembler discovers the dependencies needed to make those contents executable.</p>
+<p>Manifest entries under Binaries receive special handling. The ELF header is inspected for dependencies and automatically get copied to the container&rsquo;s staging directory. This is why we don&rsquo;t need to list libc.so.6 in the manifest.</p>
+<h3 id="validate-the-container-image">Validate the container image<a hidden class="anchor" aria-hidden="true" href="#validate-the-container-image">#</a></h3>
+<p>We still need to validate the container image, even after static analysis of reading ELF header from the binaries.  Sometimes libraries are lazily loaded at runtime or access unexpected file paths like <em>/etc/openssl.cnf</em> by Unbound DNS.</p>
+<p>After tracing system calls made by the running container, the <a href="../container_validation/index.md">Validator generates a report</a> detailing file read and write access attempts.  Reading the report is more art than science as libraries often probe non-existent paths to inspect the local environment, meaning failed file access attempts aren&rsquo;t always a failure condition.</p>
+<p>Validation remains a manual step because the system call output isn&rsquo;t deterministic.  Additional work is needed to normalize the runtime traces before using GitHub actions.</p>
+<h3 id="generate-metadata-and-release">Generate Metadata and Release<a hidden class="anchor" aria-hidden="true" href="#generate-metadata-and-release">#</a></h3>
+<p>During container assembly, a Software Bill of Materials (SBOM) is generated from the staging directory and inserted into each container image as it&rsquo;s being built.</p>
+<p>After the the container image is created, attestation is added to state which GitHub Action Build number built that container and which git tag from the Buildroot project was used to generate the Buildroot artifact.</p>
+<p>Finally the container image with updated tags is pushed to GHCR container registry.</p>
+<h2 id="keeping-images-updated">Keeping Images Updated<a hidden class="anchor" aria-hidden="true" href="#keeping-images-updated">#</a></h2>
+<p>The release tag from the upstream Buildroot project is attached to the newly created container image.  I also tag the container image with the current git hash from the JustEnough project.  Together, these tags identify both the Buildroot source used to build the image and the JustEnough configuration that assembled it.  This makes it possible to identify how an existing release was built.</p>
+<p>It&rsquo;s possible to use <a href="https://buildroot.org/downloads/manual/manual.html#_adding_project_specific_patches_and_hashes">local patches</a> with Buildroot and override the project settings.  This is useful for when the Buildroot project is in the middle of a release cycle and I need to patch a critical CVE within the container.  Creating a package patch isn&rsquo;t complicated.  Each package has a <a href="https://gitlab.com/buildroot.org/buildroot/-/blob/2026.05.1/package/unbound/unbound.mk">*.mk file</a> which contains the upstream version number and upstream git hash, both of which can be easily overridden.  Patching is also how one can add or remove build options for a package.</p>
+<h2 id="creating-a-new-image">Creating a New Image<a hidden class="anchor" aria-hidden="true" href="#creating-a-new-image">#</a></h2>
+<p>Because of the primitives listed above, creating a new container image is simple. These are the steps I took when adding a new Python interpreter as a base image.</p>
+<ul>
+<li>Enable the Python 3.14 and Pip packages in the Buildroot config.</li>
+<li>Create a container manifest file that lists the Python and Pip binaries with their dependencies.</li>
+<li>Create a Dockerfile to copy content from the containers staging directory into the new container.</li>
+<li>Use the Validator tool to confirm the new container image is working</li>
+<li>Add the new Python container to an <a href="https://github.com/amf3/just_enough/blob/90316a9002d013803758ee80849bf5e68a66328c/.github/workflows/appliance_pipeline.yml#L33">appliance array</a> within the GitHub workflow.</li>
+</ul>
+<p>With the new build pipeline, the updates are mostly additions and modifications are minimal.</p>
+<h2 id="generated-images-as-building-blocks">Generated Images as Building Blocks<a hidden class="anchor" aria-hidden="true" href="#generated-images-as-building-blocks">#</a></h2>
+<p>To validate these images with real world usage, also known as dogfooding the project, I needed a service to build with those components.  I wanted a self hosted DNS based advertisement blocking service at home as a lightweight alternative to the Pihole project.  In addition to ad list support, I wanted a local resolver, split-horizon records, and reporting.  The Pihole replacement seemed like a great test case.</p>
+<p>I ended up using the Python and Unbound images for the foundation of the <a href="https://github.com/amf3/adlist_generator">adlist generator</a> project that downloads ad-block lists and generates a local DNS based ad blocker.</p>
+<p><img alt="Lineage showing how the JustEnough project created an ad blocking DNS service from the python and unbound container images generated with Buildroot. " loading="lazy" src="/articles/virtualization/oci_pipeline/assets/BuildingBlock.png"></p>
+<p>The Python container image provided the runtime for the generator.  Unbound provides the DNS resolver.  The adlist generator is a Python project that downloads ad block lists and formats them to be used with Unbound DNS. The generator also writes Unbound DNS configs to support the other features I listed.</p>
+<p>I ran into one minor issue when using the Python and Unbound DNS container images in a multi-stage build for the adlist generator. I found out the pip command expects a shell environment. As there&rsquo;s no shell in my containers, I needed to invoke the pip command as a module. You can see this in the generator project&rsquo;s Dockerfile.</p>
+<pre tabindex="0"><code>RUN [&#34;python&#34;, &#34;-m&#34;, &#34;pip&#34;, &#34;install&#34;, &#34;--no-cache-dir&#34;, &#34;-r&#34;, &#34;requirements.txt&#34;]
+</code></pre><p>Otherwise, using the JustEnough container image as building blocks worked great.</p>
+<h2 id="whats-next">What&rsquo;s Next<a hidden class="anchor" aria-hidden="true" href="#whats-next">#</a></h2>
+<p>In the intro I mentioned a fourth container is planned.  I want to create a Samba container image that&rsquo;s focused on Apple&rsquo;s Time Machine backups.</p>
+<p>The existing images are straightforward application runtimes and static utilities.  The Samba container image will be a more demanding test of the pipeline, because of dynamic configurations, user/group permission mappings, and persistent storage mounts.</p>
+<p>Supporting stateful container images will show which declarative primitives hold up, which need to evolve, and whether the design can scale beyond the simple images the project started with.</p>
+
+
+  </div>
+
+  
+
+<div class="related-wrapper">
+  <hr class="related-divider" />
+  <div class="related-card">
+    <h3 class="related-title">Related Posts</h3>
+    <ul class="related-list">
+      
+      <li>
+        <a href="/articles/virtualization/inject_busybox/">No Shell in Your Container? No Problem</a>
+      </li>
+      
+      <li>
+        <a href="/articles/virtualization/declarative_builds/">Declarative Container Builds</a>
+      </li>
+      
+      <li>
+        <a href="/articles/virtualization/base_image/">Hidden Systems in Base Container Images</a>
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://amf3.github.io/tags/oci-image/">Oci-Image</a></li>
+      <li><a href="https://amf3.github.io/tags/docker/">Docker</a></li>
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://amf3.github.io/">Adam Faris</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

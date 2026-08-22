@@ -162,6 +162,23 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">Go Generics: A Real World Use Case
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Until recently, I haven’t had many opportunities to use Go’s generics. I ran into a case where generics make sense. Best of all, this isn’t a contrived example.
+I’m working on a project and using openAPI to generate API contracts. One of the generated structs contains optional fields implemented as pointers. The only required field is Name.
+const ( Gzip PostPailsCompression = &#34;gzip&#34; None PostPailsCompression = &#34;none&#34; ) type PostPails struct { Compression *PostPailsCompression `json:&#34;compression,omitempty&#34;` // MaxArchiveSize Max size (bytes) before rotating to a new archive. MaxArchiveSize *int `json:&#34;max_archive_size,omitempty&#34;` // Name Name of the new pail Name string `json:&#34;name&#34;` } I need to populate the struct with values when writing unit tests. But dealing with pointers in Go test code usually results in using temporary variables. It’s not bad, but there’s some visual noise.
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2025-07-11 21:11:43 -0700 -0700'>July 11, 2025</span>&nbsp;·&nbsp;<span>325 words</span></footer>
+  <a class="entry-link" aria-label="post link to Go Generics: A Real World Use Case" href="https://amf3.github.io/articles/code/go/real_world_generics/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">OpenAPI in Practice: Go Server &#43; Python Client from Spec
     </h2>
   </header>
@@ -171,7 +188,7 @@
   </div>
   <footer class="entry-footer">
 
-<span title='2025-07-04 22:43:09 -0700 PDT'>July 4, 2025</span>&nbsp;·&nbsp;<span>1149 words</span></footer>
+<span title='2025-07-04 22:43:09 -0700 -0700'>July 4, 2025</span>&nbsp;·&nbsp;<span>1149 words</span></footer>
   <a class="entry-link" aria-label="post link to OpenAPI in Practice: Go Server &#43; Python Client from Spec" href="https://amf3.github.io/articles/api/hello_openapi/"></a>
 </article>
 
@@ -187,7 +204,7 @@ In this post, I’ll cover how Docker handles volume storage under the hood. I�
   </div>
   <footer class="entry-footer">
 
-<span title='2025-06-26 22:37:40 -0700 PDT'>June 26, 2025</span>&nbsp;·&nbsp;<span>1952 words</span></footer>
+<span title='2025-06-26 22:37:40 -0700 -0700'>June 26, 2025</span>&nbsp;·&nbsp;<span>1952 words</span></footer>
   <a class="entry-link" aria-label="post link to DIY Docker Volume Drivers: What&#39;s Missing" href="https://amf3.github.io/articles/storage/docker_volumes/"></a>
 </article>
 
@@ -203,7 +220,7 @@ Haystack Overview There are several components mentioned in the original Haystac
   </div>
   <footer class="entry-footer">
 
-<span title='2025-05-30 16:46:07 -0700 PDT'>May 30, 2025</span>&nbsp;·&nbsp;<span>1553 words</span></footer>
+<span title='2025-05-30 16:46:07 -0700 -0700'>May 30, 2025</span>&nbsp;·&nbsp;<span>1553 words</span></footer>
   <a class="entry-link" aria-label="post link to Using Tar Files as Object Store Storage" href="https://amf3.github.io/articles/storage/tar_objectstore/"></a>
 </article>
 
@@ -270,7 +287,7 @@ autoinstall is a tool that allows for unattended installations of Ubuntu, ensuri
   </div>
   <footer class="entry-footer">
 
-<span title='2025-03-03 23:07:23 -0800 PST'>March 3, 2025</span>&nbsp;·&nbsp;<span>2082 words</span></footer>
+<span title='2025-03-03 23:07:23 -0800 -0800'>March 3, 2025</span>&nbsp;·&nbsp;<span>2082 words</span></footer>
   <a class="entry-link" aria-label="post link to Unattended Ubuntu Installs - Virtual Machines to Bare-Metal" href="https://amf3.github.io/articles/cloudinit/autoinstall/"></a>
 </article>
 
@@ -286,7 +303,7 @@ cloud-init is a useful tool that doesn’t rely on network services like PXE as 
   </div>
   <footer class="entry-footer">
 
-<span title='2025-02-21 23:06:35 -0800 PST'>February 21, 2025</span>&nbsp;·&nbsp;<span>1035 words</span></footer>
+<span title='2025-02-21 23:06:35 -0800 -0800'>February 21, 2025</span>&nbsp;·&nbsp;<span>1035 words</span></footer>
   <a class="entry-link" aria-label="post link to Getting started with cloud-init for unattended Linux deployments" href="https://amf3.github.io/articles/cloudinit/intro/"></a>
 </article>
 <footer class="page-footer">
