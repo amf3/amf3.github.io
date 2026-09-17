@@ -6,8 +6,22 @@
     <description>Recent content in Docker on Adam Faris</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 08 Aug 2026 15:59:56 +0200</lastBuildDate>
+    <lastBuildDate>Fri, 18 Sep 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://amf3.github.io/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Virtual L2 Networks From Scratch</title>
+      <link>https://amf3.github.io/articles/networks/bridges/</link>
+      <pubDate>Fri, 18 Sep 2026 00:00:00 +0000</pubDate>
+      <guid>https://amf3.github.io/articles/networks/bridges/</guid>
+      <description>Beginning With Basics: Bridges, Taps, and VETHs</description>
+    </item>
+    <item>
+      <title>Self Hosting Publicly Facing Services</title>
+      <link>https://amf3.github.io/articles/networks/self_hosting/</link>
+      <pubDate>Thu, 17 Sep 2026 00:00:00 +0000</pubDate>
+      <guid>https://amf3.github.io/articles/networks/self_hosting/</guid>
+      <description>Understanding Virtual Networking and Segmentation: A Three Part Series</description>
+    </item>
     <item>
       <title>Building and Maintaining an Open Container Image Distribution</title>
       <link>https://amf3.github.io/articles/virtualization/oci_pipeline/</link>

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Virtual L2 Networks From Scratch | Adam Faris</title>
+<meta name="keywords" content="networking, docker, qemu, homelab">
+<meta name="description" content="Beginning With Basics: Bridges, Taps, and VETHs">
+<meta name="author" content="">
+<link rel="canonical" href="https://amf3.github.io/articles/networks/bridges/">
+<meta name="google-site-verification" content="6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E">
+<meta name="msvalidate.01" content="C1E02AC59FE7ECBDB6D9EFB7D5E02B65">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a9dee1160239c080e21943d7a8576d3f0eee73f3885c24e93fc94aa929af9f86.css" integrity="sha256-qd7hFgI5wIDiGUPXqFdtPw7uc/OIXCTpP8lKqSmvn4Y=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://amf3.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://amf3.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://amf3.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://amf3.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://amf3.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://amf3.github.io/articles/networks/bridges/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-MKR06D6KGD"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-MKR06D6KGD');
+        }
+      </script><meta property="og:url" content="https://amf3.github.io/articles/networks/bridges/">
+  <meta property="og:site_name" content="Adam Faris">
+  <meta property="og:title" content="Virtual L2 Networks From Scratch">
+  <meta property="og:description" content="Beginning With Basics: Bridges, Taps, and VETHs">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="articles">
+    <meta property="article:published_time" content="2026-09-18T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-09-18T00:00:00+00:00">
+    <meta property="article:tag" content="Networking">
+    <meta property="article:tag" content="Docker">
+    <meta property="article:tag" content="Qemu">
+    <meta property="article:tag" content="Homelab">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Virtual L2 Networks From Scratch">
+  <meta name="twitter:description" content="Beginning With Basics: Bridges, Taps, and VETHs">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "articles",
+      "item": "https://amf3.github.io/articles/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Virtual L2 Networks From Scratch",
+      "item": "https://amf3.github.io/articles/networks/bridges/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Virtual L2 Networks From Scratch",
+  "name": "Virtual L2 Networks From Scratch",
+  "description": "Beginning With Basics: Bridges, Taps, and VETHs",
+  "keywords": [
+    "networking", "docker", "qemu", "homelab"
+  ],
+  "articleBody": "Intro This is the first article in a three part series focused on self hosting publicly facing services.\nVirtualization stacks like libvirt, Proxmox, or Docker abstract network creation behind single CLI commands. The abstractions are convenient but hide the kernel primitives used to create virtualized networks. Knowing these primitives makes it easier to understand how virtual machines and containers connect to the host’s network.\nThis post will manually construct an isolated Layer 2 network and connect user space processes using native iproute tooling.\nKernel Primitives We rely on three Linux Kernel components to build virtual Layer 2 networks.\nThe Linux Bridge The bridge is a kernel network object that operates at L2, connecting two or more data segments. Bridges work like a physical network switch by inspecting Ethernet frames and mapping MAC addresses to virtual bridge ports. When an Ethernet frame enters the bridge, it’s destination MAC address is inspected and if found in the bridge’s Forwarding Database (FDB), the bridge switches the frame to the mapped egress port. If the destination MAC address isn’t found in the FDB or the destination is to the broadcast address (FF:FF:FF:FF:FF:FF), the Ethernet frame is sent to all ports on the bridge except the ingress port.\nIn addition to switching, the Linux bridge supports VLAN tagging and basic support of Spanning Tree Protocol.\nThe TAP Device A TAP device is a virtual Layer 2 network device that enables user space applications like QEMU to send and receive raw Ethernet frames. Instead of being backed by a physical network adapter, TAP devices are backed by the /dev/net/tun character device node. When a user space process opens /dev/net/tun, it’s accessing the TAP/TUN interface in the kernel to create or attach to a virtual TAP interface. The kernel associates the application’s file descriptor with the TAP interface, allowing the application to exchange Ethernet frames with the host kernel.\nThe Virtual Ethernet (VETH) Pair Where a TAP device connects a user space process to the kernel, a VETH pair connects two kernel network entities directly. A VETH device exists as a connected pair of virtual interfaces acting like two ends of a virtual Ethernet cable. Any Ethernet frame entering one end of the pair immediately exits the other end in kernel memory. VETH pairs are often used by container engines like Docker, Podman, or LXC for bridging network name spaces to the host level Linux bridge.\nTAP Demonstration Let’s start with creating a Linux bridge and a TAP device. A QEMU virtual machine will use the TAP device to share the host OS network. The bridge itself operates at Layer 2 and does not require an IP address. Assigning an address to the bridge gives the host’s Layer 3 network stack an interface on the bridged network. This allows the host to communicate directly with the connected guests. Later when routing is enabled, the bridge IP will allow the host to act as the gateway for connected guests.\nCreate the Bridge # Create the bridge object in the host kernel ubuntu@bridge-tutorial:~$ sudo ip link add dev br0 type bridge # Bring the bridge interface state to UP ubuntu@bridge-tutorial:~$ sudo ip link set dev br0 up # Assign L3 IP address to the bridge interface ubuntu@bridge-tutorial:~$ sudo ip addr add 192.168.100.1/24 dev br0 # Verify interface state and has an IP binding ubuntu@bridge-tutorial:~$ ip -4 addr show dev br0 4: br0: mtu 1500 qdisc noqueue state DOWN group default qlen 1000 inet 192.168.100.1/24 scope global br0 valid_lft forever preferred_lft forever Bridge flags from ip addr show output should display and state DOWN. A bridge will evaluate its operational link state based on attached ports. If there are no member interfaces with an active link carrier, the kernel flags the bridge as NO-CARRIER and sets the operational state to DOWN.\nOnce we create the TAP device, attach it to the bridge, and bring link state up on TAP device, the bridge will detect the active port and transition from state DOWN to state UP.\nCreate the TAP device To create the TAP device:\n# Create persistent TAP interface owned by current user ubuntu@bridge-tutorial:~$ sudo ip tuntap add dev tap0 mode tap user $USER # Bind the TAP interface to the bridge switch ubuntu@bridge-tutorial:~$ sudo ip link set dev tap0 master br0 # Bring the TAP interface state to UP ubuntu@bridge-tutorial:~$ sudo ip link set dev tap0 up Start the Guest VM I’m using QEMU to start the virtual machine that boots from the standard Alpine ISO image. The QEMU command assigns the tap0 network device created earlier to the VM, -netdev tap,id=net0,ifname=tap0. The file referenced by the -bios option was installed with sudo apt install qemu-efi-aarch64.\nubuntu@bridge-tutorial:~$ qemu-system-aarch64 \\ -machine type=virt,gic-version=3 \\ -cpu cortex-a72 \\ -m 1024 \\ -smp 2 \\ -bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd \\ -cdrom alpine-standard-3.24.1-aarch64.iso \\ -netdev tap,id=net0,ifname=tap0,script=no,downscript=no \\ -device virtio-net-pci,netdev=net0,mac=52:54:00:12:34:56 \\ -nographic \\ -serial mon:stdio After the VM boots, login as root with an empty password. (We are booting an Alpine ISO image so no password is set.) Assign a static IP to eth0.\n# Set the hostname to Alpine to make the shell prompts in the tutorial easier to understand. localhost:~# hostname alpine # Statically assign an address to eth0 alpine:~# ip addr add 192.168.100.2/24 dev eth0 # Enable the eth0 interface alpine:~# ip link set dev eth0 up # Assign a default route to the br0 address alpine:~# ip route add default via 192.168.100.1 dev eth0 # Ping the gateway on br0 alpine:~# ping -c2 192.168.100.1 PING 192.168.100.1 (192.168.100.1): 56 data bytes 64 bytes from 192.168.100.1: seq=0 ttl=64 time=13.928 ms 64 bytes from 192.168.100.1: seq=1 ttl=64 time=7.542 ms --- 192.168.100.1 ping statistics --- 2 packets transmitted, 2 packets received, 0% packet loss round-trip min/avg/max = 7.542/10.735/13.928 ms Recap the Bridge Tap Environment Let’s review our working bridge tap environment now that it’s been built. We have two new network objects on the host OS, a tap device (tap0) and a bridge (br0).\nubuntu@bridge-tutorial:~$ ip link show dev br0 4: br0: mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000 link/ether 96:91:55:a8:21:52 brd ff:ff:ff:ff:ff:ff ubuntu@bridge-tutorial:~$ ip link show dev tap0 5: tap0: mtu 1500 qdisc fq_codel master br0 state UP mode DEFAULT group default qlen 1000 link/ether 22:db:85:86:30:1a brd ff:ff:ff:ff:ff:ff We can verify the tap device is bound to the bridge. If nothing were to print, then we know there’s a config issue.\nubuntu@bridge-tutorial:~$ ip link show master br0 5: tap0: mtu 1500 qdisc fq_codel master br0 state UP mode DEFAULT group default qlen 1000 link/ether 22:db:85:86:30:1a brd ff:ff:ff:ff:ff:ff br0 has an IP assigned to it, but tap0 does not.\nubuntu@bridge-tutorial:~$ ip -4 addr show dev br0 4: br0: mtu 1500 qdisc noqueue state UP group default qlen 1000 inet 192.168.100.1/24 scope global br0 valid_lft forever preferred_lft forever ubuntu@bridge-tutorial:~$ ip -4 addr show dev tap0 ubuntu@bridge-tutorial:~$ Remember the bridge and tap devices are L2 network devices. An IP was assigned to br0 so the host’s network stack has an L3 interface on the bridged network. The QEMU command binds tap0 to the VM so it would show as a standard Ethernet device inside the guest OS, -netdev tap,ifname=tap0. When the guest VM was booted, a static IP address was assigned to eth0 inside the guest. That is why tap0 on the host does not have a IP address. The IP was assigned to the guest’s eth0 interface.\nVerify the Layer 2 Environment To verify packets are crossing the bridge use tcpdump -e as “-e” displays link level headers. This was captured earlier when the Alpine host with mac addresses 52:54:00:12:34:56 was pinging the bridge IP having a mac address of 96:91:55:a8:21:52.\nubuntu@bridge-tutorial:~$ sudo tcpdump -nn -e -i br0 icmp tcpdump: verbose output suppressed, use -v[v]... for full protocol decode listening on br0, link-type EN10MB (Ethernet), snapshot length 262144 bytes 08:27:43.530966 52:54:00:12:34:56 \u003e 96:91:55:a8:21:52, ethertype IPv4 (0x0800), length 98: 192.168.100.2 \u003e 192.168.100.1: ICMP echo request, id 2473, seq 6, length 64 08:27:43.531042 96:91:55:a8:21:52 \u003e 52:54:00:12:34:56, ethertype IPv4 (0x0800), length 98: 192.168.100.1 \u003e 192.168.100.2: ICMP echo reply, id 2473, seq 6, length 64 ^C 2 packets captured 2 packets received by filter 0 packets dropped by kernel Notice when pinging the host’s physical network adapter from within the VM, the bridge MAC appears in tcpdump output instead of the host’s MAC.\nalpine:~# ping -c1 192.168.252.6 PING 192.168.252.6 (192.168.252.6): 56 data bytes 64 bytes from 192.168.252.6: seq=0 ttl=64 time=2.525 ms --- 192.168.252.6 ping statistics --- 1 packets transmitted, 1 packets received, 0% packet loss round-trip min/avg/max = 2.525/2.525/2.525 ms ubuntu@bridge-tutorial:~$ sudo tcpdump -nn -e -i br0 icmp tcpdump: verbose output suppressed, use -v[v]... for full protocol decode listening on br0, link-type EN10MB (Ethernet), snapshot length 262144 bytes 09:00:54.961011 52:54:00:12:34:56 \u003e 96:91:55:a8:21:52, ethertype IPv4 (0x0800), length 98: 192.168.100.2 \u003e 192.168.252.6: ICMP echo request, id 2479, seq 0, length 64 09:00:54.961159 96:91:55:a8:21:52 \u003e 52:54:00:12:34:56, ethertype IPv4 (0x0800), length 98: 192.168.252.6 \u003e 192.168.100.2: ICMP echo reply, id 2479, seq 0, length 64 ^C 2 packets captured 2 packets received by filter 0 packets dropped by kernel This happens because br0 is also an interface in the host’s network name space. The Ethernet frame is addressed to the bridge’s MAC address, after which the host’s L3 IP stack processes the packet.\nThe bridge command can display the Forwarding Database (FDB) of the bridge. Permanent entries are statically assigned in the FDB, dynamic entries are learned when traffic passes over the bridge.\nubuntu@bridge-tutorial:~$ bridge fdb show vlan 1 96:91:55:a8:21:52 dev br0 vlan 1 master br0 permanent 22:db:85:86:30:1a dev tap0 vlan 1 master br0 permanent ubuntu@bridge-tutorial:~$ bridge fdb show dynamic 52:54:00:12:34:56 dev tap0 master br0 The Alpine VM’s MAC address is a dynamic entry associated with tap0. The bridge learned that MAC because frames originating from the VM arrived through that port.\nVETH Demonstration Create the Network Name Space # Add an isolated network name space ubuntu@bridge-tutorial:~$ sudo ip netns add demo-ns # Verify the network name space existence ubuntu@bridge-tutorial:~$ sudo ip netns list demo-ns Create the VETH Pair We can reuse the Linux bridge created in the previous demonstration to show how different network name spaces can be connected. Instead of using QEMU and a TAP device, this will demonstrate how a VETH pair can connect a new network name space to the existing br0 bridge.\nThis shows another way of connecting a process inside an isolated network name space to the same L2 network without needing a virtual machine.\n# Create the peer interface pair ubuntu@bridge-tutorial:~$ sudo ip link add veth-host type veth peer name veth-guest # Attach the host end of the pair to our existing bridge ubuntu@bridge-tutorial:~$ sudo ip link set veth-host master br0 ubuntu@bridge-tutorial:~$ sudo ip link set veth-host up # Assign veth-guest to the new network name space sudo ip link set veth-guest netns demo-ns Enter the Network Name space # Execute an interactive bash shell within demo-ns network scope ubuntu@bridge-tutorial:~$ sudo ip netns exec demo-ns /bin/bash root@bridge-tutorial:/home/ubuntu# # Bring up the loopback interface root@bridge-tutorial:/home/ubuntu# ip link set dev lo up # Assign an IP from our bridge subnet to the veth endpoint root@bridge-tutorial:/home/ubuntu# ip addr add 192.168.100.3/24 dev veth-guest root@bridge-tutorial:/home/ubuntu# ip link set dev veth-guest up # Set default gateway to the host bridge IP root@bridge-tutorial:/home/ubuntu# ip route add default via 192.168.100.1 dev veth-guest # Verify configuration root@bridge-tutorial:/home/ubuntu# ip -4 addr show dev veth-guest 5: veth-guest@if6: mtu 1500 qdisc noqueue state UP group default qlen 1000 link-netnsid 0 inet 192.168.100.3/24 scope global veth-guest valid_lft forever preferred_lft forever root@bridge-tutorial:/home/ubuntu# ip route default via 192.168.100.1 dev veth-guest 192.168.100.0/24 dev veth-guest proto kernel scope link src 192.168.100.3 # Verify networking works by pinging the br0 IP root@bridge-tutorial:/home/ubuntu# ping -c 2 192.168.100.1 PING 192.168.100.1 (192.168.100.1) 56(84) bytes of data. 64 bytes from 192.168.100.1: icmp_seq=1 ttl=64 time=0.423 ms 64 bytes from 192.168.100.1: icmp_seq=2 ttl=64 time=0.183 ms --- 192.168.100.1 ping statistics --- 2 packets transmitted, 2 received, 0% packet loss, time 1027ms rtt min/avg/max/mdev = 0.183/0.303/0.423/0.120 ms Recap the Bridge VETH environment There are three network objects with the VETH environment, the bridge (br0 created in the TAP demo) and the VETH pair.\nubuntu@bridge-tutorial:~$ ip link show dev br0 4: br0: mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000 link/ether 96:91:55:a8:21:52 brd ff:ff:ff:ff:ff:ff ubuntu@bridge-tutorial:~$ ip link show type veth 7: veth-host@if6: mtu 1500 qdisc noqueue master br0 state UP mode DEFAULT group default qlen 1000 link/ether da:b6:cc:23:26:ee brd ff:ff:ff:ff:ff:ff link-netns demo-ns The VETH pair should be read as endpoint @ endpoint (veth-host@if6). We originally created a veth-host@veth-guest pair, but veth-guest was moved into the demo-ns network name space where the kernel assigned it index 6 (if6).\n# This is a shell associated with the network namespace. root@bridge-tutorial:/home/ubuntu# ip link show type veth 6: veth-guest@if7: mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000 link/ether b2:6d:6d:83:2b:28 brd ff:ff:ff:ff:ff:ff link-netnsid 0 Inside the network name space we see the reverse (veth-guest@if7) where veth-guest interface is present but veth-host was assigned index 7 (if7).\nThe numeric value in if6 or if7 is an internal kernel interface index (ifindex) so values can differ from whats shown. Index values are unique to each network name space.\nReset All Network Changes All network changes made in this demo are ephemeral. A reboot of the host OS will remove all virtual bridges, TAP and VETH devices, and any network name spaces created during the tutorial.\nFollow up One thing I didn’t demonstrate is how VMs or containers can access off host network resources. I didn’t make any ping attempts to remote domains like github.com in this article. Without additional layer 3 changes, the network ends at the host. The host can communicate with guests, but the guests can’t reach networks external to the host.\nThis is the next problem to solve. Part 2 will introduce IP forwarding, NAT, and packet mangling to connect this private virtual network to an upstream network. For update notifications on this series, either subscribe to the RSS feed or follow along on my Bluesky account.\n",
+  "wordCount" : "2329",
+  "inLanguage": "en",
+  "datePublished": "2026-09-18T00:00:00Z",
+  "dateModified": "2026-09-18T00:00:00Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://amf3.github.io/articles/networks/bridges/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Adam Faris",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://amf3.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="https://amf3.github.io/" accesskey="h" title="Adam Faris (Alt + H)">Adam Faris</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="https://amf3.github.io/search/" title="search (Alt &#43; /)" accesskey=/>
+                    <span>search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/articles/" title="articles">
+                    <span>articles</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/about/" title="about">
+                    <span>about</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://amf3.github.io/archives/" title="archives">
+                    <span>archives</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Virtual L2 Networks From Scratch
+    </h1>
+    <div class="post-description">
+      Beginning With Basics: Bridges, Taps, and VETHs
+    </div>
+    <div class="post-meta">
+
+<span title='2026-09-18 00:00:00 +0000 UTC'>September 18, 2026</span>&nbsp;·&nbsp;<span>2329 words</span>
+
+</div>
+  </header> <details class="toc" >
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">Table of Contents</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#intro" aria-label="Intro">Intro</a></li>
+            <li>
+                <a href="#kernel-primitives" aria-label="Kernel Primitives">Kernel Primitives</a><ul>
+                    
+            <li>
+                <a href="#the-linux-bridge" aria-label="The Linux Bridge">The Linux Bridge</a></li>
+            <li>
+                <a href="#the-tap-device" aria-label="The TAP Device">The TAP Device</a></li>
+            <li>
+                <a href="#the-virtual-ethernet-veth-pair" aria-label="The Virtual Ethernet (VETH) Pair">The Virtual Ethernet (VETH) Pair</a></li></ul>
+            </li>
+            <li>
+                <a href="#tap-demonstration" aria-label="TAP Demonstration">TAP Demonstration</a><ul>
+                    
+            <li>
+                <a href="#create-the-bridge" aria-label="Create the Bridge">Create the Bridge</a></li>
+            <li>
+                <a href="#create-the-tap-device" aria-label="Create the TAP device">Create the TAP device</a></li>
+            <li>
+                <a href="#start-the-guest-vm" aria-label="Start the Guest VM">Start the Guest VM</a></li>
+            <li>
+                <a href="#recap-the-bridge-tap-environment" aria-label="Recap the Bridge Tap Environment">Recap the Bridge Tap Environment</a></li>
+            <li>
+                <a href="#verify-the-layer-2-environment" aria-label="Verify the Layer 2 Environment">Verify the Layer 2 Environment</a></li></ul>
+            </li>
+            <li>
+                <a href="#veth-demonstration" aria-label="VETH Demonstration">VETH Demonstration</a><ul>
+                    
+            <li>
+                <a href="#create-the-network-name-space" aria-label="Create the Network Name Space">Create the Network Name Space</a></li>
+            <li>
+                <a href="#create-the-veth-pair" aria-label="Create the VETH Pair">Create the VETH Pair</a></li>
+            <li>
+                <a href="#enter-the-network-name-space" aria-label="Enter the Network Name space">Enter the Network Name space</a></li>
+            <li>
+                <a href="#recap-the-bridge-veth-environment" aria-label="Recap the Bridge VETH environment">Recap the Bridge VETH environment</a></li></ul>
+            </li>
+            <li>
+                <a href="#reset-all-network-changes" aria-label="Reset All Network Changes">Reset All Network Changes</a></li>
+            <li>
+                <a href="#follow-up" aria-label="Follow up">Follow up</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+  <div class="post-content md-content"><h2 id="intro">Intro<a hidden class="anchor" aria-hidden="true" href="#intro">#</a></h2>
+<p>This is the first article in a <a href="../self_hosting/index.md">three part series</a> focused on self hosting publicly facing services.</p>
+<p>Virtualization stacks like libvirt, Proxmox, or Docker abstract network creation behind single CLI commands.  The abstractions are convenient but hide the kernel primitives used to create virtualized networks. Knowing these primitives makes it easier to understand how virtual machines and containers connect to the host&rsquo;s network.</p>
+<p>This post will manually construct an isolated Layer 2 network and connect user space processes using native iproute tooling.</p>
+<h2 id="kernel-primitives">Kernel Primitives<a hidden class="anchor" aria-hidden="true" href="#kernel-primitives">#</a></h2>
+<p>We rely on three Linux Kernel components to build virtual Layer 2 networks.</p>
+<h3 id="the-linux-bridge">The Linux Bridge<a hidden class="anchor" aria-hidden="true" href="#the-linux-bridge">#</a></h3>
+<p>The bridge is a kernel network object that operates at L2, connecting two or more data segments.  Bridges <strong>work like a physical network switch</strong> by inspecting Ethernet frames and mapping MAC addresses to virtual bridge ports.  When an Ethernet frame enters the bridge, it&rsquo;s destination MAC address is inspected and if found in the bridge&rsquo;s Forwarding Database (FDB), the bridge switches the frame to the mapped egress port.  If the destination MAC address isn&rsquo;t found in the FDB or the destination is to the broadcast address (<code>FF:FF:FF:FF:FF:FF</code>), the Ethernet frame is sent to all ports on the bridge except the ingress port.</p>
+<p>In addition to switching, the Linux bridge supports VLAN tagging and basic support of Spanning Tree Protocol.</p>
+<h3 id="the-tap-device">The TAP Device<a hidden class="anchor" aria-hidden="true" href="#the-tap-device">#</a></h3>
+<p>A TAP device is <strong>a virtual Layer 2 network device</strong> that enables user space applications like QEMU to send and receive raw Ethernet frames.  Instead of being backed by a physical network adapter, TAP devices are backed by the <code>/dev/net/tun</code> character device node.  When a user space process opens /dev/net/tun, it&rsquo;s accessing the TAP/TUN interface in the kernel to create or attach to a virtual TAP interface. The kernel associates the application&rsquo;s file descriptor with the TAP interface, allowing the application to exchange Ethernet frames with the host kernel.</p>
+<h3 id="the-virtual-ethernet-veth-pair">The Virtual Ethernet (VETH) Pair<a hidden class="anchor" aria-hidden="true" href="#the-virtual-ethernet-veth-pair">#</a></h3>
+<p>Where a TAP device connects a user space process to the kernel, <strong>a VETH pair connects two kernel network entities directly</strong>. A VETH device  exists as a connected pair of virtual interfaces acting like two ends of a virtual Ethernet cable.  Any Ethernet frame entering one end of the pair immediately exits the other end in kernel memory.  VETH pairs are often used by container engines like Docker, Podman, or LXC for bridging network name spaces to the host level Linux bridge.</p>
+<p><img alt="Diagram showing how Primitives connect with one another." loading="lazy" src="/articles/networks/bridges/assets/kernel_v_net.png"></p>
+<h2 id="tap-demonstration">TAP Demonstration<a hidden class="anchor" aria-hidden="true" href="#tap-demonstration">#</a></h2>
+<p>Let&rsquo;s start with creating a Linux bridge and a TAP device. A QEMU virtual machine will use the TAP device to share the host OS network.  The bridge itself operates at Layer 2 and does not require an IP address. Assigning an address to the bridge gives the host&rsquo;s Layer 3 network stack an interface on the bridged network. This allows the host to communicate directly with the connected guests.  Later when routing is enabled, the bridge IP will allow the host to act as the gateway for connected guests.</p>
+<h3 id="create-the-bridge">Create the Bridge<a hidden class="anchor" aria-hidden="true" href="#create-the-bridge">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e"># Create the bridge object in the host kernel</span>
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ sudo ip link add dev br0 type bridge
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Bring the bridge interface state to UP</span>
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ sudo ip link set dev br0 up
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Assign L3 IP address to the bridge interface</span>
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ sudo ip addr add 192.168.100.1/24 dev br0
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Verify interface state and has an IP binding</span>
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ ip -4 addr  show dev br0
+</span></span><span style="display:flex;"><span>4: br0: &lt;NO-CARRIER,BROADCAST,MULTICAST,UP&gt; mtu <span style="color:#ae81ff">1500</span> qdisc noqueue state DOWN group default qlen <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>    inet 192.168.100.1/24 scope global br0
+</span></span><span style="display:flex;"><span>       valid_lft forever preferred_lft forever
+</span></span></code></pre></div><p>Bridge flags from <code>ip addr show</code> output should display <code>&lt;NO-CARRIER,BROADCAST,MULTICAST,UP&gt;</code> and <code>state DOWN</code>. A bridge will evaluate its operational link state based on attached ports. If there are no member interfaces with an active link carrier, the kernel flags the bridge as <code>NO-CARRIER</code> and sets the operational state to <code>DOWN</code>.</p>
+<p>Once we create the TAP device, attach it to the bridge, and bring link state up on TAP device, the bridge will detect the active port and transition from <code>state DOWN</code> to <code>state UP</code>.</p>
+<h3 id="create-the-tap-device">Create the TAP device<a hidden class="anchor" aria-hidden="true" href="#create-the-tap-device">#</a></h3>
+<p>To create the TAP device:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e"># Create persistent TAP interface owned by current user</span>
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ sudo ip tuntap add dev tap0 mode tap user $USER
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Bind the TAP interface to the bridge switch</span>
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ sudo ip link set dev tap0 master br0
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Bring the TAP interface state to UP</span>
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ sudo ip link set dev tap0 up
+</span></span></code></pre></div><h3 id="start-the-guest-vm">Start the Guest VM<a hidden class="anchor" aria-hidden="true" href="#start-the-guest-vm">#</a></h3>
+<p>I&rsquo;m using QEMU to start the virtual machine that boots from the <a href="https://alpinelinux.org/downloads/">standard Alpine ISO image.</a> The QEMU command assigns the <code>tap0</code> network device created earlier to the VM, <code>-netdev tap,id=net0,ifname=tap0</code>.  The file referenced by the <code>-bios</code> option was installed with <code>sudo apt install qemu-efi-aarch64</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ qemu-system-aarch64 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -machine type<span style="color:#f92672">=</span>virt,gic-version<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -cpu cortex-a72 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -m <span style="color:#ae81ff">1024</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -smp <span style="color:#ae81ff">2</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -cdrom alpine-standard-3.24.1-aarch64.iso <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -netdev tap,id<span style="color:#f92672">=</span>net0,ifname<span style="color:#f92672">=</span>tap0,script<span style="color:#f92672">=</span>no,downscript<span style="color:#f92672">=</span>no <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -device virtio-net-pci,netdev<span style="color:#f92672">=</span>net0,mac<span style="color:#f92672">=</span>52:54:00:12:34:56 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -nographic <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -serial mon:stdio
+</span></span></code></pre></div><p>After the VM boots, login as <code>root</code> with an empty password. (We are booting an Alpine ISO image so no password is set.)  Assign a static IP to eth0.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e"># Set the hostname to Alpine to make the shell prompts in the tutorial easier to understand.</span>
+</span></span><span style="display:flex;"><span>localhost:~# hostname alpine
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Statically assign an address to eth0</span>
+</span></span><span style="display:flex;"><span>alpine:~# ip addr add 192.168.100.2/24 dev eth0 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Enable the eth0 interface</span>
+</span></span><span style="display:flex;"><span>alpine:~# ip link set dev eth0 up
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Assign a default route to the br0 address</span>
+</span></span><span style="display:flex;"><span>alpine:~# ip route add default via 192.168.100.1 dev eth0 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Ping the gateway on br0</span>
+</span></span><span style="display:flex;"><span>alpine:~# ping -c2 192.168.100.1
+</span></span><span style="display:flex;"><span>PING 192.168.100.1 <span style="color:#f92672">(</span>192.168.100.1<span style="color:#f92672">)</span>: <span style="color:#ae81ff">56</span> data bytes
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">64</span> bytes from 192.168.100.1: seq<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> ttl<span style="color:#f92672">=</span><span style="color:#ae81ff">64</span> time<span style="color:#f92672">=</span>13.928 ms
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">64</span> bytes from 192.168.100.1: seq<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> ttl<span style="color:#f92672">=</span><span style="color:#ae81ff">64</span> time<span style="color:#f92672">=</span>7.542 ms
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>--- 192.168.100.1 ping statistics ---
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2</span> packets transmitted, <span style="color:#ae81ff">2</span> packets received, 0% packet loss
+</span></span><span style="display:flex;"><span>round-trip min/avg/max <span style="color:#f92672">=</span> 7.542/10.735/13.928 ms
+</span></span></code></pre></div><h3 id="recap-the-bridge-tap-environment">Recap the Bridge Tap Environment<a hidden class="anchor" aria-hidden="true" href="#recap-the-bridge-tap-environment">#</a></h3>
+<p>Let&rsquo;s review our working bridge tap environment now that it&rsquo;s been built.  We have two new network objects on the host OS, a tap device (tap0) and a bridge (br0).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ ip link show dev br0 
+</span></span><span style="display:flex;"><span>4: br0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu <span style="color:#ae81ff">1500</span> qdisc noqueue state UP mode DEFAULT group default qlen <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>    link/ether 96:91:55:a8:21:52 brd ff:ff:ff:ff:ff:ff
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ ip link show dev tap0
+</span></span><span style="display:flex;"><span>5: tap0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu <span style="color:#ae81ff">1500</span> qdisc fq_codel master br0 state UP mode DEFAULT group default qlen <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>    link/ether 22:db:85:86:30:1a brd ff:ff:ff:ff:ff:ff
+</span></span></code></pre></div><p>We can verify the tap device is bound to the bridge.  If nothing were to print, then we know there&rsquo;s a config issue.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ ip link show master br0
+</span></span><span style="display:flex;"><span>5: tap0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu <span style="color:#ae81ff">1500</span> qdisc fq_codel master br0 state UP mode DEFAULT group default qlen <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>    link/ether 22:db:85:86:30:1a brd ff:ff:ff:ff:ff:ff
+</span></span></code></pre></div><p>br0 has an IP assigned to it, but tap0 does not.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ ip -4 addr show dev br0
+</span></span><span style="display:flex;"><span>4: br0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu <span style="color:#ae81ff">1500</span> qdisc noqueue state UP group default qlen <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>    inet 192.168.100.1/24 scope global br0
+</span></span><span style="display:flex;"><span>       valid_lft forever preferred_lft forever
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ ip -4 addr show dev tap0
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$
+</span></span></code></pre></div><p>Remember the bridge and tap devices are L2 network devices.  An IP was assigned to br0 so the host&rsquo;s network stack has an L3 interface on the bridged network. The QEMU command binds tap0 to the VM so it would show as a standard Ethernet device inside the guest OS, <code>-netdev tap,ifname=tap0</code>.  When the guest VM was booted, a static IP address was assigned to eth0 inside the guest.  That is why tap0 on the host does not have a IP address. The IP was assigned to the guest&rsquo;s eth0 interface.</p>
+<h3 id="verify-the-layer-2-environment">Verify the Layer 2 Environment<a hidden class="anchor" aria-hidden="true" href="#verify-the-layer-2-environment">#</a></h3>
+<p>To verify packets are crossing the bridge use <code>tcpdump -e</code> as &ldquo;-e&rdquo; displays link level headers.  This was captured earlier when the Alpine host with mac addresses 52:54:00:12:34:56 was pinging the bridge IP having a mac address of 96:91:55:a8:21:52.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ sudo tcpdump -nn -e  -i br0 icmp
+</span></span><span style="display:flex;"><span>tcpdump: verbose output suppressed, use -v<span style="color:#f92672">[</span>v<span style="color:#f92672">]</span>... <span style="color:#66d9ef">for</span> full protocol decode
+</span></span><span style="display:flex;"><span>listening on br0, link-type EN10MB <span style="color:#f92672">(</span>Ethernet<span style="color:#f92672">)</span>, snapshot length <span style="color:#ae81ff">262144</span> bytes
+</span></span><span style="display:flex;"><span>08:27:43.530966 52:54:00:12:34:56 &gt; 96:91:55:a8:21:52, ethertype IPv4 <span style="color:#f92672">(</span>0x0800<span style="color:#f92672">)</span>, length 98: 192.168.100.2 &gt; 192.168.100.1: ICMP echo request, id 2473, seq 6, length <span style="color:#ae81ff">64</span>
+</span></span><span style="display:flex;"><span>08:27:43.531042 96:91:55:a8:21:52 &gt; 52:54:00:12:34:56, ethertype IPv4 <span style="color:#f92672">(</span>0x0800<span style="color:#f92672">)</span>, length 98: 192.168.100.1 &gt; 192.168.100.2: ICMP echo reply, id 2473, seq 6, length <span style="color:#ae81ff">64</span>
+</span></span><span style="display:flex;"><span>^C
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2</span> packets captured
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2</span> packets received by filter
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">0</span> packets dropped by kernel
+</span></span></code></pre></div><p>Notice when pinging the host&rsquo;s physical network adapter from within the VM, the bridge MAC appears in tcpdump output instead of the host&rsquo;s MAC.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>alpine:~# ping -c1 192.168.252.6                                                       
+</span></span><span style="display:flex;"><span>PING 192.168.252.6 <span style="color:#f92672">(</span>192.168.252.6<span style="color:#f92672">)</span>: <span style="color:#ae81ff">56</span> data bytes                                      
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">64</span> bytes from 192.168.252.6: seq<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> ttl<span style="color:#f92672">=</span><span style="color:#ae81ff">64</span> time<span style="color:#f92672">=</span>2.525 ms                                
+</span></span><span style="display:flex;"><span>                                                                                       
+</span></span><span style="display:flex;"><span>--- 192.168.252.6 ping statistics ---                                                  
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span> packets transmitted, <span style="color:#ae81ff">1</span> packets received, 0% packet loss                              
+</span></span><span style="display:flex;"><span>round-trip min/avg/max <span style="color:#f92672">=</span> 2.525/2.525/2.525 ms 
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ sudo tcpdump -nn -e  -i br0 icmp
+</span></span><span style="display:flex;"><span>tcpdump: verbose output suppressed, use -v<span style="color:#f92672">[</span>v<span style="color:#f92672">]</span>... <span style="color:#66d9ef">for</span> full protocol decode
+</span></span><span style="display:flex;"><span>listening on br0, link-type EN10MB <span style="color:#f92672">(</span>Ethernet<span style="color:#f92672">)</span>, snapshot length <span style="color:#ae81ff">262144</span> bytes
+</span></span><span style="display:flex;"><span>09:00:54.961011 52:54:00:12:34:56 &gt; 96:91:55:a8:21:52, ethertype IPv4 <span style="color:#f92672">(</span>0x0800<span style="color:#f92672">)</span>, length 98: 192.168.100.2 &gt; 192.168.252.6: ICMP echo request, id 2479, seq 0, length <span style="color:#ae81ff">64</span>
+</span></span><span style="display:flex;"><span>09:00:54.961159 96:91:55:a8:21:52 &gt; 52:54:00:12:34:56, ethertype IPv4 <span style="color:#f92672">(</span>0x0800<span style="color:#f92672">)</span>, length 98: 192.168.252.6 &gt; 192.168.100.2: ICMP echo reply, id 2479, seq 0, length <span style="color:#ae81ff">64</span>
+</span></span><span style="display:flex;"><span>^C
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2</span> packets captured
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2</span> packets received by filter
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">0</span> packets dropped by kernel
+</span></span></code></pre></div><p>This happens because br0 is also an interface in the host&rsquo;s network name space.  The Ethernet frame is addressed to the bridge&rsquo;s MAC address, after which the host&rsquo;s L3 IP stack processes the packet.</p>
+<p>The bridge command can display the Forwarding Database (FDB) of the bridge.  Permanent entries are statically assigned in the FDB, dynamic entries are learned when traffic passes over the bridge.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ bridge fdb show vlan <span style="color:#ae81ff">1</span> 
+</span></span><span style="display:flex;"><span>96:91:55:a8:21:52 dev br0 vlan <span style="color:#ae81ff">1</span> master br0 permanent
+</span></span><span style="display:flex;"><span>22:db:85:86:30:1a dev tap0 vlan <span style="color:#ae81ff">1</span> master br0 permanent
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ bridge fdb show dynamic 
+</span></span><span style="display:flex;"><span>52:54:00:12:34:56 dev tap0 master br0 
+</span></span></code></pre></div><p>The Alpine VM&rsquo;s MAC address is a dynamic entry associated with tap0. The bridge learned that MAC because frames originating from the VM arrived through that port.</p>
+<h2 id="veth-demonstration">VETH Demonstration<a hidden class="anchor" aria-hidden="true" href="#veth-demonstration">#</a></h2>
+<h3 id="create-the-network-name-space">Create the Network Name Space<a hidden class="anchor" aria-hidden="true" href="#create-the-network-name-space">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e"># Add an isolated network name space</span>
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ sudo ip netns add demo-ns
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Verify the network name space existence</span>
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ sudo ip netns list
+</span></span><span style="display:flex;"><span>demo-ns
+</span></span></code></pre></div><h3 id="create-the-veth-pair">Create the VETH Pair<a hidden class="anchor" aria-hidden="true" href="#create-the-veth-pair">#</a></h3>
+<p>We can reuse the Linux bridge created in the previous demonstration to show how different network name spaces can be connected.  Instead of using QEMU and a TAP device, this will demonstrate how a VETH pair can connect a new network name space to the existing br0 bridge.</p>
+<p>This shows another way of connecting a process inside an isolated network name space to the same L2 network without needing a virtual machine.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e"># Create the peer interface pair</span>
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ sudo ip link add veth-host type veth peer name veth-guest
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Attach the host end of the pair to our existing bridge</span>
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ sudo ip link set veth-host master br0
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ sudo ip link set veth-host up
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Assign veth-guest to the new network name space</span>
+</span></span><span style="display:flex;"><span>sudo ip link set veth-guest netns demo-ns
+</span></span></code></pre></div><h3 id="enter-the-network-name-space">Enter the Network Name space<a hidden class="anchor" aria-hidden="true" href="#enter-the-network-name-space">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e"># Execute an interactive bash shell within demo-ns network scope </span>
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ sudo ip netns exec demo-ns /bin/bash 
+</span></span><span style="display:flex;"><span>root@bridge-tutorial:/home/ubuntu#
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Bring up the loopback interface</span>
+</span></span><span style="display:flex;"><span>root@bridge-tutorial:/home/ubuntu# ip link set dev lo up
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Assign an IP from our bridge subnet to the veth endpoint</span>
+</span></span><span style="display:flex;"><span>root@bridge-tutorial:/home/ubuntu# ip addr add 192.168.100.3/24 dev veth-guest
+</span></span><span style="display:flex;"><span>root@bridge-tutorial:/home/ubuntu# ip link set dev veth-guest up
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Set default gateway to the host bridge IP</span>
+</span></span><span style="display:flex;"><span>root@bridge-tutorial:/home/ubuntu# ip route add default via 192.168.100.1 dev veth-guest
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Verify configuration</span>
+</span></span><span style="display:flex;"><span>root@bridge-tutorial:/home/ubuntu# ip -4  addr show dev veth-guest
+</span></span><span style="display:flex;"><span>5: veth-guest@if6: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu <span style="color:#ae81ff">1500</span> qdisc noqueue state UP group default qlen <span style="color:#ae81ff">1000</span> link-netnsid <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    inet 192.168.100.3/24 scope global veth-guest
+</span></span><span style="display:flex;"><span>       valid_lft forever preferred_lft forever
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>root@bridge-tutorial:/home/ubuntu# ip route
+</span></span><span style="display:flex;"><span>default via 192.168.100.1 dev veth-guest 
+</span></span><span style="display:flex;"><span>192.168.100.0/24 dev veth-guest proto kernel scope link src 192.168.100.3
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Verify networking works by pinging the br0 IP</span>
+</span></span><span style="display:flex;"><span>root@bridge-tutorial:/home/ubuntu# ping -c <span style="color:#ae81ff">2</span> 192.168.100.1
+</span></span><span style="display:flex;"><span>PING 192.168.100.1 <span style="color:#f92672">(</span>192.168.100.1<span style="color:#f92672">)</span> 56<span style="color:#f92672">(</span>84<span style="color:#f92672">)</span> bytes of data.
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">64</span> bytes from 192.168.100.1: icmp_seq<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> ttl<span style="color:#f92672">=</span><span style="color:#ae81ff">64</span> time<span style="color:#f92672">=</span>0.423 ms
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">64</span> bytes from 192.168.100.1: icmp_seq<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> ttl<span style="color:#f92672">=</span><span style="color:#ae81ff">64</span> time<span style="color:#f92672">=</span>0.183 ms
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>--- 192.168.100.1 ping statistics ---
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2</span> packets transmitted, <span style="color:#ae81ff">2</span> received, 0% packet loss, time 1027ms
+</span></span><span style="display:flex;"><span>rtt min/avg/max/mdev <span style="color:#f92672">=</span> 0.183/0.303/0.423/0.120 ms
+</span></span></code></pre></div><h3 id="recap-the-bridge-veth-environment">Recap the Bridge VETH environment<a hidden class="anchor" aria-hidden="true" href="#recap-the-bridge-veth-environment">#</a></h3>
+<p>There are three network objects with the VETH environment, the bridge (br0 created in the TAP demo) and the VETH pair.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ ip link show dev br0
+</span></span><span style="display:flex;"><span>4: br0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu <span style="color:#ae81ff">1500</span> qdisc noqueue state UP mode DEFAULT group default qlen <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>    link/ether 96:91:55:a8:21:52 brd ff:ff:ff:ff:ff:ff
+</span></span><span style="display:flex;"><span>ubuntu@bridge-tutorial:~$ ip link show type veth
+</span></span><span style="display:flex;"><span>7: veth-host@if6: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu <span style="color:#ae81ff">1500</span> qdisc noqueue master br0 state UP mode DEFAULT group default qlen <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>    link/ether da:b6:cc:23:26:ee brd ff:ff:ff:ff:ff:ff link-netns demo-ns
+</span></span></code></pre></div><p>The VETH pair should be read as endpoint @ endpoint (veth-host@if6). We originally created a veth-host@veth-guest pair, but veth-guest was moved into the demo-ns network name space where the kernel assigned it index 6 (if6).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e"># This is a shell associated with the network namespace. </span>
+</span></span><span style="display:flex;"><span>root@bridge-tutorial:/home/ubuntu# ip link show type veth
+</span></span><span style="display:flex;"><span>6: veth-guest@if7: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu <span style="color:#ae81ff">1500</span> qdisc noqueue state UP mode DEFAULT group default qlen <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>    link/ether b2:6d:6d:83:2b:28 brd ff:ff:ff:ff:ff:ff link-netnsid <span style="color:#ae81ff">0</span>
+</span></span></code></pre></div><p>Inside the network name space we see the reverse (veth-guest@if7) where veth-guest interface is present but veth-host was assigned index 7 (if7).</p>
+<p>The numeric value in if6 or if7 is an internal kernel interface index (ifindex) so values can differ from whats shown.  Index values are unique to each network name space.</p>
+<h2 id="reset-all-network-changes">Reset All Network Changes<a hidden class="anchor" aria-hidden="true" href="#reset-all-network-changes">#</a></h2>
+<p>All network changes made in this demo are ephemeral.  A <strong>reboot of the host OS</strong> will remove all virtual bridges, TAP and VETH devices, and any network name spaces created during the tutorial.</p>
+<h2 id="follow-up">Follow up<a hidden class="anchor" aria-hidden="true" href="#follow-up">#</a></h2>
+<p>One thing I didn&rsquo;t demonstrate is how VMs or containers can access off host network resources.  I didn&rsquo;t make any ping attempts to remote domains like <code>github.com</code> in this article.  Without additional layer 3 changes, the network ends at the host.  The host can communicate with guests, but the guests can&rsquo;t reach networks external to the host.</p>
+<p>This is the next problem to solve. Part 2 will introduce IP forwarding, NAT, and packet mangling to connect this private virtual network to an upstream network.  For update notifications on this series, either subscribe to the <a href="/articles/index.xml">RSS feed</a> or follow along on my <a href="https://bsky.app/profile/af9.us">Bluesky account</a>.</p>
+
+
+  </div>
+
+  
+
+<div class="related-wrapper">
+  <hr class="related-divider" />
+  <div class="related-card">
+    <h3 class="related-title">Related Posts</h3>
+    <ul class="related-list">
+      
+      <li>
+        <a href="/articles/networks/self_hosting/">Self Hosting Publicly Facing Services</a>
+      </li>
+      
+      <li>
+        <a href="/articles/virtualization/virtual_router/">Uh-oh. Is the router down?</a>
+      </li>
+      
+      <li>
+        <a href="/articles/virtualization/macos_qemu_networks/">Virtual Router Lab on macOS with QEMU</a>
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://amf3.github.io/tags/networking/">Networking</a></li>
+      <li><a href="https://amf3.github.io/tags/docker/">Docker</a></li>
+      <li><a href="https://amf3.github.io/tags/qemu/">Qemu</a></li>
+      <li><a href="https://amf3.github.io/tags/homelab/">Homelab</a></li>
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://amf3.github.io/">Adam Faris</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

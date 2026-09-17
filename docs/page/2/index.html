@@ -162,6 +162,37 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">Uh-oh. Is the router down?
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>This post is the README for my home network and something I can refer to later. It’s the story of how I replaced a underperforming consumer-grade router with a fully virtualized RouterOS instance using QEMU and PCI passthrough for the network.
+Like any software project, this project is source controlled and rebuildable from scratch. If the router dies, I simply deploy a new router instance. This is the reproducibility you’d expect in a datacenter, not a home office.
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2025-11-19 00:06:09 -0800 PST'>November 19, 2025</span>&nbsp;·&nbsp;<span>2794 words</span></footer>
+  <a class="entry-link" aria-label="post link to Uh-oh. Is the router down?" href="https://amf3.github.io/articles/virtualization/virtual_router/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Go CLIs: Creating Subcommands and Flags
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Adding Subcommands to Go CLIs Command Line Interfaces (CLIs) use subcommands and flags to enable different program features. A subcommand is a grouping of related features, and flags are options for controlling those features. The openssl command provides a great example of subcommands and flags. openssl rand -base64 8 will generate 8 random bytes of data with hexadecimal output. The subcommand is “rand” and “-base64” is the flag. Other openssl subcommands like “s_client” or “x509”, provide different features and each has their own options.
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2025-09-29 17:17:10 -0400 -0400'>September 29, 2025</span>&nbsp;·&nbsp;<span>1265 words</span></footer>
+  <a class="entry-link" aria-label="post link to Go CLIs: Creating Subcommands and Flags" href="https://amf3.github.io/articles/code/go/cli_args/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">Go Generics: A Real World Use Case
     </h2>
   </header>
@@ -173,7 +204,7 @@ const ( Gzip PostPailsCompression = &#34;gzip&#34; None PostPailsCompression = &
   </div>
   <footer class="entry-footer">
 
-<span title='2025-07-11 21:11:43 -0700 -0700'>July 11, 2025</span>&nbsp;·&nbsp;<span>325 words</span></footer>
+<span title='2025-07-11 21:11:43 -0700 PDT'>July 11, 2025</span>&nbsp;·&nbsp;<span>325 words</span></footer>
   <a class="entry-link" aria-label="post link to Go Generics: A Real World Use Case" href="https://amf3.github.io/articles/code/go/real_world_generics/"></a>
 </article>
 
@@ -188,7 +219,7 @@ const ( Gzip PostPailsCompression = &#34;gzip&#34; None PostPailsCompression = &
   </div>
   <footer class="entry-footer">
 
-<span title='2025-07-04 22:43:09 -0700 -0700'>July 4, 2025</span>&nbsp;·&nbsp;<span>1149 words</span></footer>
+<span title='2025-07-04 22:43:09 -0700 PDT'>July 4, 2025</span>&nbsp;·&nbsp;<span>1149 words</span></footer>
   <a class="entry-link" aria-label="post link to OpenAPI in Practice: Go Server &#43; Python Client from Spec" href="https://amf3.github.io/articles/api/hello_openapi/"></a>
 </article>
 
@@ -204,7 +235,7 @@ In this post, I’ll cover how Docker handles volume storage under the hood. I�
   </div>
   <footer class="entry-footer">
 
-<span title='2025-06-26 22:37:40 -0700 -0700'>June 26, 2025</span>&nbsp;·&nbsp;<span>1952 words</span></footer>
+<span title='2025-06-26 22:37:40 -0700 PDT'>June 26, 2025</span>&nbsp;·&nbsp;<span>1952 words</span></footer>
   <a class="entry-link" aria-label="post link to DIY Docker Volume Drivers: What&#39;s Missing" href="https://amf3.github.io/articles/storage/docker_volumes/"></a>
 </article>
 
@@ -220,7 +251,7 @@ Haystack Overview There are several components mentioned in the original Haystac
   </div>
   <footer class="entry-footer">
 
-<span title='2025-05-30 16:46:07 -0700 -0700'>May 30, 2025</span>&nbsp;·&nbsp;<span>1553 words</span></footer>
+<span title='2025-05-30 16:46:07 -0700 PDT'>May 30, 2025</span>&nbsp;·&nbsp;<span>1553 words</span></footer>
   <a class="entry-link" aria-label="post link to Using Tar Files as Object Store Storage" href="https://amf3.github.io/articles/storage/tar_objectstore/"></a>
 </article>
 
@@ -287,29 +318,15 @@ autoinstall is a tool that allows for unattended installations of Ubuntu, ensuri
   </div>
   <footer class="entry-footer">
 
-<span title='2025-03-03 23:07:23 -0800 -0800'>March 3, 2025</span>&nbsp;·&nbsp;<span>2082 words</span></footer>
+<span title='2025-03-03 23:07:23 -0800 PST'>March 3, 2025</span>&nbsp;·&nbsp;<span>2082 words</span></footer>
   <a class="entry-link" aria-label="post link to Unattended Ubuntu Installs - Virtual Machines to Bare-Metal" href="https://amf3.github.io/articles/cloudinit/autoinstall/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Getting started with cloud-init for unattended Linux deployments
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>Cloud compute companies like GCP, AWS, or Azure offer a management API for allocating resources. In the on-premise space, services such as Docker or Incus provide APIs for managing containers or virtual machines (VMs). But what about installing the operating system (OS) on bare-metal hosts? What API exists for this task? This is where cloud-init enters the picture, providing the ability to provision VMs or bare-metal hardware.
-cloud-init is a useful tool that doesn’t rely on network services like PXE as a dependency. Its simplicity saves time by removing the need to navigate OS installation menus, while ensuring user accounts and installed software packages are consistent across hosts. So why should one bother using cloud-init if they are managing a single host at home? In the event the OS needs to be reinstalled due to failure, cloud-init allows one to quickly restore the system to a known state.
-...</p>
-  </div>
-  <footer class="entry-footer">
-
-<span title='2025-02-21 23:06:35 -0800 -0800'>February 21, 2025</span>&nbsp;·&nbsp;<span>1035 words</span></footer>
-  <a class="entry-link" aria-label="post link to Getting started with cloud-init for unattended Linux deployments" href="https://amf3.github.io/articles/cloudinit/intro/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">
     <a class="prev" href="https://amf3.github.io/">
       «&nbsp;Prev&nbsp;
+    </a>
+    <a class="next" href="https://amf3.github.io/page/3/">Next&nbsp;&nbsp;»
     </a>
   </nav>
 </footer>

@@ -3,27 +3,42 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://amf3.github.io/</loc>
-    <lastmod>2026-08-08T15:59:56+02:00</lastmod>
+    <lastmod>2026-09-18T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/articles/</loc>
-    <lastmod>2026-08-08T15:59:56+02:00</lastmod>
+    <lastmod>2026-09-18T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://amf3.github.io/categories/</loc>
+    <lastmod>2026-09-18T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://amf3.github.io/tags/docker/</loc>
+    <lastmod>2026-09-18T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://amf3.github.io/tags/homelab/</loc>
+    <lastmod>2026-09-18T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://amf3.github.io/tags/networking/</loc>
+    <lastmod>2026-09-18T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://amf3.github.io/tags/qemu/</loc>
+    <lastmod>2026-09-18T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://amf3.github.io/categories/systems/</loc>
+    <lastmod>2026-09-18T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://amf3.github.io/tags/</loc>
+    <lastmod>2026-09-18T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://amf3.github.io/articles/networks/bridges/</loc>
+    <lastmod>2026-09-18T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://amf3.github.io/articles/networks/self_hosting/</loc>
+    <lastmod>2026-09-17T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/articles/virtualization/oci_pipeline/</loc>
     <lastmod>2026-08-08T15:59:56+02:00</lastmod>
   </url><url>
-    <loc>https://amf3.github.io/categories/</loc>
-    <lastmod>2026-08-08T15:59:56+02:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/tags/docker/</loc>
-    <lastmod>2026-08-08T15:59:56+02:00</lastmod>
-  </url><url>
     <loc>https://amf3.github.io/tags/oci-image/</loc>
-    <lastmod>2026-08-08T15:59:56+02:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/categories/systems/</loc>
-    <lastmod>2026-08-08T15:59:56+02:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/tags/</loc>
     <lastmod>2026-08-08T15:59:56+02:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/articles/virtualization/inject_busybox/</loc>
@@ -61,15 +76,6 @@
   </url><url>
     <loc>https://amf3.github.io/tags/storage/</loc>
     <lastmod>2025-12-16T21:51:16-08:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/tags/homelab/</loc>
-    <lastmod>2025-11-19T00:06:09-08:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/tags/networking/</loc>
-    <lastmod>2025-11-19T00:06:09-08:00</lastmod>
-  </url><url>
-    <loc>https://amf3.github.io/tags/qemu/</loc>
-    <lastmod>2025-11-19T00:06:09-08:00</lastmod>
   </url><url>
     <loc>https://amf3.github.io/articles/virtualization/virtual_router/</loc>
     <lastmod>2025-11-19T00:06:09-08:00</lastmod>

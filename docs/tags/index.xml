@@ -6,13 +6,34 @@
     <description>Recent content in Tags on Adam Faris</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 08 Aug 2026 15:59:56 +0200</lastBuildDate>
+    <lastBuildDate>Fri, 18 Sep 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://amf3.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Docker</title>
       <link>https://amf3.github.io/tags/docker/</link>
-      <pubDate>Sat, 08 Aug 2026 15:59:56 +0200</pubDate>
+      <pubDate>Fri, 18 Sep 2026 00:00:00 +0000</pubDate>
       <guid>https://amf3.github.io/tags/docker/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Homelab</title>
+      <link>https://amf3.github.io/tags/homelab/</link>
+      <pubDate>Fri, 18 Sep 2026 00:00:00 +0000</pubDate>
+      <guid>https://amf3.github.io/tags/homelab/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Networking</title>
+      <link>https://amf3.github.io/tags/networking/</link>
+      <pubDate>Fri, 18 Sep 2026 00:00:00 +0000</pubDate>
+      <guid>https://amf3.github.io/tags/networking/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Qemu</title>
+      <link>https://amf3.github.io/tags/qemu/</link>
+      <pubDate>Fri, 18 Sep 2026 00:00:00 +0000</pubDate>
+      <guid>https://amf3.github.io/tags/qemu/</guid>
       <description></description>
     </item>
     <item>
@@ -55,27 +76,6 @@
       <link>https://amf3.github.io/tags/storage/</link>
       <pubDate>Tue, 16 Dec 2025 21:51:16 -0800</pubDate>
       <guid>https://amf3.github.io/tags/storage/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Homelab</title>
-      <link>https://amf3.github.io/tags/homelab/</link>
-      <pubDate>Wed, 19 Nov 2025 00:06:09 -0800</pubDate>
-      <guid>https://amf3.github.io/tags/homelab/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Networking</title>
-      <link>https://amf3.github.io/tags/networking/</link>
-      <pubDate>Wed, 19 Nov 2025 00:06:09 -0800</pubDate>
-      <guid>https://amf3.github.io/tags/networking/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Qemu</title>
-      <link>https://amf3.github.io/tags/qemu/</link>
-      <pubDate>Wed, 19 Nov 2025 00:06:09 -0800</pubDate>
-      <guid>https://amf3.github.io/tags/qemu/</guid>
       <description></description>
     </item>
     <item>
