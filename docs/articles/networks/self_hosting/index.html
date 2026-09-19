@@ -5,11 +5,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>Go Generics: A Real World Use Case | Adam Faris</title>
-<meta name="keywords" content="go, tips">
-<meta name="description" content="Using Generics for Testing Pointers In Structs">
+<title>Self Hosting Publicly Facing Services | Adam Faris</title>
+<meta name="keywords" content="networking, docker, qemu, homelab">
+<meta name="description" content="Understanding Virtual Networking and Segmentation: A Three Part Series">
 <meta name="author" content="">
-<link rel="canonical" href="https://amf3.github.io/articles/code/go/real_world_generics/">
+<link rel="canonical" href="https://amf3.github.io/articles/networks/self_hosting/">
 <meta name="google-site-verification" content="6ZFu-1_Lir3DsFJP8sshXEJ1_SjtFUw9TIISOcaJh7E">
 <meta name="msvalidate.01" content="C1E02AC59FE7ECBDB6D9EFB7D5E02B65">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.a9dee1160239c080e21943d7a8576d3f0eee73f3885c24e93fc94aa929af9f86.css" integrity="sha256-qd7hFgI5wIDiGUPXqFdtPw7uc/OIXCTpP8lKqSmvn4Y=" rel="preload stylesheet" as="style">
@@ -20,7 +20,7 @@
 <link rel="mask-icon" href="https://amf3.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="https://amf3.github.io/articles/code/go/real_world_generics/">
+<link rel="alternate" hreflang="en" href="https://amf3.github.io/articles/networks/self_hosting/">
 <noscript>
     <style>
         #theme-toggle,
@@ -80,21 +80,23 @@
           gtag('js', new Date());
           gtag('config', 'G-MKR06D6KGD');
         }
-      </script><meta property="og:url" content="https://amf3.github.io/articles/code/go/real_world_generics/">
+      </script><meta property="og:url" content="https://amf3.github.io/articles/networks/self_hosting/">
   <meta property="og:site_name" content="Adam Faris">
-  <meta property="og:title" content="Go Generics: A Real World Use Case">
-  <meta property="og:description" content="Using Generics for Testing Pointers In Structs">
+  <meta property="og:title" content="Self Hosting Publicly Facing Services">
+  <meta property="og:description" content="Understanding Virtual Networking and Segmentation: A Three Part Series">
   <meta property="og:locale" content="en_us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="articles">
-    <meta property="article:published_time" content="2025-07-11T21:11:43-07:00">
-    <meta property="article:modified_time" content="2025-07-11T21:11:43-07:00">
-    <meta property="article:tag" content="Go">
-    <meta property="article:tag" content="Tips">
+    <meta property="article:published_time" content="2026-09-17T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-09-17T00:00:00+00:00">
+    <meta property="article:tag" content="Networking">
+    <meta property="article:tag" content="Docker">
+    <meta property="article:tag" content="Qemu">
+    <meta property="article:tag" content="Homelab">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Go Generics: A Real World Use Case">
-  <meta name="twitter:description" content="Using Generics for Testing Pointers In Structs">
+  <meta name="twitter:title" content="Self Hosting Publicly Facing Services">
+  <meta name="twitter:description" content="Understanding Virtual Networking and Segmentation: A Three Part Series">
 
 
 <script type="application/ld+json">
@@ -111,8 +113,8 @@
     {
       "@type": "ListItem",
       "position":  2 ,
-      "name": "Go Generics: A Real World Use Case",
-      "item": "https://amf3.github.io/articles/code/go/real_world_generics/"
+      "name": "Self Hosting Publicly Facing Services",
+      "item": "https://amf3.github.io/articles/networks/self_hosting/"
     }
   ]
 }
@@ -121,20 +123,20 @@
 {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Go Generics: A Real World Use Case",
-  "name": "Go Generics: A Real World Use Case",
-  "description": "Using Generics for Testing Pointers In Structs",
+  "headline": "Self Hosting Publicly Facing Services",
+  "name": "Self Hosting Publicly Facing Services",
+  "description": "Understanding Virtual Networking and Segmentation: A Three Part Series",
   "keywords": [
-    "go", "tips"
+    "networking", "docker", "qemu", "homelab"
   ],
-  "articleBody": "Until recently, I haven’t had many opportunities to use Go’s generics. I ran into a case where generics make sense. Best of all, this isn’t a contrived example.\nI’m working on a project and using openAPI to generate API contracts. One of the generated structs contains optional fields implemented as pointers. The only required field is Name.\nconst ( Gzip PostPailsCompression = \"gzip\" None PostPailsCompression = \"none\" ) type PostPails struct { Compression *PostPailsCompression `json:\"compression,omitempty\"` // MaxArchiveSize Max size (bytes) before rotating to a new archive. MaxArchiveSize *int `json:\"max_archive_size,omitempty\"` // Name Name of the new pail Name string `json:\"name\"` } I need to populate the struct with values when writing unit tests. But dealing with pointers in Go test code usually results in using temporary variables. It’s not bad, but there’s some visual noise.\ngzip := PostPailsCompression(\"gzip\") size := 1000000 payload := PostPails{ Name: \"testpail\" Compression: \u0026gzip, MaxArchiveSize: \u0026size, } Implementing a helper function using generics, provides a much cleaner solution.\nThe temporary variables are no longer needed. Test code becomes much easier to read by naming the helper function ptr. func ptr[T any](v T) *T { return \u0026v } func TestPostPails_CreatesDirectory(t *testing.T) { tmpStorage := t.TempDir() server := NewServer(tmpStorage) payload := PostPails{ Name: \"testpail\", Compression: ptr(PostPailsCompression(\"gzip\")), MaxArchiveSize: ptr(1000000), ... } Let’s discuss the ptr function.\nT is a type parameter and is a placeholder for any type. The any constraint means T can be anything and is equivalent to interface{}. Inside the function, we take a value v and return its pointer. Using generics avoids the temporary variable pattern and provides a means to write cleaner test code. The benefit becomes obvious when dealing with many optional fields.\nUntil now, generics didn’t seem to be a feature I needed. The examples I read about didn’t feel relevant. This one clicked because it solved a real issue while writing unit tests.\nAny thoughts or clever uses of Go generics? Drop me a line on Bluesky.\n",
-  "wordCount" : "325",
+  "articleBody": "Motivation Online discussions around self hosting public services typically fall into two unhelpful groups. Alarmists will warn that exposing any service guarantees unwanted security intrusions and offer no path forward. The other group offers a recipe. It’s suggested that some Proxmox or Podman command will solve the issue, but what the command does isn’t explained.\nBoth approaches leave the reader without a clear understanding of the network boundaries being created or why they provide protection.\nIt’s possible to self host a public facing service by limiting its network exposure to the traffic it needs. Network segmentation and firewall rules provide the foundation for doing this. My intent with this series is to demonstrate how combining features of the Linux kernel can control exposure of a public service.\nNetwork Series Creating trust zones through network segmentation is a deep topic and is why I’m splitting this series into three sections.\nPart 1: Virtual L2 Networks From Scratch will create a basic Layer 2 network using iproute tooling. This section will describe the virtual network objects created in the host’s kernel and how virtual machines and containers connect to the virtual network.\nPart 2: Introduces the Layer 3 components by explaining IP forwarding, routing on the host, and using nftables to implement firewall and mangle rules.\nPart 3: Pulls together the lessons from Parts 1 and 2 to discuss exposing a service to the public Internet. This is where I’ll explain how routing, trust zones, and firewall rules can be used to restrict traffic.\nWhat’s not discussed Docker/Podman or Proxmox specific details won’t be discussed. I’m not suggesting that hand written ip commands be used to replace those platforms. Instead, understanding the kernel objects created by virtualization stacks is helpful in designing networks and troubleshooting network issues.\nThis series won’t provide a cookbook for publicly hosting a service as there are too many variables to consider. The intent is to provide enough foundation that one knows what questions to ask during follow up research.\nMost changes I describe are ephemeral. Creating network interfaces during boot up is the job of the init system. Depending on the operating system, managing network interfaces could be the responsibility of systemd, netplan, or rc.d. Additional research is needed by the reader to make the changes permanent with their init system.\nBecause this series is focused on networking, I won’t discuss application sandboxing with apparmor or selinux. Both are important topics in preventing a public attacker from escaping a virtual machine or container, but are being ignored due to scope of the series.\nRecommendations Warning: I do not recommend running examples from this series on a computer that is directly attached to the Internet. Some of the commands can briefly expose the host system to unsolicited traffic, risking attack.\nWhat I do recommend:\nTesting within a local isolated network environment. Using an ephemeral host like a Virtual Machine or spare PC for testing changes. Using a disposable network from a cloud provider when experimenting with public exposure. Both Google Cloud and Oracle Cloud offer a free tier for cloud services. Save self hosting at home for later, after gaining network and firewall experience. Series Updates For updates on the series, one can either subscribe to the RSS feed or follow along on Bluesky account.\n",
+  "wordCount" : "547",
   "inLanguage": "en",
-  "datePublished": "2025-07-11T21:11:43-07:00",
-  "dateModified": "2025-07-11T21:11:43-07:00",
+  "datePublished": "2026-09-17T00:00:00Z",
+  "dateModified": "2026-09-17T00:00:00Z",
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://amf3.github.io/articles/code/go/real_world_generics/"
+    "@id": "https://amf3.github.io/articles/networks/self_hosting/"
   },
   "publisher": {
     "@type": "Organization",
@@ -205,75 +207,76 @@
   <header class="post-header">
     
     <h1 class="post-title entry-hint-parent">
-      Go Generics: A Real World Use Case
+      Self Hosting Publicly Facing Services
     </h1>
     <div class="post-description">
-      Using Generics for Testing Pointers In Structs
+      Understanding Virtual Networking and Segmentation: A Three Part Series
     </div>
     <div class="post-meta">
 
-<span title='2025-07-11 21:11:43 -0700 PDT'>July 11, 2025</span>&nbsp;·&nbsp;<span>325 words</span>
+<span title='2026-09-17 00:00:00 +0000 UTC'>September 17, 2026</span>&nbsp;·&nbsp;<span>547 words</span>
 
 </div>
-  </header> 
-  <div class="post-content md-content"><p>Until recently, I haven&rsquo;t had many opportunities to use Go&rsquo;s generics.  I ran into
-a case where generics make sense.  Best of all, this isn&rsquo;t a contrived example.</p>
-<p>I&rsquo;m working on a project and using openAPI to generate API contracts.  One of the generated
-structs contains optional fields implemented as pointers. The only required field is Name.</p>
-<pre tabindex="0"><code>const (
-	Gzip PostPailsCompression = &#34;gzip&#34;
-	None PostPailsCompression = &#34;none&#34;
-)
+  </header> <details class="toc" >
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">Table of Contents</span>
+    </summary>
 
-type PostPails struct {
-	Compression *PostPailsCompression `json:&#34;compression,omitempty&#34;`
+    <div class="inner"><ul>
+            <li>
+                <a href="#motivation" aria-label="Motivation">Motivation</a></li>
+            <li>
+                <a href="#network-series" aria-label="Network Series">Network Series</a></li>
+            <li>
+                <a href="#whats-not-discussed" aria-label="What&rsquo;s not discussed">What&rsquo;s not discussed</a></li>
+            <li>
+                <a href="#recommendations" aria-label="Recommendations">Recommendations</a></li>
+            <li>
+                <a href="#series-updates" aria-label="Series Updates">Series Updates</a>
+            </li>
+        </ul>
+    </div>
+</details>
 
-	// MaxArchiveSize Max size (bytes) before rotating to a new archive.
-	MaxArchiveSize *int `json:&#34;max_archive_size,omitempty&#34;`
-
-	// Name Name of the new pail
-	Name string `json:&#34;name&#34;`
-}
-</code></pre><p>I need to populate the struct with values when writing unit tests. But dealing with pointers in Go
-test code usually results in using temporary variables.  It&rsquo;s not bad, but there&rsquo;s some visual noise.</p>
-<pre tabindex="0"><code>gzip := PostPailsCompression(&#34;gzip&#34;)
-size := 1000000
-payload := PostPails{
-    Name: &#34;testpail&#34;
-    Compression: &amp;gzip,
-    MaxArchiveSize: &amp;size,
-}
-</code></pre><p>Implementing a helper function using generics, provides a much cleaner solution.</p>
+  <div class="post-content md-content"><h2 id="motivation">Motivation<a hidden class="anchor" aria-hidden="true" href="#motivation">#</a></h2>
+<p>Online discussions around self hosting public services typically fall into two unhelpful groups.  Alarmists will warn that exposing any service guarantees unwanted security intrusions and offer no path forward.  The other group offers a recipe. It&rsquo;s suggested that some Proxmox or Podman command will solve the issue, but what the command does isn&rsquo;t explained.</p>
+<p>Both approaches leave the reader without a clear understanding of the network boundaries being created or why they provide protection.</p>
+<p>It&rsquo;s possible to self host a public facing service by limiting its network exposure to the traffic it needs.  Network segmentation and firewall rules provide the foundation for doing this.  My intent with this series is to demonstrate how combining features of the Linux kernel can control exposure of a public service.</p>
+<h2 id="network-series">Network Series<a hidden class="anchor" aria-hidden="true" href="#network-series">#</a></h2>
+<p>Creating trust zones through network segmentation is a deep topic and is why I&rsquo;m splitting this series into three sections.</p>
 <ul>
-<li>The temporary variables are no longer needed.</li>
-<li>Test code becomes much easier to read by naming the helper function ptr.</li>
+<li>
+<p>Part 1: <a href="../bridges/">Virtual L2 Networks From Scratch</a> will create a basic Layer 2 network using <code>iproute</code> tooling. This section will describe the virtual network objects created in the host&rsquo;s kernel and how virtual machines and containers connect to the virtual network.</p>
+</li>
+<li>
+<p>Part 2: Introduces the Layer 3 components by explaining IP forwarding, routing on the host, and using nftables to implement firewall and mangle rules.</p>
+</li>
+<li>
+<p>Part 3: Pulls together the lessons from Parts 1 and 2 to discuss exposing a service to the public Internet.  This is where I&rsquo;ll explain how routing, trust zones, and firewall rules can be used to restrict traffic.</p>
+</li>
 </ul>
-<pre tabindex="0"><code>func ptr[T any](v T) *T {
-	return &amp;v
-}
-
-func TestPostPails_CreatesDirectory(t *testing.T) {
-	tmpStorage := t.TempDir()
-	server := NewServer(tmpStorage)
-
-	payload := PostPails{
-		Name:           &#34;testpail&#34;,
-		Compression:    ptr(PostPailsCompression(&#34;gzip&#34;)),
-		MaxArchiveSize: ptr(1000000),
-        ... 
-}
-</code></pre><p>Let&rsquo;s discuss the ptr function.</p>
+<h2 id="whats-not-discussed">What&rsquo;s not discussed<a hidden class="anchor" aria-hidden="true" href="#whats-not-discussed">#</a></h2>
+<p>Docker/Podman or Proxmox specific details won&rsquo;t be discussed.  I&rsquo;m not suggesting that hand written <code>ip</code> commands be used to replace those platforms.  Instead, understanding the kernel objects created by virtualization stacks is helpful in designing networks and troubleshooting network issues.</p>
+<p>This series won&rsquo;t provide a cookbook for publicly hosting a service as there are too many variables to consider.  The intent is to provide enough foundation that one knows what questions to ask during follow up research.</p>
+<p>Most changes I describe are ephemeral.  Creating network interfaces during boot up is the job of the init system. Depending on the operating system, managing network interfaces could be the responsibility of systemd, netplan, or rc.d.  Additional research is needed by the reader to make the changes permanent with their init system.</p>
+<p>Because this series is focused on networking, I won&rsquo;t discuss application sandboxing with apparmor or selinux.  Both are important topics in preventing a public attacker from escaping a virtual machine or container, but are being ignored due to scope of the series.</p>
+<h2 id="recommendations">Recommendations<a hidden class="anchor" aria-hidden="true" href="#recommendations">#</a></h2>
+<blockquote>
+<p><strong>Warning:</strong> I do not recommend running examples from this series on a computer that is directly attached to the Internet. Some of the commands can briefly expose the host system to unsolicited traffic, risking attack.</p>
+</blockquote>
+<p><strong>What I do recommend:</strong></p>
 <ul>
-<li>T is a type parameter and is a placeholder for any type.</li>
-<li>The any constraint means T can be anything and is equivalent to interface{}.</li>
-<li>Inside the function, we take a value v and return its pointer.</li>
+<li>Testing within a local isolated network environment.</li>
+<li>Using an ephemeral host like a Virtual Machine or spare PC for testing changes.</li>
+<li>Using a disposable network from a cloud provider when experimenting with public exposure.
+<ul>
+<li>Both Google Cloud and Oracle Cloud offer a free tier for cloud services.</li>
+<li>Save self hosting at home for later, after gaining network and firewall experience.</li>
 </ul>
-<hr>
-<p>Using generics avoids the temporary variable pattern and provides a means to write cleaner test code.
-The benefit becomes obvious when dealing with many optional fields.</p>
-<p>Until now, generics didn&rsquo;t seem to be a feature I needed.  The examples I read about didn&rsquo;t feel relevant.  This one clicked because
-it solved a real issue while writing unit tests.</p>
-<p>Any thoughts or clever uses of Go generics? Drop me a line on <a href="https://bsky.app/profile/af9.us">Bluesky</a>.</p>
+</li>
+</ul>
+<h2 id="series-updates">Series Updates<a hidden class="anchor" aria-hidden="true" href="#series-updates">#</a></h2>
+<p>For updates on the series, one can either subscribe to the <a href="/articles/index.xml">RSS feed</a> or follow along on <a href="https://bsky.app/profile/af9.us">Bluesky account</a>.</p>
 
 
   </div>
@@ -287,15 +290,15 @@ it solved a real issue while writing unit tests.</p>
     <ul class="related-list">
       
       <li>
-        <a href="/articles/code/go/cli_args/">Go CLIs: Creating Subcommands and Flags</a>
+        <a href="/articles/networks/bridges/">Virtual L2 Networks From Scratch</a>
       </li>
       
       <li>
-        <a href="/articles/api/hello_openapi/">OpenAPI in Practice: Go Server &#43; Python Client from Spec</a>
+        <a href="/articles/virtualization/virtual_router/">Uh-oh. Is the router down?</a>
       </li>
       
       <li>
-        <a href="/articles/storage/docker_volumes/">DIY Docker Volume Drivers: What&#39;s Missing</a>
+        <a href="/articles/virtualization/macos_qemu_networks/">Virtual Router Lab on macOS with QEMU</a>
       </li>
       
     </ul>
@@ -305,8 +308,10 @@ it solved a real issue while writing unit tests.</p>
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://amf3.github.io/tags/go/">Go</a></li>
-      <li><a href="https://amf3.github.io/tags/tips/">Tips</a></li>
+      <li><a href="https://amf3.github.io/tags/networking/">Networking</a></li>
+      <li><a href="https://amf3.github.io/tags/docker/">Docker</a></li>
+      <li><a href="https://amf3.github.io/tags/qemu/">Qemu</a></li>
+      <li><a href="https://amf3.github.io/tags/homelab/">Homelab</a></li>
     </ul>
   </footer>
 </article>
