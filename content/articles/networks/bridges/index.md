@@ -7,11 +7,12 @@ searchHidden: false
 showtoc: true
 tags: ["networking", "docker", "qemu", "homelab"]
 categories: [systems]
+lastmod: 2026-10-10
 ---
 
 ## Intro
 
-This is the first article in a [three part series](../self_hosting/index.md) focused on self hosting publicly facing services.
+This is the first article in a [three part series](../self_hosting/) focused on self hosting publicly facing services.
 
 Virtualization stacks like libvirt, Proxmox, or Docker abstract network creation behind single CLI commands.  The abstractions are convenient but hide the kernel primitives used to create virtualized networks. Knowing these primitives makes it easier to understand how virtual machines and containers connect to the host's network.
 
@@ -104,11 +105,17 @@ localhost:~# hostname alpine
 # Statically assign an address to eth0
 alpine:~# ip addr add 192.168.100.2/24 dev eth0 
 
+# Enable the loopback interface
+alpine:~# ip link set dev lo up
+
 # Enable the eth0 interface
 alpine:~# ip link set dev eth0 up
 
 # Assign a default route to the br0 address
 alpine:~# ip route add default via 192.168.100.1 dev eth0 
+
+# Configure Name Resolution
+alpine:~# echo "nameserver 1.1.1.1" > /etc/resolv.conf
 
 # Ping the gateway on br0
 alpine:~# ping -c2 192.168.100.1

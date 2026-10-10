@@ -7,6 +7,7 @@ searchHidden: false
 showToc: true
 tags: ["networking", "docker", "qemu", "homelab"]
 categories: [systems]
+lastmod: 2026-10-10
 ---
 
 ## Motivation
@@ -23,7 +24,7 @@ Creating trust zones through network segmentation is a deep topic and is why I'm
 
 * Part 1: [Virtual L2 Networks From Scratch](../bridges/) will create a basic Layer 2 network using `iproute` tooling. This section will describe the virtual network objects created in the host's kernel and how virtual machines and containers connect to the virtual network.
 
-* Part 2: Introduces the Layer 3 components by explaining IP forwarding, routing on the host, and using nftables to implement firewall and mangle rules.
+* Part 2: [Connecting Virtual Layer 3 Networks](../l3_networks/) Introduces the Layer 3 components by explaining IP forwarding, routing on the host, and using nftables to implement firewall and mangle rules.
 
 * Part 3: Pulls together the lessons from Parts 1 and 2 to discuss exposing a service to the public Internet.  This is where I'll explain how routing, trust zones, and firewall rules can be used to restrict traffic.
 

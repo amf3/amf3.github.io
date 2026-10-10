@@ -1,6 +1,6 @@
 module github.com/amf3/amf3.github.io
 
-go 1.26.3
+go 1.27.2
 
 tool github.com/gohugoio/hugo
 
@@ -29,8 +29,6 @@ require (
 	github.com/JohannesKaufmann/dom v0.2.0 // indirect
 	github.com/JohannesKaufmann/html-to-markdown/v2 v2.5.1 // indirect
 	github.com/alecthomas/chroma/v2 v2.24.1 // indirect
-	github.com/armon/go-radix v1.0.1-0.20221118154546-54df44f2176c // indirect
-	github.com/aws/aws-sdk-go v1.55.8 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.41.6 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.8 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.32.2 // indirect
@@ -61,7 +59,6 @@ require (
 	github.com/bep/golibsass v1.2.0 // indirect
 	github.com/bep/golocales v0.2.0 // indirect
 	github.com/bep/goportabletext v0.2.0 // indirect
-	github.com/bep/gowebp v0.3.0 // indirect
 	github.com/bep/helpers v0.12.0 // indirect
 	github.com/bep/imagemeta v0.17.2 // indirect
 	github.com/bep/lazycache v0.8.1 // indirect
@@ -78,7 +75,6 @@ require (
 	github.com/clipperhouse/uax29/v2 v2.6.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20251210132809-ee656c7534f5 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
-	github.com/disintegration/gift v1.2.1 // indirect
 	github.com/dlclark/regexp2 v1.12.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/envoyproxy/go-control-plane/envoy v1.36.0 // indirect
@@ -105,8 +101,6 @@ require (
 	github.com/gohugoio/hugo v0.163.0 // indirect
 	github.com/gohugoio/hugo-goldmark-extensions/extras v0.7.0 // indirect
 	github.com/gohugoio/hugo-goldmark-extensions/passthrough v0.5.0 // indirect
-	github.com/gohugoio/locales v0.14.0 // indirect
-	github.com/gohugoio/localescompressed v1.0.1 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
@@ -120,7 +114,6 @@ require (
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jdkato/prose v1.2.1 // indirect
-	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
@@ -150,7 +143,6 @@ require (
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
-	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.15.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2 // indirect
@@ -166,7 +158,6 @@ require (
 	github.com/woodsbury/decimal128 v1.3.0 // indirect
 	github.com/yuin/goldmark v1.8.2 // indirect
 	github.com/yuin/goldmark-emoji v1.0.6 // indirect
-	github.com/zeebo/errs v1.4.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.39.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.67.0 // indirect
