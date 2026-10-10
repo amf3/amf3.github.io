@@ -7,6 +7,7 @@ searchHidden: false
 showtoc: true
 tags: ["networking", "docker", "qemu", "homelab"]
 categories: [systems]
+lastmod: 2026-10-10
 ---
 
 ## Intro
@@ -104,11 +105,17 @@ localhost:~# hostname alpine
 # Statically assign an address to eth0
 alpine:~# ip addr add 192.168.100.2/24 dev eth0 
 
+# Enable the loopback interface
+alpine:~# ip link set dev lo up
+
 # Enable the eth0 interface
 alpine:~# ip link set dev eth0 up
 
 # Assign a default route to the br0 address
 alpine:~# ip route add default via 192.168.100.1 dev eth0 
+
+# Configure Name Resolution
+alpine:~# echo "nameserver 1.1.1.1" > /etc/resolv.conf
 
 # Ping the gateway on br0
 alpine:~# ping -c2 192.168.100.1
