@@ -11,11 +11,11 @@ categories: [systems]
 
 ## Intro
 
-This is the second article of a [three part series](../self_hosting/index.md) which explains how to expose a self hosted service to the public Internet.  I will discuss basic IP forwarding, routing on the host, and using nftables to implement firewall filters and Network Address Translation (NAT).
+This is the second article of a [three part series](../self_hosting/) which explains how to expose a self hosted service to the public Internet.  I will discuss basic IP forwarding, routing on the host, and using nftables to implement firewall filters and Network Address Translation (NAT).
 
 ## Setup
 
-This post builds upon the [first article](../bridges/index.md) describing how bridges are used to setup L2 networking.  Scripts are provided to [recreate the L2 environment](./assets/setup-bridge.sh) on the host and to [start the Alpine Linux guest](./assets/start-vm.sh).  The guest VM startup script will need to be modified to match the [downloaded Alpine image](https://alpinelinux.org/downloads/).  These [network commands](./assets/vm-networking.sh) will help with configuring the Alpine Linux guest VM for this article.
+This post builds upon the [first article](../bridges/) describing how bridges are used to setup L2 networking.  Scripts are provided to [recreate the L2 environment](./assets/setup-bridge.sh) on the host and to [start the Alpine Linux guest](./assets/start-vm.sh).  The guest VM startup script will need to be modified to match the [downloaded Alpine image](https://alpinelinux.org/downloads/).  These [network commands](./assets/vm-networking.sh) will help with configuring the Alpine Linux guest VM for this article.
 
 The host is located inside my Local Area Network and does not have a direct connection to the Internet.  Host network links should look something like this after running the setup-bridge.sh script.
 
@@ -46,9 +46,9 @@ enp0s1 is my host's physical network interface and could be different.  br0 is t
 
 ## IP Packet forwarding
 
-In the first article a VM was attached to a L2 network with IP addresses assigned.  The VM could ping interfaces on the host but nothing off the host.  The first step in allowing off host access is to enable L3 packet forwarding between interfaces.
+In the first article a VM was attached to a L2 network with a staticly assigned IP address.  The VM could ping interfaces on the host but nothing off the host.  
 
-We can use tcpdump to see what happens when packet forwarding is not enabled and the guest VM attempts to ping Google's DNS servers at 8.8.8.8:
+The first step in allowing off host access is to enable L3 packet forwarding between interfaces.  We can use tcpdump to see what happens when packet forwarding is not enabled and the guest VM attempts to ping Google's DNS servers at 8.8.8.8:
 
 ```shell
 # What the VM receives
@@ -70,7 +70,7 @@ listening on br0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 15:17:22.787296 IP 192.168.100.2 > 8.8.8.8: ICMP echo request, id 2480, seq 1, length 64
 ```
 
-We also expect to see ICMP traffic from the bridge to the host's physical network interface, but ICMP traffic isn't appearing.
+We want to see ICMP traffic from the bridge going over the host's physical network interface, but ICMP traffic isn't appearing.
 
 ```shell
 # ICMP traffic is absent from the host's network interface. Not what we want.
@@ -120,7 +120,7 @@ PING 8.8.8.8 (8.8.8.8): 56 data bytes
 2 packets transmitted, 0 packets received, 100% packet loss
 ```
 
-If we look at guest VM traffic passing from the host to the router, the router sees the guest VM's address, not the host's.  The router doesn't have a route to the VM guest network so it doesn't know where to send replies.  SNAT on the host makes the return path possible without adding a route to the upstream router.
+If we look at guest VM traffic passing from the host to the router, the router sees the guest VM's address, not the host's.  The router doesn't have a route to the VM guest network so it doesn't know where to send replies.  Enabling source NAT (SNAT) on the host makes the return path possible without adding a route to the upstream router.
 
 ```
 # tcpdump taken on the router upstream from the guest VM and host OS.
@@ -132,7 +132,7 @@ listening on bridge100, link-type EN10MB (Ethernet), snapshot length 524288 byte
 16:13:33.295881 IP 192.168.100.2 > 8.8.8.8: ICMP echo request, id 2486, seq 1, length 64
 ```
 
-This is why Docker and Podman typically use source NAT (SNAT) with bridged networks. The source address in the IP packet needs to be changed from the container or guest VM to the IP address of the host's network adapter.
+This is why Docker and Podman typically use SNAT with bridged networks. The source address in the IP packet needs to be changed from the container or guest VM to the IP address of the host's network adapter.
 
 ## nftables
 
@@ -142,7 +142,7 @@ nftables provides Linux's packet filtering and network address translation frame
 
 ![Diagram showing tables, chains, and rules relationship in nftables](./assets/nftables.png)
 
-The table family determines which network protocols the table can process. The `ip` family handles IPv4, `ip6` handles IPv6, and `inet` supports both IPv4 and IPv6.
+The table family determines which network protocols the table will process. The `ip` family handles IPv4, `ip6` handles IPv6, and `inet` supports both IPv4 and IPv6.
 
 | Table Family | Traffic Match |
 | --- | --- |
@@ -150,7 +150,7 @@ The table family determines which network protocols the table can process. The `
 | `ip6` | IPv6 traffic |
 | `inet` | Both IPv4 and IPv6 traffic |
 
-Chains attach to `hooks`. Individual hooks associate to network packets during a particular stage of packet processing. The rules within that chain are then applied to those network packets associated with the attached hook.  I only mention the few hooks used in this series, but there are [additional hooks](https://wiki.nftables.org/wiki-nftables/index.php/Netfilter_hooks).  
+Chains attach to `hooks`. Individual hooks associate to network packets during a particular stage of packet processing. The rules within that chain are then applied to those network packets associated with the attached hook.  I only mention a few hooks in this series, but there are [additional hooks](https://wiki.nftables.org/wiki-nftables/index.php/Netfilter_hooks) worth reading about. 
 
 | Hook Name  | Description |
 | --- | --- |
@@ -234,7 +234,7 @@ listening on br0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 06:39:35.434570 IP 8.8.8.8 > 192.168.100.2: ICMP echo reply, id 2491, seq 0, length 64
 ```
 
-But on the host's network interface, the source IP has been switched from the guest VM's IP at 192.168.100.2 to the host's IP at 192.168.252.12.  This verifies NAT is working as expected.
+But on the host's network interface (enp0s1), the source IP has been switched from the guest VM's IP at 192.168.100.2 to the host's IP at 192.168.252.12.  This verifies NAT is working as expected.
 
 ```shell
 hostOS $ sudo tcpdump -n -i enp0s1  icmp
@@ -323,15 +323,15 @@ flush ruleset
 table ip filter {
 	chain input {
                 # The input hook is for traffic to the host
-		type filter hook input priority filter; policy drop;
+                type filter hook input priority filter; policy drop;
                 
                 # iifname matches against "Input INterface Name" matching lo
-		# Allow internal loopback traffic
-		iifname "lo" accept
+                # Allow internal loopback traffic
+                iifname "lo" accept
 
                 # CT is the "Connection Tracking" feature described earlier.
-		# Allow established and related connections (return traffic to host)
-		ct state established,related accept
+                # Allow established and related connections (return traffic to host)
+                ct state established,related accept
 
                 # Filter traffic arriving on host's physical network connection "enp0s1"
                 # Allow SSH management to the host OS (Port 22) if src IP is my laptop.
@@ -339,29 +339,29 @@ table ip filter {
                 # If your laptop has a different IP, you will lose SSH access to the host.
                 iifname "enp0s1" ip saddr 192.168.252.1/32 tcp dport 22 accept
 
-		# Allow ICMP/ping for host diagnostics
-		ip protocol icmp accept
+                # Allow ICMP/ping for host diagnostics
+                ip protocol icmp accept
 	}
 
 	chain forward {
                 # The forward hook is for traffic routing through the host to another network.
                 # The other network is our VM in this example
-		type filter hook forward priority filter; policy drop;
+                type filter hook forward priority filter; policy drop;
 
-		# Allow established/related return traffic for the VM
-		ct state established,related accept
+                # Allow established/related return traffic for the VM
+                ct state established,related accept
 
-		# Allow **any** outbound traffic originating from the guest VM
+                # Allow **any** outbound traffic originating from the guest VM
                 # Production deployments should restrict destinations or services to guest VM's intended role
-		iifname "br0" oifname "enp0s1" ip saddr 192.168.100.2 accept
+                iifname "br0" oifname "enp0s1" ip saddr 192.168.100.2 accept
 
-		# Allow forwarded HTTP and HTTPS traffic reaching the VM
+                # Allow forwarded HTTP and HTTPS traffic reaching the VM
                 # oifname matches "Output INterface Name" matching br0
-		oifname "br0" ip daddr 192.168.100.2 tcp dport 8080 accept
+                oifname "br0" ip daddr 192.168.100.2 tcp dport 8080 accept
 	}
 
 	chain output {
-		# This allows all outbound traffic from the host, not the guest VM.
+                # This allows all outbound traffic from the host, not the guest VM.
                 type filter hook output priority filter; policy accept;
 	}
 }
@@ -370,7 +370,6 @@ table ip filter {
 # Table 2: Previously Defined - NAT (Port Forwarding & Egress Masquerade)
 # ------------------------------------------------------------------
 table ip nat {
-        # IP is IPv4 only
 	chain PREROUTING {
                 # The prerouting hook processes packets before routing to input or forward stages
                 type nat hook prerouting priority dstnat; policy accept;
@@ -381,10 +380,10 @@ table ip nat {
 
 	chain POSTROUTING {
                 # The postrouting hook processes packets after the output hook routing decision
-		type nat hook postrouting priority srcnat; policy accept;
+                type nat hook postrouting priority srcnat; policy accept;
 
-		# Masquerade outbound traffic from the VM out through enp0s1
-		ip saddr 192.168.100.0/24 oifname "enp0s1" masquerade
+                # Masquerade outbound traffic from the VM out through enp0s1
+                ip saddr 192.168.100.0/24 oifname "enp0s1" masquerade
 	}
 }
 ```
@@ -404,6 +403,8 @@ GREETINGS FROM THE GUEST VM
 
 ### Recap
 
-This has been a short intro to get started with host level routing and nftables. Understanding that traffic destined for a container or VM will pass through forward and prerouting hooks instead of the input hook explains why protecting the host and forwarded traffic require separate sets of rules.  It's why I recommend learning more about [nftables](https://wiki.nftables.org/wiki-nftables/index.php/Main_Page).
+This has been a short intro to get started with host level routing and nftables.
+
+Understanding that traffic destined for a container or VM will pass through the forward hook instead of the input hook, explains why protecting the host and forwarded traffic require separate sets of rules.  It's why I recommend learning more about [nftables](https://wiki.nftables.org/wiki-nftables/index.php/Main_Page).
 
 The third article will apply this information to a deployment model for self hosting a local service on the public Internet.  For update notifications on this series, either subscribe to the [RSS feed](/articles/index.xml) or follow along on my [Bluesky account](https://bsky.app/profile/af9.us).

@@ -12,7 +12,7 @@ lastmod: 2026-10-10
 
 ## Intro
 
-This is the first article in a [three part series](../self_hosting/index.md) focused on self hosting publicly facing services.
+This is the first article in a [three part series](../self_hosting/) focused on self hosting publicly facing services.
 
 Virtualization stacks like libvirt, Proxmox, or Docker abstract network creation behind single CLI commands.  The abstractions are convenient but hide the kernel primitives used to create virtualized networks. Knowing these primitives makes it easier to understand how virtual machines and containers connect to the host's network.
 
