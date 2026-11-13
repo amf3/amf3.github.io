@@ -1,10 +1,10 @@
 module github.com/amf3/amf3.github.io
 
-go 1.27.2
+go 1.27.4
 
 tool github.com/gohugoio/hugo
 
-require github.com/urfave/cli/v3 v3.9.0
+require github.com/urfave/cli/v3 v3.14.0
 
 require (
 	cel.dev/expr v0.25.1 // indirect
@@ -168,7 +168,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.43.0 // indirect
 	go.opentelemetry.io/otel/trace v1.43.0 // indirect
 	go.uber.org/automaxprocs v1.5.3 // indirect
-	go.yaml.in/yaml/v3 v3.0.4 // indirect
+	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	gocloud.dev v0.45.0 // indirect
 	golang.org/x/crypto v0.51.0 // indirect
 	golang.org/x/image v0.41.0 // indirect

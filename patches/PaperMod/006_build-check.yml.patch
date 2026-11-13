@@ -1,6 +1,6 @@
 diff --git a/.github/workflows/build-check.yml b/.github/workflows/build-check.yml
 deleted file mode 100644
-index 3f239dd..0000000
+index c297ce0..0000000
 --- a/.github/workflows/build-check.yml
 +++ /dev/null
 @@ -1,56 +0,0 @@
@@ -29,7 +29,7 @@ index 3f239dd..0000000
 -      hugoVersion:
 -        description: "Hugo Version"
 -        required: false
--        default: "0.146.0"
+-        default: "0.158.0"
 -
 -defaults:
 -  run:
@@ -40,7 +40,7 @@ index 3f239dd..0000000
 -    runs-on: ubuntu-latest
 -    env:
 -      # min_version from theme.toml
--      HUGO_VERSION: ${{ github.event.inputs.hugoVersion || '0.146.0' }}
+-      HUGO_VERSION: ${{ github.event.inputs.hugoVersion || '0.158.0' }}
 -    steps:
 -      - name: Install Hugo CLI
 -        run: |
